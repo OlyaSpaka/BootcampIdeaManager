@@ -1,6 +1,7 @@
 package com.example.demo.IdeaPackage;
 
 import jakarta.persistence.*;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Date;
 @Entity
@@ -18,13 +19,13 @@ public class Idea {
     private String title;
     private String description;
     private String key_features;
+    @Column(name = "`references`") // Escaping the column name
     private String references;
     private Date created_at;
     private String pictures; // String type for now
 
     public Idea() {
     }
-
     public Idea(long id, long competition_id, long user_id, String description, String title, String key_features, String references, Date created_at, String pictures) {
         this.id = id;
         this.Competition_id = competition_id;

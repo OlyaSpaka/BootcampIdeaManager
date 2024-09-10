@@ -11,7 +11,11 @@ public class IdeaController {
     public IdeaController(IdeaService ideaService) {
         this.ideaService = ideaService;
     }
-
+@GetMapping
+public String show(){
+        return "working";
+}
+    @PostMapping
     public void addIdea(@RequestBody Idea idea){
         ideaService.addNewIdea(idea);
     }
