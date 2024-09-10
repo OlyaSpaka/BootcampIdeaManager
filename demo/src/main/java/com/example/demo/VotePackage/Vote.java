@@ -1,48 +1,53 @@
 package com.example.demo.VotePackage;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Table
 @Entity
 public class Vote {
+    @Id
+    @SequenceGenerator( name = "vote_sequence",
+            sequenceName = "vote_sequence",
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+            generator = "vote_sequence")
     private Long id;
-    private int voteType_id;
-    private Long user_id;
-    private Long idea_id;
+    private int Vote_type_id;
+    private Long User_id;
+    private Long Idea_id;
 
     public Vote() {
     }
 
-    public Vote(Long id, int voteType_id, Long user_id, Long idea_id) {
+    public Vote(Long id, int vote_type_id, Long user_id, Long idea_id) {
         this.id = id;
-        this.voteType_id = voteType_id;
-        this.user_id = user_id;
-        this.idea_id = idea_id;
+        this.Vote_type_id = vote_type_id;
+        this.User_id = user_id;
+        this.Idea_id = idea_id;
     }
 
     public Long getIdea_id() {
-        return idea_id;
+        return Idea_id;
     }
 
     public void setIdea_id(Long idea_id) {
-        this.idea_id = idea_id;
+        this.Idea_id = idea_id;
     }
 
     public Long getUser_id() {
-        return user_id;
+        return User_id;
     }
 
     public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+        this.User_id = user_id;
     }
 
-    public int getVoteType_id() {
-        return voteType_id;
+    public int getVote_type_id() {
+        return Vote_type_id;
     }
 
-    public void setVoteType_id(int voteType_id) {
-        this.voteType_id = voteType_id;
+    public void setVote_type_id(int vote_type_id) {
+        this.Vote_type_id = vote_type_id;
     }
 
     public Long getId() {
@@ -57,9 +62,9 @@ public class Vote {
     public String toString() {
         return "Vote{" +
                 "id=" + id +
-                ", voteType_id=" + voteType_id +
-                ", user_id=" + user_id +
-                ", idea_id=" + idea_id +
+                ", voteType_id=" + Vote_type_id +
+                ", user_id=" + User_id +
+                ", idea_id=" + Idea_id +
                 '}';
     }
 }

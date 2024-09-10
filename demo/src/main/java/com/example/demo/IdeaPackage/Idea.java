@@ -1,16 +1,20 @@
 package com.example.demo.IdeaPackage;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.Date;
 @Entity
 @Table
 public class Idea {
-
+    @Id
+    @SequenceGenerator( name = "idea_sequence",
+            sequenceName = "idea_sequence",
+            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+            generator = "idea_sequence")
     private long id;
-    private long competition_id;
-    private long  user_id;
+    private long Competition_id;
+    private long User_id;
     private String title;
     private String description;
     private String key_features;
@@ -23,8 +27,8 @@ public class Idea {
 
     public Idea(long id, long competition_id, long user_id, String description, String title, String key_features, String references, Date created_at, String pictures) {
         this.id = id;
-        this.competition_id = competition_id;
-        this.user_id = user_id;
+        this.Competition_id = competition_id;
+        this.User_id = user_id;
         this.description = description;
         this.title = title;
         this.key_features = key_features;
@@ -42,19 +46,19 @@ public class Idea {
     }
 
     public long getCompetition_id() {
-        return competition_id;
+        return Competition_id;
     }
 
     public void setCompetition_id(long competition_id) {
-        this.competition_id = competition_id;
+        this.Competition_id = competition_id;
     }
 
     public long getUser_id() {
-        return user_id;
+        return User_id;
     }
 
     public void setUser_id(long user_id) {
-        this.user_id = user_id;
+        this.User_id = user_id;
     }
 
     public String getTitle() {
@@ -109,8 +113,8 @@ public class Idea {
     public String toString() {
         return "Idea{" +
                 "id=" + id +
-                ", competition_id=" + competition_id +
-                ", user_id=" + user_id +
+                ", competition_id=" + Competition_id +
+                ", user_id=" + User_id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", key_features='" + key_features + '\'' +
