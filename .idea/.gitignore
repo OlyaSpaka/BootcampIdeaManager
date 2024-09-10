@@ -1,8 +1,100 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-# Editor-based HTTP Client requests
-/httpRequests/
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Project-specific files
+/.idea/
+/*.iml
+/.idea_modules/
+
+# Logs
+*.log
+
+# Compiled files
+/out/
+target/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# IDE-specific files
+.idea/.name
+.idea/.project
+.idea/.idea_modules/
+.idea/.gradle/
+.idea/.idea/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/dataSources/
+.idea/dataSources.local.xml
+.idea/httpRequests/
+
+# Maven Wrapper
+.mvn/wrapper/
+
+# Gradle Wrapper
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+
+# Node.js modules
+node_modules/
+
+# NPM logs
+npm-debug.log
+
+# Yarn logs
+yarn-error.log
+
+# Build artifacts
+build/
+dist/
+
+# Linux
+*~
+
+# Application-specific files
+*.sqlite
+*.db
+
+# Docker
+*.dockerignore
+Dockerfile
+docker-compose.yml
+.docker/
+
+# Custom local configurations
+*.local
+*.sublime-project
+*.sublime-workspace
+
+# JetBrains specific files
+.idea/gradle.xml
+.idea/gradle_modules.xml
+.idea/misc.xml
+.idea/runConfigurations/
+.idea/assetWizard/
+.idea/libraries/
+.idea/datasources/
+
+# Backup files
+*.bak
+
+# Coverage
+*.lcov
+
+# Other common ignore files
+*.pem
+*.key
+*.crt
+*.p12
