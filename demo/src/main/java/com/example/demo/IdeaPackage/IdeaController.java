@@ -21,7 +21,7 @@ public String show(){
     }
 
     @DeleteMapping(path = "{ideaId}")
-    public void deleteBankAccount(@PathVariable("ideaId") Long id) {
+    public void deleteIdea(@PathVariable("ideaId") Long id) {
         ideaService.deleteIdea(id);
     }
 
@@ -31,7 +31,7 @@ public String show(){
                            @RequestParam(required = false) String title,
                            @RequestParam(required = false) String key_features,
                            @RequestParam(required = false) String references) {
-        ideaService.updateName(id, description,title,key_features,references);
+        ideaService.updateIdea(id, description,title,key_features,references);
 
     }
 

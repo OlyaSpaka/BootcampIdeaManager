@@ -6,20 +6,16 @@ import jakarta.persistence.*;
 @Entity
 public class Vote {
     @Id
-    @SequenceGenerator( name = "vote_sequence",
-            sequenceName = "vote_sequence",
-            allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "vote_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int Vote_type_id;
+    private Long Vote_type_id;
     private Long User_id;
     private Long Idea_id;
 
     public Vote() {
     }
 
-    public Vote(Long id, int vote_type_id, Long user_id, Long idea_id) {
+    public Vote(Long id, Long vote_type_id, Long user_id, Long idea_id) {
         this.id = id;
         this.Vote_type_id = vote_type_id;
         this.User_id = user_id;
@@ -42,11 +38,11 @@ public class Vote {
         this.User_id = user_id;
     }
 
-    public int getVote_type_id() {
+    public Long getVote_type_id() {
         return Vote_type_id;
     }
 
-    public void setVote_type_id(int vote_type_id) {
+    public void setVote_type_id(Long vote_type_id) {
         this.Vote_type_id = vote_type_id;
     }
 

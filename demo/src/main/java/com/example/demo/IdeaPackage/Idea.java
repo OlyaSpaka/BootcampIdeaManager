@@ -8,11 +8,7 @@ import java.util.Date;
 @Table
 public class Idea {
     @Id
-    @SequenceGenerator( name = "idea_sequence",
-            sequenceName = "idea_sequence",
-            allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-            generator = "idea_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private long Competition_id;
     private long User_id;
