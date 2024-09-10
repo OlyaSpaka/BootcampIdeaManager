@@ -31,7 +31,7 @@ public class Idea {
     private String description;
     @Column(name = "key_features")
     private String keyFeatures;
-    @Column(name = "'references'")
+    @Column(name = "references")
     private String references;
     @Column(name = "created_at", nullable = false)
     private Date createdAt;

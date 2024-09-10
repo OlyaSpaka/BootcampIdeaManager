@@ -19,7 +19,7 @@ public class VoteTypeService {
         voteTypeRepository.save(voteType);
     }
 
-    public void deleteVoteType(Long id) {
+    public void deleteVoteType(Integer id) {
         boolean exists = voteTypeRepository.existsById(id);
         if (!exists) {
             throw new IllegalStateException("VoteType with Id " + id + " does not exist");

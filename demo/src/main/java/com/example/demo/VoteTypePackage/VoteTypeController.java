@@ -17,7 +17,7 @@ public class VoteTypeController {
         voteTypeService.addVoteType(voteType);
     }
     @DeleteMapping(path = "{voteTypeId}")
-    public void deleteVote(@PathVariable("voteTypeId") Long id) {
+    public void deleteVote(@PathVariable("voteTypeId") Integer id) {
         voteTypeService.deleteVoteType(id);
     }
 }

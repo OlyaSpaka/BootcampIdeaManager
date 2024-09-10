@@ -18,14 +18,14 @@ public class VoteController {
     }
 
     @DeleteMapping(path = "{voteId}")
-    public void deleteVote(@PathVariable("voteId") Long id) {
+    public void deleteVote(@PathVariable("voteId") Integer id) {
         voteService.deleteVote(id);
     }
     @PutMapping(path = "{voteId}/vote")
-    public void updateVote(@PathVariable("voteId") Long id,
-                           @RequestParam(required = false) Long user_id,
-                           @RequestParam(required = false) Long idea_id,
-                           @RequestParam(required = false) Long voteType_id) {
+    public void updateVote(@PathVariable("voteId") Integer id,
+                           @RequestParam(required = false) Integer user_id,
+                           @RequestParam(required = false) Integer idea_id,
+                           @RequestParam(required = false) Integer voteType_id) {
         voteService.updateVote(id,user_id,idea_id,voteType_id);
 
     }

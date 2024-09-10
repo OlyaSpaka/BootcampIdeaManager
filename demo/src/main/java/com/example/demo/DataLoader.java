@@ -46,8 +46,9 @@ public class DataLoader implements CommandLineRunner {
 //        Idea idea = new Idea(competition, user, "A cool idea", "Cool Idea Title", "Key features", "References", new Date(), "image.png");
 //        competition.addIdea(idea);
 
-//        userRepository.deleteById(46);
-
+//        for (int i = 30; i<=39; i++){
+//            competitionRepository.deleteById(i);
+//        }
 //        ideaRepository.save(idea);
 //        competitionRepository.save(competition);
 //
