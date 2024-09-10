@@ -17,12 +17,12 @@ public class IdeaController {
     }
 
     @DeleteMapping(path = "{ideaId}")
-    public void deleteBankAccount(@PathVariable("ideaId") Long id) {
+    public void deleteBankAccount(@PathVariable("ideaId") Integer id) {
         ideaService.deleteIdea(id);
     }
 
     @PutMapping(path = "{ideaId}/idea")
-    public void updateIdea(@PathVariable("ideaId") Long id,
+    public void updateIdea(@PathVariable("ideaId") Integer id,
                            @RequestParam(required = false) String description,
                            @RequestParam(required = false) String title,
                            @RequestParam(required = false) String key_features,

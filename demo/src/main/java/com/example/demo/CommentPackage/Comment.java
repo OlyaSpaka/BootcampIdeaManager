@@ -1,32 +1,31 @@
-package com.example.demo.VotePackage;
+package com.example.demo.CommentPackage;
 
 import com.example.demo.IdeaPackage.Idea;
 import com.example.demo.UserPackage.User;
-import com.example.demo.VoteTypePackage.VoteType;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "vote")
-public class Vote {
+@Table(name = "Comment")
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ManyToOne
-    @JoinColumn(name = "VoteType_id", nullable = false)
-    private VoteType VoteType_id;
     @ManyToOne
     @JoinColumn(name = "User_id", nullable = false)
     private User user;
     @ManyToOne
     @JoinColumn(name = "Idea_id", nullable = false)
     private Idea idea;
-    public Vote() {
+    @Column(nullable = false)
+    private String content;
+
+    public Comment() {
     }
 
-    public Vote(VoteType voteType, User user, Idea idea) {
-        this.VoteType_id = voteType;
+    public Comment(User user, Idea idea, String content) {
         this.user = user;
         this.idea = idea;
+        this.content = content;
     }
 
     public Integer getId() {
@@ -35,14 +34,6 @@ public class Vote {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public VoteType getVoteType() {
-        return VoteType_id;
-    }
-
-    public void setVoteType(VoteType voteType) {
-        this.VoteType_id = voteType;
     }
 
     public User getUser() {
@@ -61,13 +52,22 @@ public class Vote {
         this.idea = idea;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+
     @Override
     public String toString() {
-        return "Vote{" +
+        return "Comment{" +
                 "id=" + id +
-                ", voteType_id=" + VoteType_id.getId() +
-                ", user_id=" + user +
-                ", idea_id=" + idea +
+                ", user=" + user +
+                ", idea=" + idea +
+                ", content='" + content + '\'' +
                 '}';
     }
 }
