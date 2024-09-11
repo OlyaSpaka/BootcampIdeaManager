@@ -33,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, RedirectAttributes redirectAttributes, Model model) throws Exception {
+    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, Model model) {
 
         // Check for existing username
         if (userRegistrationService.usernameExists(user.getUsername())) {

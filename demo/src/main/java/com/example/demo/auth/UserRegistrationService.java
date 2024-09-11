@@ -16,16 +16,16 @@ public class UserRegistrationService {
 
     // Check if username already exists
     public boolean usernameExists(String username) {
-        return userRepository.findByUsername(username) != null;
+        return userRepository.findByUsername(username).isPresent();
     }
 
     // Check if email already exists
     public boolean emailExists(String email) {
-        return userRepository.findByEmail(email) != null;
+        return userRepository.findByEmail(email).isPresent();
     }
 
 
-    public User registerNewUser(User user) throws Exception {
+    public void registerNewUser(User user) throws Exception {
         System.out.println("Saving user: " + user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -39,6 +39,6 @@ public class UserRegistrationService {
             throw new Exception("Email already exists");
         }
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 }
