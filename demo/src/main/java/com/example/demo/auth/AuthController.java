@@ -33,14 +33,33 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, RedirectAttributes redirectAttributes) throws Exception {
+    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, RedirectAttributes redirectAttributes, Model model) throws Exception {
+
+        // Check for existing username
+        if (userRegistrationService.usernameExists(user.getUsername())) {
+            result.rejectValue("username", "error.username", "Username already exists!");
+        }
+
+        // Check for existing email
+        if (userRegistrationService.emailExists(user.getEmail())) {
+            result.rejectValue("email", "error.email", "Email already exists!");
+        }
+
 
         if (result.hasErrors()) {
             return "register"; // Return to form with validation errors
         }
-        userRegistrationService.registerNewUser(user);
-        redirectAttributes.addFlashAttribute("success", "Logged in successfully!");
-        return "redirect:/login";  // Redirect to login page after registration
+
+        try {
+            userRegistrationService.registerNewUser(user);
+            model.addAttribute("success", "Registration successful!");
+            return "redirect:/login"; // Redirect to login page
+        }
+        catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "register";
+
+        }
     }
 
 }

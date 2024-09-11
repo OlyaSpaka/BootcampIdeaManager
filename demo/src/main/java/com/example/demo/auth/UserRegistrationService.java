@@ -14,6 +14,17 @@ public class UserRegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Check if username already exists
+    public boolean usernameExists(String username) {
+        return userRepository.findByUsername(username) != null;
+    }
+
+    // Check if email already exists
+    public boolean emailExists(String email) {
+        return userRepository.findByEmail(email) != null;
+    }
+
+
     public User registerNewUser(User user) throws Exception {
         System.out.println("Saving user: " + user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
