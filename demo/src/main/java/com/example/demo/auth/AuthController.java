@@ -22,7 +22,7 @@ public class AuthController {
 
 
     @GetMapping("/login")
-    public String login(Model model) {
+    public String login() {
         return "login";
     }
 
