@@ -1,45 +1,46 @@
 package com.example.demo.auth;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequestMapping("/auth")
 @Controller
 public class AuthController {
 
-//    private final AuthenticationService authenticationService;
-//
-//    public AuthController(AuthenticationService authenticationService) {
-//        this.authenticationService = authenticationService;
-//    }
+    private final UserRegistrationService userRegistrationService;
+
+    public AuthController(UserRegistrationService userRegistrationService) {
+        this.userRegistrationService = userRegistrationService;
+    }
+
 
     @GetMapping("/login")
-    public String login(Model model, UserDto userDto) {
-
-        model.addAttribute("user", userDto);
+    public String login(Model model) {
         return "login";
     }
 
-//    @GetMapping("/register")
-//    public String register(Model model, UserDto userDto) {
-//        model.addAttribute("user", userDto);
-//        return "register";
-//    }
-//
-//    @PostMapping("/register")
-//    public String register(@ModelAttribute("user") UserDto userDto, Model model) {
-//        User user = (User) authenticationService.loadUserByUsername(userDto.getUsername());
-//        if (user != null) {
-//            model.addAttribute("User exist", user);
-//            return "register";
-//        }
-//        authenticationService.save(userDto);
-//        return "redirect:/register?success";
-//    }
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("user", new User());  // Empty User object for the form
+        return "register";
+    }
 
+    @PostMapping("/register")
+    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result, RedirectAttributes redirectAttributes) throws Exception {
+
+        if (result.hasErrors()) {
+            return "register"; // Return to form with validation errors
+        }
+        userRegistrationService.registerNewUser(user);
+        redirectAttributes.addFlashAttribute("success", "Logged in successfully!");
+        return "redirect:/login";  // Redirect to login page after registration
+    }
 
 }

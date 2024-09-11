@@ -18,12 +18,16 @@ public class UserRegistrationService {
         System.out.println("Saving user: " + user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        if (userRepository.findByUsername(user.getUsername()) != null && userRepository.findByEmail(user.getEmail()) != null) {
-            System.out.println("User already exists");
-            throw new Exception("User already exists");
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            System.out.println("Username already exists");
+            throw new Exception("Username already exists");
         }
-        else {
-            return userRepository.save(user);
+
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            System.out.println("Email already exists");
+            throw new Exception("Email already exists");
         }
+
+        return userRepository.save(user);
     }
 }

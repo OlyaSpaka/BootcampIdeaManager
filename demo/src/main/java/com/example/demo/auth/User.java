@@ -1,9 +1,13 @@
 package com.example.demo.auth;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.hibernate.annotations.BatchSize;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,61 +16,34 @@ import java.util.List;
 
 @Entity
 @Table(name="user")
+@Getter
+@Setter
+@NoArgsConstructor
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(min = 6, max = 30, message = "Username must have between 6 and 30 characters.")
+    @NotEmpty(message = "Username field must be filled out.")
+    @Pattern(regexp = "^[a-zA-Z0-9._\\-?!]+$", message = "No special characters, except for .?!-_")
     @Column(nullable = false, unique = true)
-    @Size(min=2, max=30)
-    @NotEmpty
     private String username;
-    @Column(nullable = false, unique = true)
-    @NotEmpty
-    private String email;
-    @Column(nullable = false)
-    @Size(min=6, max=30)
-    @NotEmpty
-    private String password;
 
-    public User() {
-    }
+
+    @Email
+    @NotEmpty(message = "Email field must be filled out.")
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Size(min=6, message = "Password must have at least 6 characters.")
+    @NotEmpty(message = "Password field must be filled out.")
+    @Column(nullable = false)
+    private String password;
 
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
-        this.password = password;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
     }
 

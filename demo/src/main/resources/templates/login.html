@@ -103,10 +103,22 @@
             margin-top: 5px;
         }
 
+        /*.error-message {*/
+        /*    font-size: 0.7rem;*/
+        /*    color: #C62828;          !* Optional: Color of the error message *!*/
+        /*    margin-top: 5px; !* Optional: Adds space above the message *!*/
+        /*    margin-left: 3px; !* Optional: Adds space above the message *!*/
+
+        /*}*/
+
+
 
     </style>
 </head>
 <body>
+<div th:if="${success}" class="alert alert-success">
+    <p th:text="${success}"></p>
+</div>
 
 <div class="container-fluid">
     <div class="row h-100">
@@ -114,7 +126,7 @@
             <div class="card login-card shadow p-4">
                 <h4 class="card-title text-center mb-4">Welcome Back!</h4>
                 <p>Please enter your credentials.</p>
-                <form th:action="@{/login}" method="post">
+                <form th:action="@{/auth/login}" method="post">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
@@ -126,6 +138,9 @@
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
+                <div th:if="${param.error}" style="margin-top: 1rem; color: #C62828; font-size: 10px; text-align: center">
+                    <p>Invalid username or password.</p>
+                </div>
                 <hr>
                 <p class="text-center">Don't have an account? <a href="/auth/register">Sign Up</a></p>
             </div>

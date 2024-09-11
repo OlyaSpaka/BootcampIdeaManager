@@ -103,6 +103,13 @@
             margin-top: 5px;
         }
 
+        .error-message {
+            font-size: 0.7rem;
+            color: #C62828;          /* Optional: Color of the error message */
+            margin-top: 5px; /* Optional: Adds space above the message */
+            margin-left: 3px; /* Optional: Adds space above the message */
+
+        }
 
     </style>
 </head>
@@ -118,17 +125,17 @@
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" th:field="*{username}" required>
-                        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Name Error</p>
+                        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message">Name Error</p>
                     </div>
                     <div class="mb-3">
                         <label for="username" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" th:field="*{email}" required>
-                        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</p>
+                        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message">Email Error</p>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" th:field="*{password}" placeholder="Enter your password" required>
-                        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</p>
+                        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message">Password Error</p>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Register</button>
                 </form>
