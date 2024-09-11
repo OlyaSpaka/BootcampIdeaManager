@@ -8,29 +8,36 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AuthenticationService authenticationService;
+    private final UserDetailsService authenticationService;
 
-    public SecurityConfig(AuthenticationService authenticationService) {
+    public SecurityConfig(UserDetailsService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(authenticationService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
+
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setUserDetailsService(authenticationService);
+//        provider.setPasswordEncoder(passwordEncoder());
+//        return provider;
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,28 +47,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.authenticationProvider(authenticationProvider());
+//        http.authenticationProvider(authenticationProvider());
 
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF protection
+                .csrf(csrf -> csrf.disable()) // Disable CSRF protection for testing purposes (enable in production)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register").permitAll() // Permit access to /register
-                        .requestMatchers("/home").permitAll() // Permit access to /home
+                        .requestMatchers("/auth/register").anonymous() // Permit access to /register
+                        .requestMatchers("/auth/login").anonymous() // Permit access to /register
+                        .requestMatchers("/welcome").permitAll() // Permit access to /welcome
                         .anyRequest().authenticated() // All other requests need to be authenticated
                 )
                 .formLogin(form -> form
-                        .loginPage("/login") // Custom login page
+                        .loginPage("/auth/login") // Custom login page
                         .loginProcessingUrl("/login") // URL to submit login credentials
                         .defaultSuccessUrl("/home", true) // Redirect to /home on success
-                        .permitAll()
                 )
                 .logout(logout -> logout
                         .invalidateHttpSession(true) // Invalidate session on logout
                         .clearAuthentication(true) // Clear authentication on logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // Set the logout URL
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout")) // Set the logout URL
                         .logoutSuccessUrl("/login?logout") // Redirect to /login?logout on logout
                         .permitAll()
                 );
+
 
         return http.build();
     }

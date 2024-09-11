@@ -33,10 +33,9 @@
             align-items: center;
         }
         .right-side {
-            background-image: url('https://images.unsplash.com/photo-1525498128493-380d1990a112?q=80&w=3024&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Replace with your own image URL */
+            background-image: url('https://via.placeholder.com/800'); /* Replace with your own image URL */
             background-size: cover;
             background-position: center;
-            border-radius: 45px 0px 0px 45px;
         }
         .login-card {
             width: 100%;
@@ -65,12 +64,10 @@
 
         a {
             color: #3A5B22;
-            text-decoration: none;
         }
 
         a:hover, a:active {
             color: #32491C;
-            text-decoration: underline;
         }
 
         a:visited {
@@ -97,13 +94,6 @@
             opacity: 0.4;
         }
 
-        .forgot-password {
-            font-size: 0.875rem;
-            text-align: right;
-            margin-top: 5px;
-        }
-
-
     </style>
 </head>
 <body>
@@ -113,7 +103,6 @@
         <div class="col-md-6 left-side">
             <div class="card login-card shadow p-4">
                 <h4 class="card-title text-center mb-4">Welcome Back!</h4>
-                <p>Please enter your credentials.</p>
                 <form th:action="@{/login}" method="post">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
@@ -122,7 +111,6 @@
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
-                        <a href="#" class="forgot-password d-flex justify-content-end">Forgot Password?</a>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
