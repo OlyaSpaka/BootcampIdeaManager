@@ -1,10 +1,10 @@
 package com.example.demo;
 
-import com.example.demo.CompetitionPackage.Competition;
-import com.example.demo.CompetitionPackage.CompetitionRepository;
-import com.example.demo.IdeaPackage.IdeaRepository;
-import com.example.demo.RolePackage.RoleRepository;
-import com.example.demo.UserPackage.UserRepository;
+import com.example.demo.models.Competition;
+import com.example.demo.repositories.CompetitionRepository;
+import com.example.demo.repositories.IdeaRepository;
+import com.example.demo.repositories.RoleRepository;
+import com.example.demo.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
