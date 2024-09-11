@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF protection for testing purposes (enable in production)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").anonymous() // Permit access to /register for logged out users
+                        .requestMatchers("/css/style.css").permitAll()
                         .anyRequest().authenticated() // All other requests need to be authenticated
                 )
                 .formLogin(form -> form
