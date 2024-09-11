@@ -19,7 +19,7 @@ public class IdeaController {
     }
 
     @DeleteMapping(path = "{ideaId}")
-    public void deleteBankAccount(@PathVariable("ideaId") Integer id) {
+    public void deleteIdea(@PathVariable("ideaId") Integer id) {
         ideaService.deleteIdea(id);
     }
 
