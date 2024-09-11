@@ -1,5 +1,6 @@
 package com.example.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -10,11 +11,11 @@ public class IdeaSelection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "Idea_id", nullable = false)
     private Idea idea;
-
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "competition_id", nullable = false)
     private Competition competition;

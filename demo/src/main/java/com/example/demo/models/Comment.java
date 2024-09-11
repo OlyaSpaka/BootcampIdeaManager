@@ -1,5 +1,7 @@
 package com.example.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -8,9 +10,11 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "User_id", nullable = false)
     private User user;
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "Idea_id", nullable = false)
     private Idea idea;

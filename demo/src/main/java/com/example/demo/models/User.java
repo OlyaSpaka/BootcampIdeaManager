@@ -1,5 +1,7 @@
 package com.example.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -17,14 +19,19 @@ public class User {
     private String email;
     @Column(nullable = false)
     private String password;
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Bookmark> bookmarks = new HashSet<>();
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Vote> votes = new HashSet<>();
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Idea> ideas = new HashSet<>();
+    @JsonBackReference
     @ManyToMany
     @JoinTable(
             name = "user_role", // Join table name

@@ -1,5 +1,7 @@
 package com.example.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -12,9 +14,11 @@ public class Idea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "competition_id", nullable = false)
     private Competition competition;
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -30,19 +34,20 @@ public class Idea {
     private Date createdAt;
     @Column
     private String pictures;
-
+    @JsonBackReference
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
-
+    @JsonBackReference
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Bookmark> bookmarks = new HashSet<>();
-
+    @JsonBackReference
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Vote> votes = new HashSet<>();
-
+    @JsonBackReference
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<IdeaSelection> ideaSelections = new HashSet<>();
     @ManyToMany
+    @JsonBackReference
     @JoinTable(
             name = "idea_category", // Join table name
             joinColumns = @JoinColumn(name = "idea_id"), // Column in the join table referring to Idea
