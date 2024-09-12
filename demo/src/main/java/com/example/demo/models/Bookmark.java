@@ -2,8 +2,14 @@ package com.example.demo.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Objects;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "bookmark")
 public class Bookmark {
     @Id
@@ -11,42 +17,21 @@ public class Bookmark {
     private Integer id;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "User_id", nullable = false)
+    @JoinColumn(name = "User_id")
     private User user;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Idea_id", nullable = false)
+    @JoinColumn(name = "Idea_id")
     private Idea idea;
 
     public Bookmark() {
     }
 
-    public Bookmark(User user, Idea idea) {
-        this.user = user;
-        this.idea = idea;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Idea getIdea() {
-        return idea;
-    }
-
-    public void setIdea(Idea idea) {
-        this.idea = idea;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Bookmark bm = (Bookmark) o;
+        return Objects.equals(id, bm.id);
     }
 }

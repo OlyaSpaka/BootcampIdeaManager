@@ -1,53 +1,59 @@
 package com.example.demo.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "idea")
 public class Idea {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @JsonManagedReference
+
     @ManyToOne
-    @JoinColumn(name = "competition_id", nullable = false)
+    @JoinColumn(name = "competition_id")
     private Competition competition;
-    @JsonManagedReference
+
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
+
     @Column(nullable = false)
     private String title;
+
     @Column
     private String description;
+
     @Column(name = "key_features")
     private String keyFeatures;
-    @Column(name = "`references`")
+
+    @Column(name = "ref_links") //ref_links for testing, 'references' for prod
     private String references;
+
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
+
     @Column
     private String pictures;
-    @JsonBackReference
+
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
-    @JsonBackReference
+
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Bookmark> bookmarks = new HashSet<>();
-    @JsonBackReference
-    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+
+    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Vote> votes = new HashSet<>();
-    @JsonBackReference
+
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<IdeaSelection> ideaSelections = new HashSet<>();
+
     @ManyToMany
-    @JsonBackReference
     @JoinTable(
             name = "idea_category", // Join table name
             joinColumns = @JoinColumn(name = "idea_id"), // Column in the join table referring to Idea
@@ -57,9 +63,7 @@ public class Idea {
 
     public Idea() {
     }
-    public Idea(Competition competition, User user, String description, String title, String keyFeatures, String references, Date createdAt, String pictures) {
-        this.competition = competition;
-        this.user = user;
+    public Idea(String title, String description, String keyFeatures, String references, Date createdAt, String pictures) {
         this.description = description;
         this.title = title;
         this.keyFeatures = keyFeatures;
@@ -117,119 +121,6 @@ public class Idea {
         category.getIdeas().remove(this);
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Competition getCompetition() {
-        return competition;
-    }
-
-    public void setCompetition(Competition competition) {
-        this.competition = competition;
-        competition.getIdeas().add(this);
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getKeyFeatures() {
-        return keyFeatures;
-    }
-
-    public void setKeyFeatures(String keyFeatures) {
-        this.keyFeatures = keyFeatures;
-    }
-
-    public String getReferences() {
-        return references;
-    }
-
-    public void setReferences(String references) {
-        this.references = references;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getPictures() {
-        return pictures;
-    }
-
-    public void setPictures(String pictures) {
-        this.pictures = pictures;
-    }
-
-    public Set<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
-    }
-
-    public Set<Bookmark> getBookmarks() {
-        return bookmarks;
-    }
-
-    public void setBookmarks(Set<Bookmark> bookmarks) {
-        this.bookmarks = bookmarks;
-    }
-
-    public Set<Vote> getVotes() {
-        return votes;
-    }
-
-    public void setVotes(Set<Vote> votes) {
-        this.votes = votes;
-    }
-
-    public Set<IdeaSelection> getIdeaSelections() {
-        return ideaSelections;
-    }
-
-    public void setIdeaSelections(Set<IdeaSelection> ideaSelections) {
-        this.ideaSelections = ideaSelections;
-    }
-
-    public Set<Category> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
-    }
-
     @Override
     public String toString() {
         return "Idea{" +
@@ -243,5 +134,13 @@ public class Idea {
                 ", created_at=" + createdAt +
                 ", pictures='" + pictures + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Idea idea = (Idea) o;
+        return Objects.equals(id, idea.id);
     }
 }
