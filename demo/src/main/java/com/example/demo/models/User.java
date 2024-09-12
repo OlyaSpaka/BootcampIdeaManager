@@ -17,14 +17,12 @@ import java.util.Objects;
 import java.util.List;
 import java.util.Set;
 
-@Entity
-@Table(name = "user")
+@NoArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-public class User implements UserDetails {
+@Entity
 @Table(name = "user") //@Table(name = "\"USER\"") for testing
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -67,9 +65,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Column in the join table referring to Category
     )
     private Set<Role> roles = new HashSet<>();
-
-    public User() {
-    }
 
     public User(String username, String email, String password) {
         this.username = username;
