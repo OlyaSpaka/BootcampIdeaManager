@@ -1,24 +1,25 @@
 package com.example.demo.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Setter
+@Getter
 @Table(name = "votetype")
 public class VoteType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     @Column(nullable = false, length = 30)
     private String name;
-
     @Column(name = "points")
     private int points;
-
-    @OneToMany(mappedBy = "VoteType_id", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "VoteType", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Vote> votes = new HashSet<>();
 
     public VoteType() {
@@ -38,23 +39,6 @@ public class VoteType {
         this.votes.remove(vote);
         vote.setVoteType(null);
     }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     @Override
     public String toString() {
         return "VoteType{" +
@@ -63,19 +47,11 @@ public class VoteType {
                 '}';
     }
 
-    public int getPoints() {
-        return points;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
-    public Set<Vote> getVotes() {
-        return votes;
-    }
-
-    public void setVotes(Set<Vote> votes) {
-        this.votes = votes;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VoteType voteType = (VoteType) o;
+        return id != null && id.equals(voteType.id);
     }
 }
