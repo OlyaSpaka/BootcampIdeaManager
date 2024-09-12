@@ -16,11 +16,9 @@ public class IdeaSelection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "Idea_id")
     private Idea idea;
-    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "competition_id")
     private Competition competition;

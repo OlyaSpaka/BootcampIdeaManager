@@ -12,6 +12,7 @@ import java.util.List;
 
 @Service
 public class IdeaService {
+
     private final IdeaRepository ideaRepository;
 
     @Autowired

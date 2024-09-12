@@ -5,6 +5,7 @@ import com.example.demo.models.Idea;
 import com.example.demo.repositories.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,5 +36,13 @@ public class CommentService {
 
     public List<Comment> showIdeaComments(Integer ideaId){
         return commentRepository.findByIdeaId(ideaId);
+    }
+
+    @Transactional
+    public void updateComment(Integer id,
+                           String content) {
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new IllegalStateException(
+                "comment with Id " + id + " does not exist."));
+        comment.setContent(content);
     }
 }

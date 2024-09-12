@@ -14,7 +14,7 @@ public class IdeaSelectionController {
         this.ideaSelectionService = ideaSelectionService;
     }
     @PostMapping
-    public void addIdeaSelection(IdeaSelection ideaSelection){
+    public void addIdeaSelection(@RequestBody  IdeaSelection ideaSelection){
         ideaSelectionService.addIdeaSelection(ideaSelection);
     }
     @DeleteMapping(path = "{ideaSelectionId}")

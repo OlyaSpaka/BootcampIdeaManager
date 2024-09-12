@@ -32,7 +32,7 @@ public class Idea {
     @Column(name = "key_features")
     private String keyFeatures;
 
-    @Column(name = "'references'") //ref_links for testing, 'references' for prod
+    @Column(name = "`references`") //ref_links for testing, 'references' for prod
     private String references;
 
     @Column(name = "created_at", nullable = false)
