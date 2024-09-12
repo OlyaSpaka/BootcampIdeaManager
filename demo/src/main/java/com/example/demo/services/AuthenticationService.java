@@ -1,16 +1,17 @@
-package com.example.demo.auth;
+package com.example.demo.services;
 
+import com.example.demo.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthService implements UserDetailsService {
+public class AuthenticationService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthenticationService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

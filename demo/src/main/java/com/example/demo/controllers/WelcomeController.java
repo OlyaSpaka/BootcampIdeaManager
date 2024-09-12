@@ -1,5 +1,6 @@
-package com.example.demo.auth;
+package com.example.demo.controllers;
 
+import com.example.demo.models.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.security.core.Authentication;

@@ -1,22 +1,47 @@
 package com.example.demo.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "user")
-public class User {
+@Getter
+@Setter
+@NoArgsConstructor
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Size(min = 6, max = 30, message = "Username must have between 6 and 30 characters.")
+    @NotEmpty(message = "Username field must be filled out.")
+    @Pattern(regexp = "^[a-zA-Z0-9._\\-?!]+$", message = "No special characters, except for .?!-_")
     @Column(unique = true, nullable = false, length = 30)
     private String username;
+
+    @Email
+    @NotEmpty(message = "Email field must be filled out.")
     @Column(unique = true, nullable = false, length = 40)
     private String email;
+
+    @Size(min=6, message = "Password must have at least 6 characters.")
+    @NotEmpty(message = "Password field must be filled out.")
     @Column(nullable = false)
     private String password;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
@@ -32,8 +57,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Column in the join table referring to Category
     )
     private Set<Role> roles = new HashSet<>();
-    public User() {
-    }
 
     public User(String username, String email, String password) {
         this.username = username;
@@ -71,76 +94,6 @@ public class User {
         role.getUsers().remove(this);
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public Integer getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Set<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
-    }
-
-    public Set<Bookmark> getBookmarks() {
-        return bookmarks;
-    }
-
-    public void setBookmarks(Set<Bookmark> bookmarks) {
-        this.bookmarks = bookmarks;
-    }
-
-    public Set<Vote> getVotes() {
-        return votes;
-    }
-
-    public void setVotes(Set<Vote> votes) {
-        this.votes = votes;
-    }
-
-    public Set<Idea> getIdeas() {
-        return ideas;
-    }
-
-    public void setIdeas(Set<Idea> ideas) {
-        this.ideas = ideas;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
 
     @Override
     public String toString() {
@@ -150,5 +103,31 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 '}';
+    }
+
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
     }
 }
