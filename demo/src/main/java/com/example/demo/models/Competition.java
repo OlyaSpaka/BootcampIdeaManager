@@ -1,5 +1,6 @@
 package com.example.demo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -23,9 +24,10 @@ public class Competition {
     private Date startDate;
     @Column(name="end_date")
     private Date endDate;
+    @JsonBackReference
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<IdeaSelection> ideaSelections = new HashSet<>();
-
+    @JsonBackReference
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Idea> ideas = new HashSet<>();
 

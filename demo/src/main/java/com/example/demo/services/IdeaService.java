@@ -1,10 +1,14 @@
 package com.example.demo.services;
 
+import com.example.demo.models.Comment;
 import com.example.demo.models.Idea;
+import com.example.demo.models.Vote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.repositories.IdeaRepository;
+
+import java.util.List;
 
 @Service
 public class IdeaService {
@@ -42,5 +46,9 @@ public class IdeaService {
       idea.setTitle(title);
       idea.setReferences(references);
 
+    }
+
+    public List<Idea> showUserIdea(Integer userId){
+        return ideaRepository.findByUserId(userId);
     }
 }
