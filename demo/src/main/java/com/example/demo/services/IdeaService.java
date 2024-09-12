@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.repositories.IdeaRepository;
 
+import java.util.List;
+
 @Service
 public class IdeaService {
     private final IdeaRepository ideaRepository;
@@ -17,16 +19,24 @@ public class IdeaService {
 
     public void addNewIdea(Idea idea) {
         ideaRepository.save(idea);
-
     }
 
+    @Transactional
     public void deleteIdea(Integer id) {
-        boolean exists = ideaRepository.existsById(id);
-        if (!exists) {
-            throw new IllegalStateException("Idea with Id " + id + " does not exist");
-        } else {
-            ideaRepository.deleteById(id);
+        Idea idea = ideaRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Idea with Id " + id + " does not exist"));
+
+        // Remove the Idea from User and Competition
+        if (idea.getUser() != null) {
+            idea.getUser().removeIdea(idea);
         }
+
+        if (idea.getCompetition() != null) {
+            idea.getCompetition().removeIdea(idea);
+        }
+
+        // Delete the Idea
+        ideaRepository.deleteById(id);
     }
 
     @Transactional
@@ -42,5 +52,9 @@ public class IdeaService {
       idea.setTitle(title);
       idea.setReferences(references);
 
+    }
+
+    public List<Idea> showUserIdea(Integer userId){
+        return ideaRepository.findByUserId(userId);
     }
 }

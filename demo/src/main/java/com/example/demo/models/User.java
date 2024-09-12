@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.List;
 import java.util.Set;
 
@@ -22,9 +23,12 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class User implements UserDetails {
+@Table(name = "user") //@Table(name = "\"USER\"") for testing
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
 
     @Size(min = 6, max = 30, message = "Username must have between 6 and 30 characters.")
     @NotEmpty(message = "Username field must be filled out.")
@@ -32,10 +36,12 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false, length = 30)
     private String username;
 
+
     @Email
     @NotEmpty(message = "Email field must be filled out.")
     @Column(unique = true, nullable = false, length = 40)
     private String email;
+
 
     @Size(min=6, message = "Password must have at least 6 characters.")
     @NotEmpty(message = "Password field must be filled out.")
@@ -44,12 +50,16 @@ public class User implements UserDetails {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Bookmark> bookmarks = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Vote> votes = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Idea> ideas = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "user_role", // Join table name
@@ -57,6 +67,9 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Column in the join table referring to Category
     )
     private Set<Role> roles = new HashSet<>();
+
+    public User() {
+    }
 
     public User(String username, String email, String password) {
         this.username = username;
@@ -69,9 +82,19 @@ public class User implements UserDetails {
         comment.setUser(this);
     }
 
+    public void removeComment(Comment comment){
+        this.comments.remove(comment);
+        comment.setUser(null);
+    }
+
     public void addBookmark(Bookmark bookmark){
         this.bookmarks.add(bookmark);
         bookmark.setUser(this);
+    }
+
+    public void removeBookmark(Bookmark bookmark){
+        this.bookmarks.remove(bookmark);
+        bookmark.setUser(null);
     }
 
     public void addVote(Vote vote){
@@ -79,9 +102,19 @@ public class User implements UserDetails {
         vote.setUser(this);
     }
 
+    public void removeVote(Vote vote){
+        this.votes.remove(vote);
+        vote.setUser(null);
+    }
+
     public void addIdea(Idea idea){
         this.ideas.add(idea);
         idea.setUser(this);
+    }
+
+    public void removeIdea(Idea idea){
+        this.ideas.remove(idea);
+        idea.setUser(null);
     }
 
     public void addRole(Role role){
@@ -103,6 +136,19 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
 
