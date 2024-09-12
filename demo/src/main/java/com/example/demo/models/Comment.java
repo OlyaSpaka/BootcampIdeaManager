@@ -1,7 +1,13 @@
 package com.example.demo.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.Objects;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "Comment")
 public class Comment {
@@ -9,10 +15,10 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
-    @JoinColumn(name = "User_id", nullable = false)
+    @JoinColumn(name = "User_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "Idea_id", nullable = false)
+    @JoinColumn(name = "Idea_id")
     private Idea idea;
     @Column(nullable = false)
     private String content;
@@ -20,45 +26,9 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(User user, Idea idea, String content) {
-        this.user = user;
-        this.idea = idea;
+    public Comment(String content) {
         this.content = content;
     }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Idea getIdea() {
-        return idea;
-    }
-
-    public void setIdea(Idea idea) {
-        this.idea = idea;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-
     @Override
     public String toString() {
         return "Comment{" +
@@ -67,5 +37,13 @@ public class Comment {
                 ", idea=" + idea +
                 ", content='" + content + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Comment comm = (Comment) o;
+        return Objects.equals(id, comm.id);
     }
 }

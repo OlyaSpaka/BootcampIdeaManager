@@ -1,12 +1,17 @@
 package com.example.demo.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "Competition")
 public class Competition {
     @Id
@@ -21,8 +26,10 @@ public class Competition {
 
     @Column(name="start_date", nullable = false)
     private Date startDate;
+
     @Column(name="end_date")
     private Date endDate;
+
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<IdeaSelection> ideaSelections = new HashSet<>();
 
@@ -58,61 +65,6 @@ public class Competition {
         this.ideas.remove(idea);
         idea.setCompetition(null);
     }
-    public Set<Idea> getIdeas() {
-        return ideas;
-    }
-
-    public void setIdeas(Set<Idea> ideas) {
-        this.ideas = ideas;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public Set<IdeaSelection> getIdeaSelections() {
-        return ideaSelections;
-    }
-
-    public void setIdeaSelections(Set<IdeaSelection> ideaSelections) {
-        this.ideaSelections = ideaSelections;
-    }
 
     @Override
     public String toString() {
@@ -123,5 +75,13 @@ public class Competition {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Competition comp = (Competition) o;
+        return Objects.equals(id, comp.id);
     }
 }

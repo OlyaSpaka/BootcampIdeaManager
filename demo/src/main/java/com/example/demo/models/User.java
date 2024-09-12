@@ -1,30 +1,43 @@
 package com.example.demo.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 @Entity
-@Table(name = "user")
+@Table(name = "\"USER\"") //@Table(name = "\"USER\"") for testing
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(unique = true, nullable = false, length = 30)
     private String username;
+
     @Column(unique = true, nullable = false, length = 40)
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Bookmark> bookmarks = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Vote> votes = new HashSet<>();
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Idea> ideas = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "user_role", // Join table name
@@ -32,6 +45,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Column in the join table referring to Category
     )
     private Set<Role> roles = new HashSet<>();
+
     public User() {
     }
 
@@ -46,9 +60,19 @@ public class User {
         comment.setUser(this);
     }
 
+    public void removeComment(Comment comment){
+        this.comments.remove(comment);
+        comment.setUser(null);
+    }
+
     public void addBookmark(Bookmark bookmark){
         this.bookmarks.add(bookmark);
         bookmark.setUser(this);
+    }
+
+    public void removeBookmark(Bookmark bookmark){
+        this.bookmarks.remove(bookmark);
+        bookmark.setUser(null);
     }
 
     public void addVote(Vote vote){
@@ -56,9 +80,19 @@ public class User {
         vote.setUser(this);
     }
 
+    public void removeVote(Vote vote){
+        this.votes.remove(vote);
+        vote.setUser(null);
+    }
+
     public void addIdea(Idea idea){
         this.ideas.add(idea);
         idea.setUser(this);
+    }
+
+    public void removeIdea(Idea idea){
+        this.ideas.remove(idea);
+        idea.setUser(null);
     }
 
     public void addRole(Role role){
@@ -70,78 +104,6 @@ public class User {
         this.roles.remove(role);
         role.getUsers().remove(this);
     }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public Integer getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Set<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(Set<Comment> comments) {
-        this.comments = comments;
-    }
-
-    public Set<Bookmark> getBookmarks() {
-        return bookmarks;
-    }
-
-    public void setBookmarks(Set<Bookmark> bookmarks) {
-        this.bookmarks = bookmarks;
-    }
-
-    public Set<Vote> getVotes() {
-        return votes;
-    }
-
-    public void setVotes(Set<Vote> votes) {
-        this.votes = votes;
-    }
-
-    public Set<Idea> getIdeas() {
-        return ideas;
-    }
-
-    public void setIdeas(Set<Idea> ideas) {
-        this.ideas = ideas;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
     @Override
     public String toString() {
         return "User{" +
@@ -150,5 +112,18 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

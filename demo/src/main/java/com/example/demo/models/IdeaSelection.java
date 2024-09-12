@@ -1,10 +1,15 @@
 package com.example.demo.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "Idea_Selection")
 public class IdeaSelection {
     @Id
@@ -12,53 +17,27 @@ public class IdeaSelection {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "Idea_id", nullable = false)
+    @JoinColumn(name = "Idea_id")
     private Idea idea;
 
     @ManyToOne
-    @JoinColumn(name = "competition_id", nullable = false)
+    @JoinColumn(name = "competition_id")
     private Competition competition;
+
     @Column(nullable = false)
     private Date date;
 
     public IdeaSelection() {
     }
-
-    public IdeaSelection(Idea idea, Competition competition, Date date) {
-        this.idea = idea;
-        this.competition = competition;
+    public IdeaSelection(Date date) {
         this.date = date;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Idea getIdea() {
-        return idea;
-    }
-
-    public void setIdea(Idea idea) {
-        this.idea = idea;
-    }
-
-    public Competition getCompetition() {
-        return competition;
-    }
-
-    public void setCompetition(Competition competition) {
-        this.competition = competition;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IdeaSelection ideaSelection = (IdeaSelection) o;
+        return Objects.equals(id, ideaSelection.id);
     }
 }

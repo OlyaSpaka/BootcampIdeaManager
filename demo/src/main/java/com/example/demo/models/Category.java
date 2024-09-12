@@ -1,11 +1,16 @@
 package com.example.demo.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
+@Setter
+@Getter
 @Table(name = "Category")
 public class Category {
     @Id
@@ -34,27 +39,11 @@ public class Category {
         idea.getCategories().remove(this);
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Idea> getIdeas() {
-        return ideas;
-    }
-
-    public void setIdeas(Set<Idea> ideas) {
-        this.ideas = ideas;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category cat = (Category) o;
+        return Objects.equals(id, cat.id);
     }
 }
