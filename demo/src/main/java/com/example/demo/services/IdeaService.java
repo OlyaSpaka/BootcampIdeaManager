@@ -2,6 +2,7 @@ package com.example.demo.services;
 
 import com.example.demo.models.Comment;
 import com.example.demo.models.Idea;
+import com.example.demo.models.Vote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

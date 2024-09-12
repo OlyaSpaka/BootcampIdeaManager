@@ -1,8 +1,11 @@
 package com.example.demo.controllers;
 
 import com.example.demo.models.Bookmark;
+import com.example.demo.models.Comment;
 import com.example.demo.services.BookmarkService;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "Bookmark")
@@ -20,5 +23,10 @@ public class BookmarkController {
     @DeleteMapping(path = "{bookmarkId}")
     public void deleteBookmark(@PathVariable("bookmarkId") Integer id) {
         bookmarkService.deleteBookmark(id);
+    }
+
+    @GetMapping
+    public List<Bookmark> getUserBookmarks(@RequestParam("userId")Integer userId) {
+        return bookmarkService.getUserBookmarks(userId);
     }
 }

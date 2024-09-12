@@ -5,6 +5,8 @@ import com.example.demo.repositories.BookmarkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BookmarkService {
 
@@ -26,6 +28,10 @@ public class BookmarkService {
         } else {
             bookmarkRepository.deleteById(id);
         }
+    }
+
+    public List<Bookmark> getUserBookmarks(Integer userId){
+        return bookmarkRepository.findByUserId(userId);
     }
 
 }
