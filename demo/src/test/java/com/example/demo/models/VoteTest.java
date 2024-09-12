@@ -31,7 +31,6 @@ class VoteTest {
     private VoteTypeRepository voteTypeRepository;
     @PersistenceContext
     private EntityManager entityManager;
-
     private User user;
     private Idea savedIdea;
     private VoteType voteType;
