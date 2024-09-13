@@ -15,7 +15,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public void addCategory(@RequestBody Category category){
+    public void addCategory(@RequestBody Category category) {
         categoryService.addCategory(category);
     }
 
@@ -24,4 +24,11 @@ public class CategoryController {
     public void deleteCategory(@PathVariable("categoryId") Integer id) {
         categoryService.deleteCategory(id);
     }
+
+    @PutMapping(path = "{categoryId}/name")
+    public void updateCategoryName(@PathVariable("categoryId") Integer id,
+                                   @RequestParam(required = false) String name) {
+        categoryService.updateCategoryName(id, name);
+    }
+
 }

@@ -1,10 +1,12 @@
 package com.example.demo.services;
 
 import com.example.demo.models.Category;
+import com.example.demo.models.Comment;
 import com.example.demo.repositories.BookmarkRepository;
 import com.example.demo.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CategoryService {
@@ -24,6 +26,16 @@ public class CategoryService {
             throw new IllegalStateException("Category with Id " + id + " does not exist");
         } else {
             categoryRepository.deleteById(id);
+        }
+    }
+
+    @Transactional
+    public void updateCategoryName(Integer id,
+                              String name) {
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new IllegalStateException(
+                "Category with Id " + id + " does not exist."));
+        if (name != null && !name.isEmpty()) {
+            category.setName(name);
         }
     }
 }
