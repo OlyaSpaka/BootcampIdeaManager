@@ -1,8 +1,6 @@
 package com.example.demo.services;
 
-import com.example.demo.models.Comment;
 import com.example.demo.models.Idea;
-import com.example.demo.models.Vote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +20,24 @@ public class IdeaService {
 
     public void addNewIdea(Idea idea) {
         ideaRepository.save(idea);
-
     }
 
+    @Transactional
     public void deleteIdea(Integer id) {
-        boolean exists = ideaRepository.existsById(id);
-        if (!exists) {
-            throw new IllegalStateException("Idea with Id " + id + " does not exist");
-        } else {
-            ideaRepository.deleteById(id);
+        Idea idea = ideaRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Idea with Id " + id + " does not exist"));
+
+        // Remove the Idea from User and Competition
+        if (idea.getUser() != null) {
+            idea.getUser().removeIdea(idea);
         }
+
+        if (idea.getCompetition() != null) {
+            idea.getCompetition().removeIdea(idea);
+        }
+
+        // Delete the Idea
+        ideaRepository.deleteById(id);
     }
 
     @Transactional
