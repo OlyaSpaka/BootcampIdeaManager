@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.ParseException;
 import java.util.List;
 
 @Controller
@@ -51,7 +52,9 @@ public class IdeaController {
     public String newIdeaForm(Model model) {
         addCommonAttributes(model);
         model.addAttribute("categories", categoryService.getAllCategories());
-        model.addAttribute("ideaDTO", new IdeaDTO());
+        if (!model.containsAttribute("ideaDTO")){
+            model.addAttribute("ideaDTO", new IdeaDTO());
+        }
         return "new-idea-by-ilya";
     }
 
@@ -60,9 +63,17 @@ public class IdeaController {
                           BindingResult bindingResult,
                           RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()){
+            redirectAttributes.addFlashAttribute("ideaDTO", ideaDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ideaDTO", bindingResult);
             return "redirect:/ideas/new-idea";
         }
-        return "/ideas";
+        try {
+            int id = ideaService.addNewIdea(ideaDTO);
+            return "redirect:/ideas/"+id;
+        } catch (IllegalArgumentException | ParseException e){
+            redirectAttributes.addFlashAttribute("errorMsg", e);
+            return "redirect:/ideas/new-idea";
+        }
     }
 
     @PostMapping("/{ideaId}/delete")

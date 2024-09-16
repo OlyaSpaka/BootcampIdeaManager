@@ -1,11 +1,14 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.IdeaDTO;
+import com.example.demo.mapper.IdeaMapper;
 import com.example.demo.models.Idea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.repositories.IdeaRepository;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -14,14 +17,22 @@ import java.text.SimpleDateFormat;
 @Service
 public class IdeaService {
     private final IdeaRepository ideaRepository;
+    private final IdeaMapper ideaMapper;
 
     @Autowired
-    public IdeaService(IdeaRepository ideaRepository) {
+    public IdeaService(IdeaRepository ideaRepository, IdeaMapper ideaMapper) {
         this.ideaRepository = ideaRepository;
+        this.ideaMapper = ideaMapper;
     }
 
     public void addNewIdea(Idea idea) {
         ideaRepository.save(idea);
+    }
+
+    public Integer addNewIdea(IdeaDTO ideaDTO) throws IllegalArgumentException, ParseException {
+        Idea idea = ideaMapper.map(ideaDTO);
+        idea = ideaRepository.save(idea);
+        return idea.getId();
     }
 
     @Transactional

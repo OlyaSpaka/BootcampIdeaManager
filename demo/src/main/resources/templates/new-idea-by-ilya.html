@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Create New Idea</title>
@@ -21,18 +21,20 @@
     link3Text=''
 )}"></div>
     <form method="post" th:action="@{/ideas/new-idea/create}" th:object="${ideaDTO}">
-
-        <input type="hidden" name=competitionId" th:value="1">
+        <input type="hidden" name="competitionId" th:value="1">
         <input type="hidden" name="userId" th:value="${user_id}">
+        <input type="hidden" name="createdAt" th:value="${#dates.format(new java.util.Date(), 'yyyy-MM-dd')}" />
 
         <div class="form-group">
             <label for="title">Idea Title*</label>
             <input type="text" id="title" th:field="*{title}" placeholder="Enter idea title" required>
+            <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></div>
         </div>
 
         <div class="form-group">
             <label for="description">Description*</label>
             <textarea id="description" th:field="*{description}" placeholder="Enter idea description" required></textarea>
+            <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></div>
         </div>
 
         <div class="form-group">
@@ -42,21 +44,25 @@
                     <option th:value="${category.id}" th:text="${category.name}">Category Name</option>
                 </th:block>
             </select>
+            <div th:if="${#fields.hasErrors('categoryIds')}" th:errors="*{categoryIds}" class="error"></div>
         </div>
 
         <div class="form-group">
             <label for="keyFeatures">Key Features</label>
             <input type="text" id="keyFeatures" th:field="*{keyFeatures}" placeholder="List key features">
+            <div th:if="${#fields.hasErrors('keyFeatures')}" th:errors="*{keyFeatures}" class="error"></div>
         </div>
 
         <div class="form-group">
             <label for="referenceLinks">References</label>
-            <input type="text" id="referenceLinks" th:field="*{references}" placeholder="Enter any references (links)">
+            <input type="text" id="referenceLinks" th:field="*{referenceLinks}" placeholder="Enter any references (links)">
+            <div th:if="${#fields.hasErrors('referenceLinks')}" th:errors="*{referenceLinks}" class="error"></div>
         </div>
 
 <!--        <div class="form-group">-->
 <!--            <label for="fileUpload">Upload a file</label>-->
 <!--            <input type="file" id="fileUpload" name="fileUpload"/>-->
+<!--            <div th:if="${#fields.hasErrors('fileUpload')}" th:errors="*{fileUpload}" class="error"></div>-->
 <!--        </div>-->
 
         <button type="submit">Submit Idea</button>
