@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Idea Details</title>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+    <link rel="stylesheet" th:href="@{/separate-idea-style.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="container">
+        <div th:replace="~{fragments/header :: header(
+    title='Bootcamp Ideas',
+    subtitle=${competitionName},
+    message=${competitionDescription},
+    user=${user},
+    link1Href='/ideas',
+    link1Text='See all ideas',
+    link2Href='/notready',
+    link2Text='',
+    link3Href='/notready',
+    link3Text=''
+)}"></div>
+    <div class="container">
+        <div class="idea-details" th:object="${idea}">
+            <h3 th:text="${idea.title}"></h3>
+            <!--        <label for="bookmark" class="small-label">Favourite?</label>-->
+            <!--        <input type="checkbox" id="bookmark" name="bookmark" th:checked="${idea.bookmarked}" onclick="toggleBookmark()">-->
+            <p><strong>Author:</strong> <span th:text="${idea.user.username}"></span></p>
+            <p><strong>Category:</strong> <span th:each="category : ${idea.categories}"
+                                                th:text="${category.name}"></span></p>
+            <p><strong>Description:</strong> <span th:text="${idea.description}"></span></p>
+            <p><strong>Key Features:</strong> <span th:text="${idea.keyFeatures}"></span></p>
+            <p><strong>References:</strong> <a th:href="${idea.referenceLinks}" th:text="${idea.referenceLinks}"
+                                               target="_blank"></a></p>
+            <div th:if="${idea.pictures}">
+                <p><strong>Images:</strong></p>
+                <div class="picture-gallery">
+                    <div th:each="picture : ${idea.pictures}">
+                        <img th:src="@{${picture}}" alt="Idea Picture" style="max-width: 100%; height: auto; margin-bottom: 10px;">
+                    </div>
+                </div>
+            </div>
+
+        <!--    <div class="idea-options" th:if="${isAuthor || isAdmin}">-->
+        <!--        <a th:href="@{/edit-idea/{id}(id=${idea.id})}" class="edit-btn">Edit Idea</a>-->
+        <!--        <a th:href="@{/delete-idea/{id}(id=${idea.id})}" class="delete-btn">Delete Idea</a>-->
+        <!--    </div>-->
+
+        <hr>
+
+        <div class="comments-section">
+            <h2>Comments</h2>
+            <form method="post" action="/add-comment">
+                <!-- Assuming you have ideaId and userId available as hidden fields -->
+                <input type="hidden" name="ideaId" value="1" /> <!-- Replace with actual idea ID -->
+                <input type="hidden" name="userId" value="1" /> <!-- Replace with actual user ID -->
+                <textarea id="comment" name="content" placeholder="Add your comment"></textarea>
+                <button type="submit">Submit Comment</button>
+            </form>
+
+            <div class="comment-list">
+                <!-- Display comments dynamically -->
+                <div th:each="comment : ${comments}">
+                    <p>
+                        <strong th:text="${comment.user.username}"></strong>: <!-- Ensure user has a name property -->
+                        <span th:text="${comment.content}"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <footer>
+            <a href="/logout" class="footer-link">Log out</a>
+        </footer>
+    </div>
+
+    <!--<script>-->
+    <!--    function toggleBookmark() {-->
+    <!--        const bookmarkCheckbox = document.getElementById('bookmark');-->
+    <!--        const isBookmarked = bookmarkCheckbox.checked;-->
+
+    <!--        // Use AJAX to update bookmark status-->
+    <!--        fetch(`/updateBookmark/${ideaId}`, {-->
+    <!--            method: 'POST',-->
+    <!--            headers: {-->
+    <!--                'Content-Type': 'application/json'-->
+    <!--            },-->
+    <!--            body: JSON.stringify({ bookmarked: isBookmarked })-->
+    <!--        })-->
+    <!--            .then(response => response.json())-->
+    <!--            .then(data => {-->
+    <!--                console.log('Bookmark updated:', data);-->
+    <!--            })-->
+    <!--            .catch(error => {-->
+    <!--                console.error('Error updating bookmark:', error);-->
+    <!--                bookmarkCheckbox.checked = !isBookmarked; // Revert checkbox if error occurs-->
+    <!--            });-->
+    <!--    }-->
+    <!--</script>-->
+</body>
+</html>
