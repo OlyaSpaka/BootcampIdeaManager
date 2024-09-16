@@ -1,18 +1,18 @@
 package com.example.demo.services;
 
 import com.example.demo.models.Idea;
-import com.example.demo.repositories.IdeaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.demo.repositories.IdeaRepository;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import java.text.SimpleDateFormat;
+
 @Service
 public class IdeaService {
-
     private final IdeaRepository ideaRepository;
 
     @Autowired

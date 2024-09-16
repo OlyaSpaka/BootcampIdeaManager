@@ -1,18 +1,15 @@
 package com.example.demo.controllers;
 
-import com.example.demo.models.Comment;
 import com.example.demo.services.VoteService;
 import com.example.demo.models.Vote;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "Vote")
 public class VoteController {
     private final VoteService voteService;
-
 
     public VoteController(VoteService voteService) {
         this.voteService = voteService;
