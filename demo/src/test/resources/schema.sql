@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS idea (
                                     title VARCHAR(255) NOT NULL,
                                     description VARCHAR(255),
                                     key_features VARCHAR(255),
-                                    ref_links VARCHAR(255),
+                                    reference_links VARCHAR(255),
                                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                     pictures VARCHAR(255),
                                     PRIMARY KEY (id),

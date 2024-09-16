@@ -3,7 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.exceptions.EmailTakenException;
 import com.example.demo.exceptions.UsernameTakenException;
 import com.example.demo.models.User;
-import com.example.demo.services.UserRegistrationService;
+import com.example.demo.services.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,12 +17,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/auth")
 @Controller
 public class AuthenticationController {
-    private final UserRegistrationService userRegistrationService;
-
-    public AuthenticationController(UserRegistrationService userRegistrationService) {
-        this.userRegistrationService = userRegistrationService;
+    private final AuthenticationService authenticationService;
+    public AuthenticationController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
-
     /*
         @GetMapping methods should be the only
         methods where we are actually returning
@@ -60,7 +58,7 @@ public class AuthenticationController {
             they are present in service
          */
         try {
-            userRegistrationService.registerNewUser(user);
+            authenticationService.registerNewUser(user);
             redirectAttributes.addFlashAttribute("success", "Registration successful!");
             //wasn't displayed anywhere, so I added it in the template
             return "redirect:/auth/login";

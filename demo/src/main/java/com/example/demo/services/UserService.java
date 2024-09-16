@@ -23,8 +23,4 @@ public class UserService {
             userRepository.deleteById(id);
         }
     }
-//    public User getCurrentUser() { // todo: move to controller
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        return (User) auth.getPrincipal();
-//    }
 }
