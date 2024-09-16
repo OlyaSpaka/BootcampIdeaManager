@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class VoteService {
@@ -23,8 +25,25 @@ public class VoteService {
     }
 
     public void addVote(Vote vote) {
-        voteRepository.save(vote);
+        // Check if the user is not voting on their own idea
+        if (!Objects.equals(vote.getUser().getId(), vote.getIdea().getUser().getId())) {
+
+            // Check if the user has already voted on the same idea
+            Optional<Vote> existingVote = voteRepository.findByUserIdAndIdeaId(vote.getUser().getId(), vote.getIdea().getId());
+
+            if (existingVote.isPresent()) {
+                // User has already voted on this idea, do not allow voting twice
+                throw new IllegalStateException("User has already voted on this idea.");
+            } else {
+                // If the user has not voted on the idea, save the new vote
+                voteRepository.save(vote);
+            }
+        } else {
+            // If the user is trying to vote on their own idea, throw an exception or handle the case
+            throw new IllegalStateException("User cannot vote on their own idea.");
+        }
     }
+
 
     public void deleteVote(Integer id) {
         boolean exists = voteRepository.existsById(id);
