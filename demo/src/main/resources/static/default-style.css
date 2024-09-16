@@ -1,0 +1,97 @@
+body {
+    font-family: "Calibri", sans-serif;
+    background-color: grey;
+}
+
+.container {
+    max-width: 85%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+}
+
+.header {
+    background-color: grey;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    line-height: 1.1;
+}
+
+.header .subtitle {
+    margin: 5px 0 0;
+    font-size: 1.2em;
+    line-height: 1.2;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    font-size: 1.2em;
+}
+
+.admin-note-label {
+    display: block;
+    margin: 0;
+    color: grey;
+    font-size: 0.9em;
+    text-decoration: none;
+}
+
+.admin-note {
+    color: grey;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.account-info {
+    width: 300px;
+    text-align: center;
+    color: grey;
+}
+
+.account-info h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.account-info a {
+    display: block;
+    margin: 0;
+    color: grey;
+    font-size: 0.9em;
+    text-decoration: none;
+}
+
+.account-info a:hover {
+    color: orangered;
+    text-decoration: underline;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    background-color: white;
+    border-top: 1px solid #ccc;
+}
+
+.footer-link {
+    color: grey;
+    text-decoration: none;
+    font-size: 1em;
+}
+
+.footer-link:hover {
+    color: orangered;
+    text-decoration: underline;
+}

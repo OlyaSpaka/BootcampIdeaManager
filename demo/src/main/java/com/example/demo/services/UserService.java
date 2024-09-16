@@ -3,6 +3,8 @@ package com.example.demo.services;
 import com.example.demo.models.User;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,4 +31,9 @@ public class UserService {
             userRepository.deleteById(id);
         }
     }
+
+//    public User getCurrentUser() { // todo: move to controller
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        return (User) auth.getPrincipal();
+//    }
 }

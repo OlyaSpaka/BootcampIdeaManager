@@ -5,6 +5,7 @@ import com.example.demo.repositories.CompetitionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+// for now assuming there's only one competition at a time
 @Service
 public class CompetitionService {
 
@@ -14,11 +15,11 @@ public class CompetitionService {
         this.competitionRepository = competitionRepository;
     }
 
-    public void addCompetition(Competition competition){
+    public void addCompetition(Competition competition) {
         competitionRepository.save(competition);
     }
 
-    public void deleteCompetition(Integer id){
+    public void deleteCompetition(Integer id) {
         boolean exists = competitionRepository.existsById(id);
         if (!exists) {
             throw new IllegalStateException("Competition with Id " + id + " does not exist");
@@ -26,4 +27,19 @@ public class CompetitionService {
             competitionRepository.deleteById(id);
         }
     }
+
+    public String getCompetitionName(Integer id) {
+        return competitionRepository
+                .findById(id)
+                .orElseThrow(() -> new IllegalStateException("Competition by id not found:" + id))
+                .getName();
+    }
+
+    public String getCompetitionDescription(Integer id) {
+        return competitionRepository
+                .findById(id)
+                .orElseThrow(() -> new IllegalStateException("Competition by id not found:" + id))
+                .getDescription();
+    }
+
 }

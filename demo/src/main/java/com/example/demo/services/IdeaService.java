@@ -7,6 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.repositories.IdeaRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+
+import java.text.SimpleDateFormat;
 
 @Service
 public class IdeaService {
@@ -43,18 +46,44 @@ public class IdeaService {
     public void updateName(Integer id,
                            String description,
                            String title,
-                           String key_features,
-                           String references) {
+                           String keyFeatures,
+                           String referenceLinks) {
         Idea idea = ideaRepository.findById(id).orElseThrow(() -> new IllegalStateException(
                 "account with Id " + id + " does not exist."));
-      idea.setDescription(description);
-      idea.setKeyFeatures(key_features);
-      idea.setTitle(title);
-      idea.setReferences(references);
+        idea.setDescription(description);
+        idea.setKeyFeatures(keyFeatures);
+        idea.setTitle(title);
+        idea.setReferenceLinks(referenceLinks);
 
     }
 
-    public List<Idea> showUserIdea(Integer userId){
+    public List<Idea> showUserIdea(Integer userId) {
         return ideaRepository.findByUserId(userId);
+    }
+
+    public List<Idea> getFormattedIdeas(String search) {
+        List<Idea> ideas = searchIdeas(search);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm dd.MM.yy");
+
+        ideas.forEach(idea -> {
+            if (idea.getCreatedAt() != null) {
+                String formattedDate = dateFormatter.format(idea.getCreatedAt());
+                idea.setFormattedDate(formattedDate);
+            }
+        });
+        return ideas;
+    }
+
+    public Idea displayIdea(Integer id) {
+        return ideaRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Idea not found with id: " + id));
+    }
+
+    public List<Idea> searchIdeas(String search) {
+        if (search == null || search.trim().isEmpty()) {
+            return ideaRepository.findAll();
+        } else {
+            return ideaRepository.searchIdeas(search.toLowerCase());
+        }
     }
 }

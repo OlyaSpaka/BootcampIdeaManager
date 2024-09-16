@@ -1,0 +1,4 @@
+<a href="/auth/logout" class="footer-link" onclick="preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+<form id="logout-form" action="/auth/logout" method="POST">
+  <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+</form>

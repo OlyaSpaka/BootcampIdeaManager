@@ -39,13 +39,13 @@ public class SecurityConfig {
                         .loginPage("/auth/login") // Custom login page
                         .loginProcessingUrl("/auth/login") // URL to submit login credentials
                         .failureUrl("/auth/login?error")
-                        .defaultSuccessUrl("/home", true) // Redirect to /home on success
+                        .defaultSuccessUrl("/ideas", true) // Redirect to /home on success
                 )
                 .logout(logout -> logout
                         .invalidateHttpSession(true) // Invalidate session on logout
                         .clearAuthentication(true) // Clear authentication on logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout")) // Set the logout URL
-                        .logoutSuccessUrl("/login?logout") // Redirect to /login?logout on logout
+                        //.logoutSuccessUrl("/login?logout") // Redirect to /login?logout on logout
                         .permitAll()
                 );
 

@@ -32,11 +32,14 @@ public class Idea {
     @Column(name = "key_features")
     private String keyFeatures;
 
-    @Column(name = "'references'") //ref_links for testing, 'references' for prod
-    private String references;
+    @Column(name = "reference_links")
+    private String referenceLinks;
 
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
+
+    @Transient
+    private String formattedDate;
 
     @Column
     private String pictures;
@@ -63,11 +66,11 @@ public class Idea {
 
     public Idea() {
     }
-    public Idea(String title, String description, String keyFeatures, String references, Date createdAt, String pictures) {
+    public Idea(String title, String description, String keyFeatures, String referenceLinks, Date createdAt, String pictures) {
         this.description = description;
         this.title = title;
         this.keyFeatures = keyFeatures;
-        this.references = references;
+        this.referenceLinks = referenceLinks;
         this.createdAt = createdAt;
         this.pictures = pictures;
     }
@@ -130,7 +133,7 @@ public class Idea {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", key_features='" + keyFeatures + '\'' +
-                ", references='" + references + '\'' +
+                ", references='" + referenceLinks + '\'' +
                 ", created_at=" + createdAt +
                 ", pictures='" + pictures + '\'' +
                 '}';
@@ -143,4 +146,10 @@ public class Idea {
         Idea idea = (Idea) o;
         return Objects.equals(id, idea.id);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }

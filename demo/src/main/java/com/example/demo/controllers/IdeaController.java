@@ -1,6 +1,5 @@
 package com.example.demo.controllers;
 
-import com.example.demo.models.Comment;
 import com.example.demo.services.IdeaService;
 import com.example.demo.models.Idea;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +29,9 @@ public class IdeaController {
     public void updateIdea(@PathVariable("ideaId") Integer id,
                            @RequestParam(required = false) String description,
                            @RequestParam(required = false) String title,
-                           @RequestParam(required = false) String key_features,
-                           @RequestParam(required = false) String references) {
-        ideaService.updateName(id, description,title,key_features,references);
+                           @RequestParam(required = false) String keyFeatures,
+                           @RequestParam(required = false) String referenceLinks) {
+        ideaService.updateName(id, description,title, keyFeatures,referenceLinks);
 
     }
 
