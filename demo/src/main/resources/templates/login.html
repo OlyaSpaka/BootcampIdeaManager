@@ -18,6 +18,7 @@
                 <div th:unless="${param.logout}">
                     <h4 class="card-title text-center mb-4">Welcome Back!</h4>
                 </div>
+                    <p th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></p>
                 <form th:action="@{/auth/login}" method="post">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>

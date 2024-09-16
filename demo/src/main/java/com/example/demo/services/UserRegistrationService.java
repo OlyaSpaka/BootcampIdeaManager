@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.exceptions.EmailTakenException;
+import com.example.demo.exceptions.UsernameTakenException;
 import com.example.demo.repositories.UserRepository;
 import com.example.demo.models.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -7,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserRegistrationService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -17,28 +18,27 @@ public class UserRegistrationService {
     }
 
     // Check if username already exists
-    public boolean usernameExists(String username) {
+    public boolean isUsernameTaken(String username) {
         return userRepository.findByUsername(username).isPresent();
     }
 
     // Check if email already exists
-    public boolean emailExists(String email) {
+    public boolean isEmailTaken(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
-
-    public void registerNewUser(User user) throws Exception {
+    public void registerNewUser(User user) throws UsernameTakenException, EmailTakenException {
         System.out.println("Saving user: " + user.getUsername());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+        if (isUsernameTaken(user.getUsername())) {
             System.out.println("Username already exists");
-            throw new Exception("Username already exists");
+            throw new UsernameTakenException("Username already exists");
         }
 
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        if (isEmailTaken(user.getEmail())) {
             System.out.println("Email already exists");
-            throw new Exception("Email already exists");
+            throw new EmailTakenException("Email already exists");
         }
 
         userRepository.save(user);

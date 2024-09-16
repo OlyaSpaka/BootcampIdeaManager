@@ -14,12 +14,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -27,7 +25,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF protection for testing purposes (enable in production)
                 .authorizeHttpRequests(auth -> auth
@@ -48,9 +45,6 @@ public class SecurityConfig {
                         //.logoutSuccessUrl("/login?logout") // Redirect to /login?logout on logout
                         .permitAll()
                 );
-
-
         return http.build();
     }
-
 }

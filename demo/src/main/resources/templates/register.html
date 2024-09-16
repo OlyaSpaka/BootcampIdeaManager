@@ -19,17 +19,19 @@
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" th:field="*{username}" required>
-                        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message">Name Error</p>
+                        <p th:if="${usernameError}" class="text-danger" th:text="${usernameError}"></p>
+                        <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error-message text-danger">Name Error</p>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" th:field="*{email}" required>
-                        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message">Email Error</p>
+                        <p th:if="${emailError}" class="text-danger" th:text="${emailError}"></p>
+                        <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error-message text-danger">Email Error</p>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" th:field="*{password}" placeholder="Enter your password" required>
-                        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message">Password Error</p>
+                        <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message text-danger">Password Error</p>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Register</button>
                 </form>

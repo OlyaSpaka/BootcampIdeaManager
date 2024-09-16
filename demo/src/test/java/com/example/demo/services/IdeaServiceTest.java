@@ -51,7 +51,7 @@ class IdeaServiceTest {
         idea.setTitle("Test Idea");
         idea.setDescription("Test description");
         idea.setKeyFeatures("Test features");
-        idea.setReferences("Test references");
+        idea.setReferenceLinks("Test references");
 
         user.addIdea(idea);
         competition.addIdea(idea);
