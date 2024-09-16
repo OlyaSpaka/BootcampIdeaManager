@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class IdeaService {
@@ -45,29 +47,43 @@ public class IdeaService {
                            String description,
                            String title,
                            String keyFeatures,
-                           String references) {
+                           String referenceLinks) {
         Idea idea = ideaRepository.findById(id).orElseThrow(() -> new IllegalStateException(
-                "Idea with Id " + id + " does not exist."));
+                "account with Id " + id + " does not exist."));
+        idea.setDescription(description);
+        idea.setKeyFeatures(keyFeatures);
+        idea.setTitle(title);
+        idea.setReferenceLinks(referenceLinks);
 
-        if (description != null && !description.isEmpty()) {
-            idea.setDescription(description);
-        }
-
-        if (title != null && !title.isEmpty()) {
-            idea.setTitle(title);
-        }
-
-        if (keyFeatures != null && !keyFeatures.isEmpty()) {
-            idea.setKeyFeatures(keyFeatures);
-        }
-
-        if (references != null && !references.isEmpty()) {
-            idea.setReferences(references);
-        }
     }
-
 
     public List<Idea> showUserIdea(Integer userId) {
         return ideaRepository.findByUserId(userId);
+    }
+
+    public List<Idea> getFormattedIdeas(String search) {
+        List<Idea> ideas = searchIdeas(search);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm dd.MM.yy");
+
+        ideas.forEach(idea -> {
+            if (idea.getCreatedAt() != null) {
+                String formattedDate = dateFormatter.format(idea.getCreatedAt());
+                idea.setFormattedDate(formattedDate);
+            }
+        });
+        return ideas;
+    }
+
+    public Idea displayIdea(Integer id) {
+        return ideaRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Idea not found with id: " + id));
+    }
+
+    public List<Idea> searchIdeas(String search) {
+        if (search == null || search.trim().isEmpty()) {
+            return ideaRepository.findAll();
+        } else {
+            return ideaRepository.searchIdeas(search.toLowerCase());
+        }
     }
 }

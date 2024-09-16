@@ -60,4 +60,17 @@ public class CompetitionService {
             competition.setEndDate(end);
         }
     }
+    public String getCompetitionName(Integer id) {
+        return competitionRepository
+                .findById(id)
+                .orElseThrow(() -> new IllegalStateException("Competition by id not found:" + id))
+                .getName();
+    }
+
+    public String getCompetitionDescription(Integer id) {
+        return competitionRepository
+                .findById(id)
+                .orElseThrow(() -> new IllegalStateException("Competition by id not found:" + id))
+                .getDescription();
+    }
 }
