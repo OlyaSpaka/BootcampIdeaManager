@@ -24,11 +24,11 @@
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
-                    <a href="#" class="forgot-password d-flex justify-content-end">Forgot Password?</a>
+<!--                    <a href="#" class="forgot-password d-flex justify-content-end">Forgot Password?</a>-->
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Login</button>
             </form>
-        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0rem" role="alert">
+        <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
             Invalid username or password.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
