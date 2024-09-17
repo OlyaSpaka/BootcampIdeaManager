@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Idea</title>
+    <link rel="stylesheet" th:href="@{/css/new-idea-by-ilya.css}">
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+</head>
+<body>
+<div class="container">
+    <div th:replace="~{fragments/header :: header(
+    title='Bootcamp Ideas',
+    subtitle=${competitionName},
+    message=${competitionDescription},
+    user=${user},
+    link1Href='/ideas',
+    link1Text='See all ideas',
+    link2Href='/notready',
+    link2Text='',
+    link3Href='/notready',
+    link3Text=''
+)}"></div>
+    <form method="post" th:action="@{/ideas/new-idea/create}" th:object="${ideaDTO}">
+
+        <input type="hidden" name=competitionId" th:value="1">
+        <input type="hidden" name="userId" th:value="${user_id}">
+
+        <div class="form-group">
+            <label for="title">Idea Title*</label>
+            <input type="text" id="title" th:field="*{title}" placeholder="Enter idea title" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description*</label>
+            <textarea id="description" th:field="*{description}" placeholder="Enter idea description" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category*</label>
+            <select id="category" th:field="*{categoryIds}" multiple>
+                <th:block th:each="category : ${categories}">
+                    <option th:value="${category.id}" th:text="${category.name}">Category Name</option>
+                </th:block>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="keyFeatures">Key Features</label>
+            <input type="text" id="keyFeatures" th:field="*{keyFeatures}" placeholder="List key features">
+        </div>
+
+        <div class="form-group">
+            <label for="referenceLinks">References</label>
+            <input type="text" id="referenceLinks" th:field="*{references}" placeholder="Enter any references (links)">
+        </div>
+
+<!--        <div class="form-group">-->
+<!--            <label for="fileUpload">Upload a file</label>-->
+<!--            <input type="file" id="fileUpload" name="fileUpload"/>-->
+<!--        </div>-->
+
+        <button type="submit">Submit Idea</button>
+    </form>
+    <footer>
+        <a href="/ideas" class="footer-link">Back to ideas</a>
+    </footer>
+</div>
+</body>
+</html>
