@@ -39,6 +39,15 @@ public class IdeaController {
         return "ideas";
     }
 
+    @GetMapping("/my-ideas")
+    public String listMyIdeas(Model model) {
+        User user = authenticationService.getCurrentUser();
+        List<Idea> userIdeas = ideaService.displayIdeasByUser(user);
+        addCommonAttributes(model);
+        model.addAttribute("ideas", userIdeas);
+        return "ideas";
+    }
+
     @GetMapping("/{userId}")
     public String showUserIdea(@PathVariable Integer userId, Model model){
         addCommonAttributes(model);
@@ -62,7 +71,7 @@ public class IdeaController {
         if (bindingResult.hasErrors()){
             return "redirect:/ideas/new-idea";
         }
-        return "/ideas";
+        return "ideas";
     }
 
     @PostMapping("/{ideaId}/delete")
@@ -77,6 +86,7 @@ public class IdeaController {
                            @RequestParam(required = false) String referenceLinks) {
         ideaService.updateName(id, description, title, keyFeatures, referenceLinks);
     }
+
     private void addCommonAttributes(Model model) {
         User user = authenticationService.getCurrentUser();
         model.addAttribute("user", user.getUsername());
