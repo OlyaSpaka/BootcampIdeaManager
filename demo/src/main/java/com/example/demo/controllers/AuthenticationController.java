@@ -47,7 +47,7 @@ public class AuthenticationController {
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", result);
             redirectAttributes.addFlashAttribute("user", registerDTO);
-            return "redirect:/auth/register"; // Return to form with validation errors
+            return "redirect:/auth/register";
         }
 
         try {
@@ -60,6 +60,5 @@ public class AuthenticationController {
 
         redirectAttributes.addFlashAttribute("user", registerDTO);
         return "redirect:/auth/register";
-
     }
 }
