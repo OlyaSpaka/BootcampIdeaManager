@@ -26,7 +26,7 @@ public class Idea {
     @Column(nullable = false)
     private String title;
 
-    @Column
+    @Column(nullable = false)
     private String description;
 
     @Column(name = "key_features")

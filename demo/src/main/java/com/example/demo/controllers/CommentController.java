@@ -28,8 +28,15 @@ public class CommentController {
     }
 
     @GetMapping
-    public List<Comment> showIdeaComments(@RequestParam("ideaId")Integer ideaId){
+    public List<Comment> showIdeaComments(@RequestParam("ideaId") Integer ideaId) {
         return commentService.showIdeaComments(ideaId);
+    }
+
+    @PutMapping(path = "{commentId}/content")
+    public void updateComment(@PathVariable("commentId") Integer id,
+                              @RequestParam(required = false) String content) {
+        commentService.updateComment(id, content);
+
     }
 
 }

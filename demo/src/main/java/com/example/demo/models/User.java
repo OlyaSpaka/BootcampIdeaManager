@@ -29,16 +29,19 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+
     @Size(min = 6, max = 30, message = "Username must have between 6 and 30 characters.")
     @NotEmpty(message = "Username field must be filled out.")
     @Pattern(regexp = "^[a-zA-Z0-9._\\-?!]+$", message = "No special characters, except for .?!-_")
     @Column(unique = true, nullable = false, length = 30)
     private String username;
 
+
     @Email
     @NotEmpty(message = "Email field must be filled out.")
     @Column(unique = true, nullable = false, length = 40)
     private String email;
+
 
     @Size(min=6, message = "Password must have at least 6 characters.")
     @NotEmpty(message = "Password field must be filled out.")
@@ -144,6 +147,7 @@ public class User implements UserDetails {
     public int hashCode() {
         return Objects.hash(id);
     }
+
 
     @Override
     public boolean isAccountNonExpired() {
