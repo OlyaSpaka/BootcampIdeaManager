@@ -5,6 +5,7 @@ import com.example.demo.exceptions.UsernameTakenException;
 import com.example.demo.models.User;
 import com.example.demo.services.AuthenticationService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,11 +22,7 @@ public class AuthenticationController {
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
-    /*
-        @GetMapping methods should be the only
-        methods where we are actually returning
-        the view (return "register")
-     */
+
     @GetMapping("/login")
     public String login() {
         return "login";
@@ -39,11 +36,6 @@ public class AuthenticationController {
         return "register";
     }
 
-    /*
-        would be best if we
-        followed the PRG (POST-REDIRECT-GET)
-        pattern https://en.wikipedia.org/wiki/Post/Redirect/Get
-     */
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result,
                                RedirectAttributes redirectAttributes) {
@@ -52,15 +44,9 @@ public class AuthenticationController {
             redirectAttributes.addFlashAttribute("user", user);
             return "redirect:/auth/register"; // Return to form with validation errors
         }
-        /*
-            removed check for existing
-            username/email checks because
-            they are present in service
-         */
         try {
             authenticationService.registerNewUser(user);
             redirectAttributes.addFlashAttribute("success", "Registration successful!");
-            //wasn't displayed anywhere, so I added it in the template
             return "redirect:/auth/login";
         }  catch (UsernameTakenException e) {
             redirectAttributes.addFlashAttribute("usernameError", e.getMessage());
