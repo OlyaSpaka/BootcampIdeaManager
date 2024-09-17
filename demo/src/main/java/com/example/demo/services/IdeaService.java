@@ -1,11 +1,13 @@
 package com.example.demo.services;
 
 import com.example.demo.models.Idea;
+import com.example.demo.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.repositories.IdeaRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -63,12 +65,10 @@ public class IdeaService {
 
     public List<Idea> getFormattedIdeas(String search) {
         List<Idea> ideas = searchIdeas(search);
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm dd.MM.yy");
 
         ideas.forEach(idea -> {
             if (idea.getCreatedAt() != null) {
-                String formattedDate = dateFormatter.format(idea.getCreatedAt());
-                idea.setFormattedDate(formattedDate);
+                idea.setFormattedDate(formatDate(idea.getCreatedAt()));
             }
         });
         return ideas;
@@ -79,11 +79,29 @@ public class IdeaService {
                 .orElseThrow(() -> new NoSuchElementException("Idea not found with id: " + id));
     }
 
+    public List<Idea> displayIdeasByUser(User user) {
+        List<Idea> ideas = ideaRepository.findByUserId(user.getId());
+        if (ideas.isEmpty()) {
+            throw new NoSuchElementException("No ideas found for user: " + user.getId());
+        }
+        ideas.forEach(idea -> {
+            if (idea.getCreatedAt() != null) {
+                idea.setFormattedDate(formatDate(idea.getCreatedAt()));
+            }
+        });
+        return ideas;
+    }
+
     public List<Idea> searchIdeas(String search) {
         if (search == null || search.trim().isEmpty()) {
             return ideaRepository.findAll();
         } else {
             return ideaRepository.searchIdeas(search.toLowerCase());
         }
+    }
+
+    private String formatDate(Date createdAt) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm dd.MM.yy");
+        return dateFormatter.format(createdAt);
     }
 }
