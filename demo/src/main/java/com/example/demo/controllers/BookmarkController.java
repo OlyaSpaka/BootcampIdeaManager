@@ -1,32 +1,48 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.BookmarkRequestDTO;
 import com.example.demo.models.Bookmark;
-import com.example.demo.models.Comment;
 import com.example.demo.services.BookmarkService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "Bookmark")
+@RequestMapping(path = "/bookmark")
 public class BookmarkController {
     private final BookmarkService bookmarkService;
 
     public BookmarkController(BookmarkService bookmarkService) {
         this.bookmarkService = bookmarkService;
     }
-    @PostMapping
-    public void addBookmark(@RequestBody Bookmark bookmark){
-        bookmarkService.addBookmark(bookmark);
+
+    @PostMapping("/add")
+    @ResponseBody
+    public ResponseEntity<String> addBookmark(@RequestBody BookmarkRequestDTO bookmarkRequestDTO) {
+        bookmarkService.addBookmark(
+                bookmarkRequestDTO.ideaId(),
+                bookmarkRequestDTO.userId()
+        );
+
+        return ResponseEntity.ok("Bookmark saved successfully");
     }
 
-    @DeleteMapping(path = "{bookmarkId}")
-    public void deleteBookmark(@PathVariable("bookmarkId") Integer id) {
-        bookmarkService.deleteBookmark(id);
+    @PostMapping("/delete")
+    @ResponseBody
+    public ResponseEntity<String> deleteBookmark(@RequestBody BookmarkRequestDTO bookmarkRequestDTO) {
+        System.out.println("Deleting bookmark = " + bookmarkRequestDTO);
+
+        bookmarkService.deleteBookmark(
+                bookmarkRequestDTO.ideaId(),
+                bookmarkRequestDTO.userId()
+        );
+
+        return ResponseEntity.ok("Bookmark deleted successfully");
     }
 
     @GetMapping
-    public List<Bookmark> getUserBookmarks(@RequestParam("userId")Integer userId) {
+    public List<Bookmark> getUserBookmarks(@RequestParam("userId") Integer userId) {
         return bookmarkService.getUserBookmarks(userId);
     }
 }

@@ -6,7 +6,6 @@ import com.example.demo.repositories.IdeaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.demo.repositories.IdeaRepository;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -40,8 +39,6 @@ public class IdeaService {
         if (idea.getUser() != null) {
             idea.getUser().removeIdea(idea);
         }
-
-
 
         // Delete the Idea
         ideaRepository.deleteById(id);
