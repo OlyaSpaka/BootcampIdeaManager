@@ -30,6 +30,9 @@ public class Competition {
     @Column(name="end_date")
     private Date endDate;
 
+    @Column(name = "amount_of_winners", nullable = false)
+    private int amountOfWinners;
+
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<IdeaSelection> ideaSelections = new HashSet<>();
 
@@ -39,11 +42,12 @@ public class Competition {
     public Competition() {
     }
 
-    public Competition(String name, String description, Date startDate, Date endDate) {
+    public Competition(String name, String description, Date startDate, Date endDate, int amountOfWinners) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.amountOfWinners = amountOfWinners;
     }
 
     public void addIdeaSelection(IdeaSelection ideaSelection){

@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "USER" (
+CREATE TABLE IF NOT EXISTS appuser (
                                       id INT NOT NULL AUTO_INCREMENT,
                                       username VARCHAR(30) NOT NULL,
                                       email VARCHAR(40) NOT NULL,
@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS competition (
                                            description VARCHAR(255) NOT NULL,
                                            start_date TIMESTAMP NOT NULL,
                                            end_date TIMESTAMP,
+                                           amount_of_winners INT NOT NULL,
                                            PRIMARY KEY (id)
 );
 
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS idea (
                                     pictures VARCHAR(255),
                                     PRIMARY KEY (id),
                                     FOREIGN KEY (Competition_id) REFERENCES competition(id),
-                                    FOREIGN KEY (User_id) REFERENCES "USER"(id)
+                                    FOREIGN KEY (User_id) REFERENCES appuser(id)
 );
 
 CREATE TABLE IF NOT EXISTS bookmark (
@@ -38,7 +39,7 @@ CREATE TABLE IF NOT EXISTS bookmark (
                                         Idea_id INT NOT NULL,
                                         PRIMARY KEY (id),
                                         FOREIGN KEY (Idea_id) REFERENCES idea(id),
-                                        FOREIGN KEY (User_id) REFERENCES "USER"(id)
+                                        FOREIGN KEY (User_id) REFERENCES appuser(id)
 );
 
 CREATE TABLE IF NOT EXISTS category (
@@ -54,7 +55,7 @@ CREATE TABLE IF NOT EXISTS comment (
                                        content VARCHAR(255) NOT NULL,
                                        PRIMARY KEY (id),
                                        FOREIGN KEY (Idea_id) REFERENCES idea(id),
-                                       FOREIGN KEY (User_id) REFERENCES "USER"(id)
+                                       FOREIGN KEY (User_id) REFERENCES appuser(id)
 );
 
 CREATE TABLE IF NOT EXISTS idea_category (
@@ -86,7 +87,7 @@ CREATE TABLE IF NOT EXISTS user_role (
                                          User_id INT NOT NULL,
                                          PRIMARY KEY (User_id, Role_id),
                                          FOREIGN KEY (Role_id) REFERENCES role(id),
-                                         FOREIGN KEY (User_id) REFERENCES "USER"(id)
+                                         FOREIGN KEY (User_id) REFERENCES appuser(id)
 );
 
 CREATE TABLE IF NOT EXISTS votetype (
@@ -103,6 +104,6 @@ CREATE TABLE IF NOT EXISTS vote (
                                     Idea_id INT NOT NULL,
                                     PRIMARY KEY (id),
                                     FOREIGN KEY (Idea_id) REFERENCES idea(id),
-                                    FOREIGN KEY (User_id) REFERENCES "USER"(id),
+                                    FOREIGN KEY (User_id) REFERENCES appuser(id),
                                     FOREIGN KEY (VoteType_id) REFERENCES votetype(id)
 );

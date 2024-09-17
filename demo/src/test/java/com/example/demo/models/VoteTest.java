@@ -39,7 +39,7 @@ class VoteTest {
     @BeforeEach
     @Transactional
     void setUp() {
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date()));
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
         user = userRepository.save(new User("unittestuser", "email@example.com", "password"));
         Idea idea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
 
