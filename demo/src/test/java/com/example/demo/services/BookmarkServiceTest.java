@@ -44,13 +44,13 @@ public class BookmarkServiceTest {
     void setUp(){
         bookmark = new Bookmark();
         user = userRepository.save(new User("username", "email@example.com", "password"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date()));
+        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(),3));
         idea = new Idea();
         idea.setCreatedAt(new Date());
         idea.setTitle("Test Idea");
         idea.setDescription("Test description");
         idea.setKeyFeatures("Test features");
-        idea.setReferences("Test references");
+        idea.setReferenceLinks("Test references");
         user.addIdea(idea);
         competition.addIdea(idea);
         idea = ideaRepository.save(idea);
@@ -68,7 +68,7 @@ public class BookmarkServiceTest {
         testIdea.setTitle("Test Idea");
         testIdea.setDescription("Test description");
         testIdea.setKeyFeatures("Test features");
-        testIdea.setReferences("Test references");
+        testIdea.setReferenceLinks("Test references");
         user.addIdea(testIdea);
         competition.addIdea(testIdea);
         testIdea = ideaRepository.save(testIdea);
@@ -89,7 +89,7 @@ public class BookmarkServiceTest {
         testIdea.setTitle("Test Idea");
         testIdea.setDescription("Test description");
         testIdea.setKeyFeatures("Test features");
-        testIdea.setReferences("Test references");
+        testIdea.setReferenceLinks("Test references");
         user.addIdea(testIdea);
         competition.addIdea(testIdea);
         testIdea = ideaRepository.save(testIdea);

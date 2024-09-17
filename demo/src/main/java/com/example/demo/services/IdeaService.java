@@ -1,18 +1,18 @@
 package com.example.demo.services;
 
 import com.example.demo.models.Idea;
+import com.example.demo.repositories.IdeaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.demo.repositories.IdeaRepository;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import java.text.SimpleDateFormat;
-
 @Service
 public class IdeaService {
+
     private final IdeaRepository ideaRepository;
 
     @Autowired
@@ -30,13 +30,15 @@ public class IdeaService {
                 .orElseThrow(() -> new IllegalStateException("Idea with Id " + id + " does not exist"));
 
         // Remove the Idea from User and Competition
+        if (idea.getCompetition() != null) {
+            idea.getCompetition().removeIdea(idea);
+        }
+
         if (idea.getUser() != null) {
             idea.getUser().removeIdea(idea);
         }
 
-        if (idea.getCompetition() != null) {
-            idea.getCompetition().removeIdea(idea);
-        }
+
 
         // Delete the Idea
         ideaRepository.deleteById(id);

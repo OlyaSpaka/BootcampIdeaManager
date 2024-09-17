@@ -49,13 +49,13 @@ public class CommentServiceTest {
     void setUp() {
         comment = new Comment();
         user = userRepository.save(new User("username", "email@example.com", "password"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date()));
+        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(),3));
         idea = new Idea();
         idea.setCreatedAt(new Date());
         idea.setTitle("Test Idea");
         idea.setDescription("Test description");
         idea.setKeyFeatures("Test features");
-        idea.setReferences("Test references");
+        idea.setReferenceLinks("Test references");
         user.addIdea(idea);
         competition.addIdea(idea);
         idea = ideaRepository.save(idea);

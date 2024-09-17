@@ -1,27 +1,32 @@
 package com.example.demo.services;
 
+import com.example.demo.models.Competition;
 import com.example.demo.models.Idea;
+import com.example.demo.models.IdeaSelection;
 import com.example.demo.models.Vote;
+import com.example.demo.repositories.CompetitionRepository;
 import com.example.demo.repositories.IdeaRepository;
+import com.example.demo.repositories.IdeaSelectionRepository;
 import com.example.demo.repositories.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class VoteService {
 
     private final VoteRepository voteRepository;
     private final IdeaRepository ideaRepository;
+    private final CompetitionRepository competitionRepository;
+    private IdeaSelectionService ideaSelectionService;
 
     @Autowired
-    public VoteService(VoteRepository voteRepository, IdeaRepository ideaRepository) {
+    public VoteService(VoteRepository voteRepository, IdeaRepository ideaRepository, CompetitionRepository competitionRepository, IdeaSelectionService ideaSelectionService) {
         this.voteRepository = voteRepository;
         this.ideaRepository = ideaRepository;
+        this.competitionRepository = competitionRepository;
+        this.ideaSelectionService = ideaSelectionService;
     }
 
     public void addVote(Vote vote) {
@@ -85,6 +90,35 @@ public class VoteService {
             hashMap.put(idea.getId(), calculatePoints(idea.getId()));
         }
         return hashMap;
+
+    }
+
+    public List<Idea> getWinningIdeas(Integer competitionId) {
+        List<Idea> winningIdeaList = new ArrayList<>();
+        Optional<Competition> competition = competitionRepository.findById(competitionId);
+        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints();
+
+        List<Map.Entry<Integer, Integer>> sortedIdeas = new ArrayList<>(ideasWithPointsCalculated.entrySet());
+        sortedIdeas.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
+
+        // Loop through the sorted list and add the corresponding ideas to the winningIdeaList
+        for (int i = 0; i < Math.min(competition.get().getAmountOfWinners(), sortedIdeas.size()); i++) {
+            Integer ideaId = sortedIdeas.get(i).getKey();
+            winningIdeaList.add(ideaRepository.findById(ideaId).orElse(null));
+        }
+
+        return winningIdeaList;
+    }
+
+    public void addWinningIdeasToIdeaSelectionRepository(Integer competitionId) {
+        List<Idea> winningIdeaList = getWinningIdeas(competitionId);
+        for (Idea idea : winningIdeaList) {
+            IdeaSelection selectedIdea = new IdeaSelection(idea.getCreatedAt());
+            selectedIdea.setCompetition(competitionRepository.findById(competitionId).get());
+            selectedIdea.setIdea(idea);
+
+            ideaSelectionService.addIdeaSelection(selectedIdea);
+        }
 
     }
 }

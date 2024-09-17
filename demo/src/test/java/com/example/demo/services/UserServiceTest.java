@@ -41,7 +41,7 @@ public class UserServiceTest {
     void addUser(){
         User testUser = new User();
         testUser.setUsername("newUser");
-        testUser.setEmail("newEmail");
+        testUser.setEmail("newEmail@google.com");
         testUser.setPassword("newPassword");
 
         userService.addUser(testUser);
@@ -54,7 +54,7 @@ public class UserServiceTest {
     void deleteUserWhenExists(){
         User userToDelete = new User();
         userToDelete.setUsername("newUser");
-        userToDelete.setEmail("newEmail");
+        userToDelete.setEmail("newEmai11l@verygoodmood.com");
         userToDelete.setPassword("newPassword");
 
         userRepository.save(userToDelete);

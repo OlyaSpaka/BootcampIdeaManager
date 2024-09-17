@@ -32,7 +32,7 @@ public class CompetitionServiceTest {
 
     @BeforeEach
     void setUp(){
-        competition = competitionRepository.save(new Competition("title","description", new Date(), new Date()));
+        competition = competitionRepository.save(new Competition("title","description", new Date(), new Date(),3));
         competitionRepository.save(competition);
     }
     @Test

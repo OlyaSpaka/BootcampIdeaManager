@@ -48,13 +48,13 @@ public class IdeaSelectionServiceTest {
     @BeforeEach
     void setUp() {
         ideaUser = userRepository.save(new User("ideaUsername", "email123@example.com", "password123"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date()));
+        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(),3));
         idea = new Idea();
         idea.setCreatedAt(new Date());
         idea.setTitle("Test Idea");
         idea.setDescription("Test description");
         idea.setKeyFeatures("Test features");
-        idea.setReferences("Test references");
+        idea.setReferenceLinks("Test references");
         ideaUser.addIdea(idea);
         competition.addIdea(idea);
         idea = ideaRepository.save(idea);
@@ -73,7 +73,7 @@ public class IdeaSelectionServiceTest {
         testIdea.setTitle("Test Idea");
         testIdea.setDescription("Test description");
         testIdea.setKeyFeatures("Test features");
-        testIdea.setReferences("Test references");
+        testIdea.setReferenceLinks("Test references");
         ideaUser.addIdea(testIdea);
         competition.addIdea(testIdea);
         testIdea = ideaRepository.save(testIdea);
@@ -95,7 +95,7 @@ public class IdeaSelectionServiceTest {
         testIdea.setTitle("Test Idea");
         testIdea.setDescription("Test description");
         testIdea.setKeyFeatures("Test features");
-        testIdea.setReferences("Test references");
+        testIdea.setReferenceLinks("Test references");
         ideaUser.addIdea(testIdea);
         competition.addIdea(testIdea);
         testIdea = ideaRepository.save(testIdea);
