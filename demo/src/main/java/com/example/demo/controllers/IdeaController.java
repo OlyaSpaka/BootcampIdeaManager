@@ -4,7 +4,9 @@ import com.example.demo.dto.IdeaDTO;
 import com.example.demo.models.User;
 import com.example.demo.services.*;
 import com.example.demo.models.Idea;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -47,6 +49,7 @@ public class IdeaController {
         return "separate-idea";
     }
 
+    @PreAuthorize("hasRole('ROLE_User')")
     @GetMapping("/new-idea")
     public String newIdeaForm(Model model) {
         addCommonAttributes(model);
@@ -55,6 +58,7 @@ public class IdeaController {
         return "new-idea-by-ilya";
     }
 
+    @PreAuthorize("hasRole('ROLE_User')")
     @PostMapping("/new-idea/create")
     public String addIdea(@Valid @ModelAttribute("ideaDTO") IdeaDTO ideaDTO,
                           BindingResult bindingResult,
@@ -65,10 +69,13 @@ public class IdeaController {
         return "/ideas";
     }
 
+    @PreAuthorize("hasRole('ROLE_User')")
     @PostMapping("/{ideaId}/delete")
     public void deleteIdea(@PathVariable("ideaId") Integer id) {
         ideaService.deleteIdea(id);
     }
+
+    @PreAuthorize("hasRole('ROLE_User')")
     @PostMapping("/{ideaId}/update")
     public void updateIdea(@PathVariable("ideaId") Integer id,
                            @RequestParam(required = false) String description,

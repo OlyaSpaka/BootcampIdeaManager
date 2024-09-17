@@ -22,7 +22,7 @@
 )}"></div>
     <form method="post" th:action="@{/ideas/new-idea/create}" th:object="${ideaDTO}">
 
-        <input type="hidden" name=competitionId" th:value="1">
+        <input type="hidden" name="competitionId" th:value="1">
         <input type="hidden" name="userId" th:value="${user_id}">
 
         <div class="form-group">
