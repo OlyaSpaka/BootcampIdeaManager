@@ -40,7 +40,7 @@ class IdeaSelectionTest {
     @Transactional
     void setUp() {
         // Setup initial data
-        savedCompetition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date()));
+        savedCompetition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
         User savedUser = userRepository.save(new User("username", "email@example.com", "password"));
 
         savedIdea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
