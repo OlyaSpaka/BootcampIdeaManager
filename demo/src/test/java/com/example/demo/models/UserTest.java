@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Date;
@@ -35,7 +34,7 @@ class UserTest {
     @BeforeEach
     @Transactional
     public void setUp() {
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date()));
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
         user = userRepository.save(new User("unittestuser", "email@example.com", "password"));
         Idea idea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
 

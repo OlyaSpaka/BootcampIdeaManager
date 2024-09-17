@@ -41,7 +41,7 @@ class CommentTest {
     void setUp() {
         // Setup initial data
         user = userRepository.save(new User("username", "email@example.com", "password"));
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date()));
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
         Idea newIdea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
 
         user.addIdea(newIdea);
@@ -72,7 +72,7 @@ class CommentTest {
     @Transactional
     void addComment() {
         // Create and persist new entities
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date()));
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
         User newUser = new User("anotherUser", "another@example.com", "password");
         Idea newIdea = new Idea("New Idea", "Description", "Key Features", "References", new Date(), "Pictures");
 

@@ -43,7 +43,7 @@ class IdeaServiceTest {
 
     @BeforeEach
     void setUp() {
-        competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date()));
+        competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
         user = userRepository.save(new User("username", "email@example.com", "password"));
         // Setting up an Idea object for testing
         idea = new Idea();
