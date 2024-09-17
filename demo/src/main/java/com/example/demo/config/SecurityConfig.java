@@ -4,17 +4,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
     @Bean
@@ -31,21 +30,21 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF protection for testing purposes (enable in production)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").anonymous() // Permit access to /auth for logged out users
-                        .requestMatchers("/css/style.css").permitAll()
-                        .anyRequest().authenticated() // All other requests need to be authenticated
+                        .requestMatchers("/auth/**").anonymous() // only unauthorized users can register/login
+                        .requestMatchers("/css/auth-error-pages-style.css").permitAll() // if not added, guests cannot see css of login/register pages
+                        .anyRequest().authenticated() // all other requests need to be authenticated
                 )
                 .formLogin(form -> form
-                        .loginPage("/auth/login") // Custom login page
-                        .loginProcessingUrl("/auth/login") // URL to submit login credentials
+                        .loginPage("/auth/login") // GET request for login page
+                        .loginProcessingUrl("/auth/login") // POST request for login page
                         .failureUrl("/auth/login?error")
-                        .defaultSuccessUrl("/ideas", true) // Redirect to /home on success
+                        .defaultSuccessUrl("/ideas", true)
                 )
                 .logout(logout -> logout
-                        .invalidateHttpSession(true) // Invalidate session on logout
-                        .clearAuthentication(true) // Clear authentication on logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout")) // Set the logout URL
-                        //.logoutSuccessUrl("/login?logout") // Redirect to /login?logout on logout
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .logoutUrl("/auth/logout") // logout url that only accepts POST requests
+                        .logoutSuccessUrl("/auth/login?logout") // on logout, redirect to this page
                         .permitAll()
                 );
         return http.build();
