@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface IdeaRepository extends JpaRepository<Idea, Integer> {
@@ -22,4 +23,6 @@ public interface IdeaRepository extends JpaRepository<Idea, Integer> {
                                 LOWER(COALESCE(i.referenceLinks, '')) LIKE %:search%
             """)
     List<Idea> searchIdeas(@Param("search") String search);
+
+    Set<Idea> findAllByIdIn(Set<Integer> set);
 }

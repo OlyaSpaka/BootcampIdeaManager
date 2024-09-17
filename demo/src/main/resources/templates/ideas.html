@@ -16,7 +16,7 @@
     title='Bootcamp Ideas',
     subtitle=${competitionName},
     message=${competitionDescription},
-    user=${user},
+    user=${username},
     link1Href='/ideas/new-idea',
     link1Text='Create new idea',
     link2Href='/notready',
@@ -45,7 +45,7 @@
         </thead>
         <tbody>
         <tr th:each="idea : ${ideas}">
-            <td class="col-date" th:text="${idea.formattedDate}"></td>
+            <td class="col-date" th:text="${idea.createdAt}"></td>
             <td class="col-author" th:text="${idea.user.username}"></td>
             <td class="col-title">
                 <a th:href="@{/ideas/{id}(id=${idea.id})}" th:text="${idea.title}"></a>

@@ -12,7 +12,7 @@
     title='Bootcamp Ideas',
     subtitle=${competitionName},
     message=${competitionDescription},
-    user=${user},
+    user=${username},
     link1Href='/ideas',
     link1Text='See all ideas',
     link2Href='/notready',
@@ -21,8 +21,8 @@
     link3Text=''
 )}"></div>
     <form method="post" th:action="@{/ideas/new-idea/create}" th:object="${ideaDTO}">
-        <input type="hidden" name="competitionId" th:value="1">
-        <input type="hidden" name="userId" th:value="${user_id}">
+        <input type="hidden" name="competition.id" th:value="1">
+        <input type="hidden" name="user.id" th:value="${user_id}">
         <input type="hidden" name="createdAt" th:value="${#dates.format(new java.util.Date(), 'yyyy-MM-dd')}" />
 
         <div class="form-group">
@@ -38,13 +38,15 @@
         </div>
 
         <div class="form-group">
-            <label for="category">Category*</label>
-            <select id="category" th:field="*{categoryIds}" multiple>
-                <th:block th:each="category : ${categories}">
-                    <option th:value="${category.id}" th:text="${category.name}">Category Name</option>
+            <label for="categories">Category*</label>
+            <select id="categories" name="categories" multiple>
+                <th:block th:each="category : ${allCategories}">
+                    <option th:value="${category.name}"
+                            th:text="${category.name}"
+                            th:selected="${ideaDTO.categories.contains(category)}">Category Name</option>
                 </th:block>
             </select>
-            <div th:if="${#fields.hasErrors('categoryIds')}" th:errors="*{categoryIds}" class="error"></div>
+            <div th:if="${#fields.hasErrors('categories')}" th:errors="*{categories}" class="error"></div>
         </div>
 
         <div class="form-group">
@@ -64,6 +66,17 @@
 <!--            <input type="file" id="fileUpload" name="fileUpload"/>-->
 <!--            <div th:if="${#fields.hasErrors('fileUpload')}" th:errors="*{fileUpload}" class="error"></div>-->
 <!--        </div>-->
+
+        <div class="form-group">
+            <label for="competition">Competition*</label>
+            <select id="competition" th:field="*{competition.id}" required>
+                <th:block th:each="competition : ${competitions}">
+                    <option th:value="${competition.id}" th:text="${competition.name}">Competition Name</option>
+                </th:block>
+            </select>
+            <div th:if="${#fields.hasErrors('competition')}" th:errors="*{competition}" class="error"></div>
+        </div>
+
 
         <button type="submit">Submit Idea</button>
     </form>

@@ -1,9 +1,10 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.IdeaDTO;
+import com.example.demo.dto.general.CommentDTO;
+import com.example.demo.dto.input.InputIdeaDTO;
+import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.models.User;
 import com.example.demo.services.*;
-import com.example.demo.models.Idea;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +34,7 @@ public class IdeaController {
 
     @GetMapping
     public String listIdeas(@RequestParam(value = "search", required = false) String search, Model model) {
-        List<Idea> ideas = ideaService.getFormattedIdeas(search);
+        List<OutputIdeaDTO> ideas = ideaService.getFormattedIdeas(search);
         addCommonAttributes(model);
         model.addAttribute("ideas", ideas);
         model.addAttribute("search", search);
@@ -43,32 +44,36 @@ public class IdeaController {
     @GetMapping("/{userId}")
     public String showUserIdea(@PathVariable Integer userId, Model model){
         addCommonAttributes(model);
-        model.addAttribute("idea", ideaService.displayIdea(userId));
+        model.addAttribute("ideaDTO", ideaService.findById(userId));
         model.addAttribute("comments", commentService.showIdeaComments(userId));
+        if (!model.containsAttribute("commentDTO")){
+            model.addAttribute("commentDTO", new CommentDTO());
+        }
         return "separate-idea";
     }
 
     @GetMapping("/new-idea")
     public String newIdeaForm(Model model) {
         addCommonAttributes(model);
-        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("allCategories", categoryService.getAllCategories());
+        model.addAttribute("competitions", competitionService.findAll());
         if (!model.containsAttribute("ideaDTO")){
-            model.addAttribute("ideaDTO", new IdeaDTO());
+            model.addAttribute("ideaDTO", new InputIdeaDTO());
         }
         return "new-idea-by-ilya";
     }
 
     @PostMapping("/new-idea/create")
-    public String addIdea(@Valid @ModelAttribute("ideaDTO") IdeaDTO ideaDTO,
+    public String addIdea(@Valid @ModelAttribute("ideaDTO") InputIdeaDTO inputIdeaDTO,
                           BindingResult bindingResult,
                           RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()){
-            redirectAttributes.addFlashAttribute("ideaDTO", ideaDTO);
+            redirectAttributes.addFlashAttribute("ideaDTO", inputIdeaDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ideaDTO", bindingResult);
             return "redirect:/ideas/new-idea";
         }
         try {
-            int id = ideaService.addNewIdea(ideaDTO);
+            int id = ideaService.addNewIdea(inputIdeaDTO);
             return "redirect:/ideas/"+id;
         } catch (IllegalArgumentException | ParseException e){
             redirectAttributes.addFlashAttribute("errorMsg", e);
@@ -77,9 +82,27 @@ public class IdeaController {
     }
 
     @PostMapping("/{ideaId}/delete")
-    public void deleteIdea(@PathVariable("ideaId") Integer id) {
-        ideaService.deleteIdea(id);
+    public String deleteIdea(@PathVariable("ideaId") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            ideaService.deleteIdea(id);
+        } catch (IllegalStateException e){
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/ideas/"+id;
+        }
+        return "redirect:/ideas";
     }
+
+    @GetMapping("/{ideaId}/edit")
+    public String editIdeaForm(@PathVariable("ideaId") Integer id, Model model) {
+        OutputIdeaDTO idea = ideaService.findById(id);
+        if (idea == null) {
+            throw new IllegalStateException("Idea with Id " + id + " does not exist");
+        }
+        addCommonAttributes(model);
+        model.addAttribute("idea", idea);
+        return "edit-idea"; // Template name for the edit form
+    }
+
     @PostMapping("/{ideaId}/update")
     public void updateIdea(@PathVariable("ideaId") Integer id,
                            @RequestParam(required = false) String description,
@@ -90,7 +113,7 @@ public class IdeaController {
     }
     private void addCommonAttributes(Model model) {
         User user = authenticationService.getCurrentUser();
-        model.addAttribute("user", user.getUsername());
+        model.addAttribute("username", user.getUsername());
         model.addAttribute("user_id", user.getId());
         model.addAttribute("competitionName", competitionService.getCompetitionName(1));
         model.addAttribute("competitionDescription", competitionService.getCompetitionDescription(1));

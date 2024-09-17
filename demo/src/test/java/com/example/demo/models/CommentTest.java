@@ -92,7 +92,7 @@ class CommentTest {
         entityManager.persist(newUser);
         entityManager.flush();
 
-        // Verify that the new comment is associated with the new user and idea
+        // Verify that the new comment is associated with the new username and idea
         Comment retrievedComment = commentRepository.findById(comment.getId()).orElse(null);
         assertThat(retrievedComment).isNotNull();
         assertThat(retrievedComment.getUser()).isEqualTo(newUser);

@@ -91,7 +91,7 @@ class BookmarkTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Verify that the new bookmark is associated with the new user and idea
+        // Verify that the new bookmark is associated with the new username and idea
         Bookmark retrievedBookmark = bookmarkRepository.findById(bookmark.getId()).orElse(null);
         assertThat(retrievedBookmark).isNotNull();
         assertThat(retrievedBookmark.getUser()).isEqualTo(newUser);

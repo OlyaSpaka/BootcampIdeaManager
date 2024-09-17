@@ -149,7 +149,7 @@ class UserTest {
 
         entityManager.persist(role);
 
-//        entityManager.persist(user); // Save Idea and associated Vote
+//        entityManager.persist(username); // Save Idea and associated Vote
         entityManager.flush(); // Ensure changes are committed
 
         User pulledUser = userRepository.findById(user.getId()).orElse(null);

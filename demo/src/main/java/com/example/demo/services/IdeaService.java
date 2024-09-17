@@ -1,7 +1,8 @@
 package com.example.demo.services;
 
-import com.example.demo.dto.IdeaDTO;
-import com.example.demo.mapper.IdeaMapper;
+import com.example.demo.dto.input.InputIdeaDTO;
+import com.example.demo.dto.output.OutputIdeaDTO;
+import com.example.demo.mapper.implementation.IdeaMapper;
 import com.example.demo.models.Idea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,10 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.repositories.IdeaRepository;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import java.text.SimpleDateFormat;
 
 @Service
 public class IdeaService {
@@ -29,14 +29,14 @@ public class IdeaService {
         ideaRepository.save(idea);
     }
 
-    public Integer addNewIdea(IdeaDTO ideaDTO) throws IllegalArgumentException, ParseException {
-        Idea idea = ideaMapper.map(ideaDTO);
+    public Integer addNewIdea(InputIdeaDTO inputIdeaDTO) throws IllegalArgumentException, ParseException {
+        Idea idea = ideaMapper.map(inputIdeaDTO);
         idea = ideaRepository.save(idea);
         return idea.getId();
     }
 
     @Transactional
-    public void deleteIdea(Integer id) {
+    public void deleteIdea(Integer id) throws IllegalStateException {
         Idea idea = ideaRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Idea with Id " + id + " does not exist"));
 
@@ -72,25 +72,23 @@ public class IdeaService {
         return ideaRepository.findByUserId(userId);
     }
 
-    public List<Idea> getFormattedIdeas(String search) {
+    public List<OutputIdeaDTO> getFormattedIdeas(String search) {
         List<Idea> ideas = searchIdeas(search);
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm dd.MM.yy");
-
-        ideas.forEach(idea -> {
-            if (idea.getCreatedAt() != null) {
-                String formattedDate = dateFormatter.format(idea.getCreatedAt());
-                idea.setFormattedDate(formattedDate);
-            }
-        });
-        return ideas;
+        List<OutputIdeaDTO> mappedIdeas = new ArrayList<>();
+        for (Idea idea : ideas){
+            mappedIdeas.add(ideaMapper.map(idea));
+        }
+        return mappedIdeas;
     }
 
-    public Idea displayIdea(Integer id) {
-        return ideaRepository.findById(id)
+    public OutputIdeaDTO findById(Integer id) {
+        Idea idea = ideaRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Idea not found with id: " + id));
+
+        return ideaMapper.map(idea);
     }
 
-    public List<Idea> searchIdeas(String search) {
+    private List<Idea> searchIdeas(String search) {
         if (search == null || search.trim().isEmpty()) {
             return ideaRepository.findAll();
         } else {

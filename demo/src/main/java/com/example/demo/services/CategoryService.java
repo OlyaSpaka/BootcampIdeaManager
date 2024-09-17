@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.output.OutputCategoryDTO;
+import com.example.demo.mapper.implementation.CategoryMapper;
 import com.example.demo.models.Category;
 import com.example.demo.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +13,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
+        this.categoryMapper = categoryMapper;
     }
 
     public void addCategory(Category category){
@@ -29,9 +33,7 @@ public class CategoryService {
         }
     }
 
-    public List<Category> getAllCategories() {
-        return categoryRepository.findAll();
+    public List<OutputCategoryDTO> getAllCategories() {
+        return categoryMapper.map(categoryRepository.findAll());
     }
-
-
 }

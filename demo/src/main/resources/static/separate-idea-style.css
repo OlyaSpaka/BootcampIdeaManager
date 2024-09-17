@@ -64,3 +64,15 @@
 .comments-section .comment-list p strong {
     color: orangered;
 }
+
+.category-bubble {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 15px;
+    background-color: #e0e0e0; /* Light grey background */
+    color: #333; /* Dark text color */
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}

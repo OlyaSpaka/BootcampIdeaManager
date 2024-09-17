@@ -88,7 +88,7 @@ class IdeaServiceTest {
 ////        ideaToDelete.setTitle("Test Idea");
 ////        ideaToDelete.setDescription("Test description");
 //
-////        user.addIdea(ideaToDelete);
+////        username.addIdea(ideaToDelete);
 ////        competition.addIdea(ideaToDelete);
 ////
 ////        ideaRepository.save(ideaToDelete);
