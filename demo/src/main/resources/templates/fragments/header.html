@@ -6,7 +6,7 @@
     <link rel="stylesheet" th:href="@{base-styles.css}">
 </head>
 <body>
-<div th:fragment="header(title, subtitle, message, user)">
+<div th:fragment="header(title, subtitle, message, user, link1Href, link1Text, link2Href, link2Text, link3Href, link3Text)">
     <header class="header">
         <h1 th:text="${title}"></h1>
         <h2 class="subtitle" th:text="${subtitle}"></h2>
@@ -23,5 +23,6 @@
             <a th:href="${link3Href}" th:text="${link3Text}"></a>
         </div>
     </div>
+</div>
 </body>
 </html>
