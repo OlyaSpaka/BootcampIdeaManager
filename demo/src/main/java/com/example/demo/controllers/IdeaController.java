@@ -1,10 +1,10 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.IdeaDTO;
+import com.example.demo.dto.general.CommentDTO;
+import com.example.demo.dto.input.InputIdeaDTO;
+import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.models.User;
 import com.example.demo.services.*;
-import com.example.demo.models.Idea;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -37,10 +38,10 @@ public class IdeaController {
 
     @GetMapping
     public String listIdeas(@RequestParam(value = "search", required = false) String search, Model model) {
-        List<Idea> ideas = ideaService.getFormattedIdeas(search);
+        List<OutputIdeaDTO> ideas = ideaService.getFormattedIdeas(search);
         User currentUser = authenticationService.getCurrentUser();
         Map<Integer, Boolean> bookmarkStatusMap = bookmarkService.getBookmarkStatusMap(currentUser, ideas);
-        addCommonAttributes(authenticationService.getCurrentUser(), model);
+        addCommonAttributes(currentUser, model);
         model.addAttribute("ideas", ideas);
         model.addAttribute("bookmarkStatusMap", bookmarkStatusMap);
         model.addAttribute("search", search);
@@ -50,7 +51,7 @@ public class IdeaController {
     @GetMapping("/my-ideas")
     public String listMyIdeas(Model model) {
         User currentUser = authenticationService.getCurrentUser();
-        List<Idea> userIdeas = ideaService.displayIdeasByUser(currentUser);
+        List<OutputIdeaDTO> userIdeas = ideaService.displayIdeasByUser(currentUser);
         Map<Integer, Boolean> bookmarkStatusMap = bookmarkService.getBookmarkStatusMap(currentUser, userIdeas);
         addCommonAttributes(authenticationService.getCurrentUser(), model);
         model.addAttribute("ideas", userIdeas);
@@ -61,7 +62,7 @@ public class IdeaController {
     @GetMapping("/bookmarks")
     public String listBookmarkedIdeas(Model model) {
         User currentUser = authenticationService.getCurrentUser();
-        List<Idea> bookmarkedIdeas = bookmarkService.getUserBookmarkedIdeas(currentUser.getId());
+        List<OutputIdeaDTO> bookmarkedIdeas = bookmarkService.getUserBookmarkedIdeas(currentUser.getId());
         Map<Integer, Boolean> bookmarkStatusMap = bookmarkService.getBookmarkStatusMap(currentUser, bookmarkedIdeas);
         addCommonAttributes(authenticationService.getCurrentUser(), model);
         model.addAttribute("ideas", bookmarkedIdeas);
@@ -70,14 +71,17 @@ public class IdeaController {
     }
 
     @GetMapping("/{userId}")
-    public String showUserIdea(@PathVariable Integer userId, Model model) {
+    public String showUserIdea(@PathVariable Integer userId, Model model){
         User currentUser = authenticationService.getCurrentUser();
-        Idea idea = ideaService.displayIdea(userId);
+        OutputIdeaDTO idea = ideaService.findById(userId);
         Map<Integer, Boolean> bookmarkStatusMap = bookmarkService.getBookmarkStatusMap(currentUser, List.of(idea));
-        addCommonAttributes(authenticationService.getCurrentUser(), model);
-        model.addAttribute("idea", ideaService.displayIdea(userId));
+        addCommonAttributes(currentUser, model);
+        model.addAttribute("ideaDTO", idea);
         model.addAttribute("comments", commentService.showIdeaComments(userId));
         model.addAttribute("bookmarkStatusMap", bookmarkStatusMap);
+        if (!model.containsAttribute("commentDTO")){
+            model.addAttribute("commentDTO", new CommentDTO());
+        }
         return "separate-idea";
     }
 
@@ -85,43 +89,81 @@ public class IdeaController {
     @GetMapping("/new-idea")
     public String newIdeaForm(Model model) {
         addCommonAttributes(authenticationService.getCurrentUser(), model);
-        model.addAttribute("categories", categoryService.getAllCategories());
-        model.addAttribute("ideaDTO", new IdeaDTO());
+        model.addAttribute("allCategories", categoryService.getAllCategories());
+        model.addAttribute("competitions", competitionService.findAll());
+        if (!model.containsAttribute("ideaDTO")){
+            model.addAttribute("ideaDTO", new InputIdeaDTO());
+        }
         return "new-idea-by-ilya";
     }
 
     @PreAuthorize("hasRole('ROLE_User')")
     @PostMapping("/new-idea/create")
-    public String addIdea(@Valid @ModelAttribute("ideaDTO") IdeaDTO ideaDTO,
+    public String addIdea(@Valid @ModelAttribute("ideaDTO") InputIdeaDTO inputIdeaDTO,
                           BindingResult bindingResult,
                           RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()){
+            redirectAttributes.addFlashAttribute("ideaDTO", inputIdeaDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ideaDTO", bindingResult);
             return "redirect:/ideas/new-idea";
         }
-        return "ideas";
+        try {
+            int id = ideaService.addNewIdea(inputIdeaDTO);
+            return "redirect:/ideas/"+id;
+        } catch (IllegalArgumentException | ParseException e){
+            redirectAttributes.addFlashAttribute("errorMsg", e);
+            return "redirect:/ideas/new-idea";
+        }
     }
 
     @PreAuthorize("hasRole('ROLE_User')")
     @PostMapping("/{ideaId}/delete")
-    public void deleteIdea(@PathVariable("ideaId") Integer id) {
-        ideaService.deleteIdea(id);
+    public String deleteIdea(@PathVariable("ideaId") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            ideaService.deleteIdea(id);
+        } catch (IllegalStateException e){
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/ideas/"+id;
+        }
+        return "redirect:/ideas";
+    }
+
+    @PreAuthorize("hasRole('ROLE_User')")
+    @GetMapping("/{ideaId}/edit")
+    public String editIdeaForm(@PathVariable("ideaId") Integer id, Model model) {
+        OutputIdeaDTO idea = ideaService.findById(id);
+        if (idea == null) {
+            throw new IllegalStateException("Idea with Id " + id + " does not exist");
+        }
+        addCommonAttributes(authenticationService.getCurrentUser(), model);
+        model.addAttribute("allCategories", categoryService.getAllCategories());
+        model.addAttribute("ideaDTO", idea);
+        return "edit-idea"; // Template name for the edit form
     }
 
     @PreAuthorize("hasRole('ROLE_User')")
     @PostMapping("/{ideaId}/update")
-    public void updateIdea(@PathVariable("ideaId") Integer id,
-                           @RequestParam(required = false) String description,
-                           @RequestParam(required = false) String title,
-                           @RequestParam(required = false) String keyFeatures,
-                           @RequestParam(required = false) String referenceLinks) {
-        ideaService.updateName(id, description, title, keyFeatures, referenceLinks);
+    public String updateIdea(@PathVariable("ideaId") Integer id,
+                           @Valid @ModelAttribute("ideaDTO")OutputIdeaDTO outputIdeaDTO,
+                           BindingResult bindingResult,
+                           RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()){
+            redirectAttributes.addFlashAttribute("ideaDTO", outputIdeaDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ideaDTO", bindingResult);
+            return "redirect:/ideas/"+id+"/edit";
+        }
+        try {
+            ideaService.updateName(id, outputIdeaDTO);
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/ideas/"+id+"/edit";
+        }
+        return "redirect:/ideas/"+id;
     }
-
     private void addCommonAttributes(User currentUser, Model model) {
-        model.addAttribute("user", currentUser.getUsername());
+        model.addAttribute("username", currentUser.getUsername());
         model.addAttribute("user_id", currentUser.getId());
         model.addAttribute("competitionName", competitionService.getCompetitionName(1));
         model.addAttribute("competitionDescription", competitionService.getCompetitionDescription(1));
     }
-
 }

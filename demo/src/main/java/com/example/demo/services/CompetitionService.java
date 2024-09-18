@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.general.CompetitionDTO;
+import com.example.demo.mapper.implementation.CompetitionMapper;
 import com.example.demo.models.Competition;
 import com.example.demo.repositories.CompetitionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,14 +9,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
+// for now assuming there's only one competition at a time
 @Service
 public class CompetitionService {
-
+    private final CompetitionMapper competitionMapper;
     private final CompetitionRepository competitionRepository;
-
     @Autowired
-    public CompetitionService(CompetitionRepository competitionRepository) {
+    public CompetitionService(CompetitionMapper competitionMapper, CompetitionRepository competitionRepository) {
+        this.competitionMapper = competitionMapper;
         this.competitionRepository = competitionRepository;
     }
 
@@ -29,6 +33,10 @@ public class CompetitionService {
         } else {
             competitionRepository.deleteById(id);
         }
+    }
+
+    public List<CompetitionDTO> findAll(){
+        return competitionMapper.map(competitionRepository.findAll());
     }
 
     @Transactional
@@ -48,8 +56,8 @@ public class CompetitionService {
 
     @Transactional
     public void updateCompetitionDate(Integer id,
-                                         Date start,
-                                         Date end) {
+                                      Date start,
+                                      Date end) {
         Competition competition = competitionRepository.findById(id).orElseThrow(() -> new IllegalStateException(
                 "Competition with Id " + id + " does not exist."));
         if (start != null) {
@@ -60,6 +68,7 @@ public class CompetitionService {
             competition.setEndDate(end);
         }
     }
+
     public String getCompetitionName(Integer id) {
         return competitionRepository
                 .findById(id)
@@ -73,4 +82,5 @@ public class CompetitionService {
                 .orElseThrow(() -> new IllegalStateException("Competition by id not found:" + id))
                 .getDescription();
     }
+
 }

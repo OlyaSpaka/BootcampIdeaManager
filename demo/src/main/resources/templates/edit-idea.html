@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Idea</title>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+    <link rel="stylesheet" th:href="@{/separate-idea-style.css}">
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 10px 0 5px;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            min-height: 100px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+        }
+
+        .form-group select {
+            height: 150px;
+        }
+
+        .form-group .error {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div th:replace="~{fragments/header :: header(
+        title='Edit Idea',
+        subtitle=${competitionName},
+        message=${competitionDescription},
+        user=${username},
+        link1Href='/ideas',
+        link1Text='See all ideas',
+        link2Href='/notready',
+        link2Text='',
+        link3Href='/notready',
+        link3Text=''
+    )}"></div>
+
+    <div class="container">
+        <h2>Edit Idea</h2>
+        <form th:action="@{/ideas/{ideaId}/update(ideaId=${ideaDTO.id})}" method="post" th:object="${ideaDTO}">
+            <input type="hidden" th:field="${ideaDTO.id}" />
+
+            <label for="title">Title:</label>
+            <input type="text" id="title" th:field="*{title}" />
+            <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></div>
+
+            <label for="description">Description:</label>
+            <textarea id="description" th:field="*{description}"></textarea>
+            <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></div>
+
+            <label for="keyFeatures">Key Features:</label>
+            <textarea id="keyFeatures" th:field="*{keyFeatures}"></textarea>
+            <div th:if="${#fields.hasErrors('keyFeatures')}" th:errors="*{keyFeatures}" class="error"></div>
+
+            <label for="referenceLinks">References:</label>
+            <input type="text" id="referenceLinks" th:field="*{referenceLinks}" />
+            <div th:if="${#fields.hasErrors('referenceLinks')}" th:errors="*{referenceLinks}" class="error"></div>
+
+<!--            <label for="pictures">Pictures:</label>-->
+<!--            <input type="text" id="pictures" th:field="*{pictures}" />-->
+<!--            <div th:if="${#fields.hasErrors('pictures')}" th:errors="*{pictures}" class="error"></div>-->
+
+            <div class="form-group">
+                <label for="categories">Categories*</label>
+                <select id="categories" name="categories" multiple th:field="*{categories}">
+                    <th:block th:each="category : ${allCategories}">
+                        <option th:value="${category.name}" th:text="${category.name}"
+                                th:selected="${ideaDTO.categories.contains(category)}"></option>
+                    </th:block>
+                </select>
+                <div th:if="${#fields.hasErrors('categories')}" th:errors="*{categories}" class="error"></div>
+            </div>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
