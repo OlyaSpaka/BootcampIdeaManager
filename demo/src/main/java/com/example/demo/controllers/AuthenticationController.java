@@ -1,12 +1,13 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.RegisterDTO;
+import com.example.demo.exceptions.EmailTakenException;
+import com.example.demo.exceptions.UsernameTakenException;
+import com.example.demo.models.User;
 import com.example.demo.services.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,11 @@ public class AuthenticationController {
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
-
+    /*
+        @GetMapping methods should be the only
+        methods where we are actually returning
+        the view (return "register")
+     */
     @GetMapping("/login")
     public String login() {
         return "login";
@@ -29,36 +34,40 @@ public class AuthenticationController {
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {
         if (!model.containsAttribute("user")){
-            model.addAttribute("user", new RegisterDTO());
+            model.addAttribute("user", new User());
         }
         return "register";
     }
 
+    /*
+        would be best if we
+        followed the PRG (POST-REDIRECT-GET)
+        pattern https://en.wikipedia.org/wiki/Post/Redirect/Get
+     */
     @PostMapping("/register")
-    public String registerUser(@Valid @ModelAttribute("user") RegisterDTO registerDTO, BindingResult result,
+    public String registerUser(@Valid @ModelAttribute("user") User user, BindingResult result,
                                RedirectAttributes redirectAttributes) {
-
-        if(authenticationService.isUsernameTaken(registerDTO.getUsername())) {
-            result.addError(new FieldError("user", "username", "Username already in use.")); }
-
-        if(authenticationService.isEmailTaken(registerDTO.getEmail())) {
-            result.addError(new FieldError("user", "email", "Email already in use.")); }
-
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.user", result);
-            redirectAttributes.addFlashAttribute("user", registerDTO);
-            return "redirect:/auth/register";
+            redirectAttributes.addFlashAttribute("user", user);
+            return "redirect:/auth/register"; // Return to form with validation errors
         }
-
+        /*
+            removed check for existing
+            username/email checks because
+            they are present in service
+         */
         try {
-            authenticationService.registerNewUser(registerDTO);
-            redirectAttributes.addFlashAttribute("success", "Registration was successful!");
-            return "redirect:/auth/register";
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("unspecifiederror", "Something went wrong. Try again later.");
+            authenticationService.registerNewUser(user);
+            redirectAttributes.addFlashAttribute("success", "Registration successful!");
+            //wasn't displayed anywhere, so I added it in the template
+            return "redirect:/auth/login";
+        }  catch (UsernameTakenException e) {
+            redirectAttributes.addFlashAttribute("usernameError", e.getMessage());
+        } catch (EmailTakenException e) {
+            redirectAttributes.addFlashAttribute("emailError", e.getMessage());
         }
-
-        redirectAttributes.addFlashAttribute("user", registerDTO);
+        redirectAttributes.addFlashAttribute("user", user);
         return "redirect:/auth/register";
     }
 }
