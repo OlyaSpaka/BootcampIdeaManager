@@ -6,6 +6,7 @@ import com.example.demo.models.User;
 import com.example.demo.services.CompetitionService;
 import com.example.demo.services.UserService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,10 +22,11 @@ import java.util.List;
 @Controller
 public class AdminToolsController {
 
-    private UserService userService;
-    private CompetitionService competitionService;
-    private int competitionId = 1; // hardcoded for now as we only have one bootcamp
+    private final UserService userService;
+    private final CompetitionService competitionService;
+    private final int competitionId = 1; // hardcoded for now as we only have one bootcamp
 
+    @Autowired
     public AdminToolsController(UserService userService, CompetitionService competitionService) {
         this.userService = userService;
         this.competitionService = competitionService;
