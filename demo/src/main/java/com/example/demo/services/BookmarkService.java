@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.output.OutputIdeaDTO;
+import com.example.demo.mapper.interf.IdeaMapperInt;
 import com.example.demo.models.Bookmark;
 import com.example.demo.models.User;
 import com.example.demo.models.Idea;
@@ -23,12 +25,14 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
     private final IdeaRepository ideaRepository;
+    private final IdeaMapperInt ideaMapperInt;
 
     @Autowired
-    public BookmarkService(BookmarkRepository bookmarkRepository, UserRepository userRepository, IdeaRepository ideaRepository) {
+    public BookmarkService(BookmarkRepository bookmarkRepository, UserRepository userRepository, IdeaRepository ideaRepository, IdeaMapperInt ideaMapperInt) {
         this.bookmarkRepository = bookmarkRepository;
         this.userRepository = userRepository;
         this.ideaRepository = ideaRepository;
+        this.ideaMapperInt = ideaMapperInt;
     }
 
     public void addBookmark(Integer ideaId, Integer userId) {
@@ -52,14 +56,15 @@ public class BookmarkService {
         return bookmarkRepository.findByUserId(userId);
     }
 
-    public List<Idea> getUserBookmarkedIdeas(Integer userId) {
+    public List<OutputIdeaDTO> getUserBookmarkedIdeas(Integer userId) {
         List<Bookmark> bookmarks = bookmarkRepository.findByUserId(userId);
         return bookmarks.stream()
                 .map(Bookmark::getIdea)
+                .map(ideaMapperInt::map)
                 .collect(Collectors.toList());
     }
 
-    public Map<Integer, Boolean> getBookmarkStatusMap(User currentUser, List<Idea> ideas) {
+    public Map<Integer, Boolean> getBookmarkStatusMap(User currentUser, List<OutputIdeaDTO> ideas) {
         List<Bookmark> userBookmarks = getUserBookmarks(currentUser.getId());
 
         Set<Integer> bookmarkedIdeaIds = userBookmarks.stream()
@@ -68,7 +73,7 @@ public class BookmarkService {
 
         Map<Integer, Boolean> bookmarkStatusMap = new HashMap<>();
 
-        for (Idea idea : ideas) {
+        for (OutputIdeaDTO idea : ideas) {
             boolean isBookmarked = bookmarkedIdeaIds.contains(idea.getId());
             bookmarkStatusMap.put(idea.getId(), isBookmarked);
         }

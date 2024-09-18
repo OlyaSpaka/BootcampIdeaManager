@@ -38,7 +38,7 @@ public class Comment {
     public String toString() {
         return "Comment{" +
                 "id=" + id +
-                ", user=" + user +
+                ", username=" + user +
                 ", idea=" + idea +
                 ", content='" + content + '\'' +
                 '}';

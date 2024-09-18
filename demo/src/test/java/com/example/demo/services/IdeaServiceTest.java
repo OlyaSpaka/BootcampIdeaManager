@@ -114,7 +114,7 @@ class IdeaServiceTest {
     @Test
     void testUpdateName() {
         // When
-        ideaService.updateName(idea.getId(), "Updated description", "Updated title", "Updated key features", "Updated references");
+        ideaService.updateIdea(idea.getId(), "Updated description", "Updated title", "Updated key features", "Updated references");
 
         // Then
         Idea updatedIdea = ideaRepository.findById(idea.getId()).orElseThrow();

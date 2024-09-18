@@ -16,7 +16,7 @@
     title='Bootcamp Ideas',
     subtitle=${competitionName},
     message=${competitionDescription},
-    user=${user},
+    user=${username},
     link1Href='/ideas/new-idea',
     link1Text='Create new idea',
     link2Href='/ideas/my-ideas',
@@ -45,14 +45,18 @@
         </thead>
         <tbody>
         <tr th:each="idea : ${ideas}">
-            <td class="col-date" th:text="${idea.formattedDate}"></td>
+            <td class="col-date" th:text="${idea.createdAt}"></td>
             <td class="col-author" th:text="${idea.user.username}"></td>
             <td class="col-title">
                 <a th:href="@{/ideas/{id}(id=${idea.id})}" th:text="${idea.title}"></a>
             </td>
             <td class="col-description" th:text="${idea.description}"></td>
-            <td class="col-category" th:each="category : ${idea.categories}"
-                th:text="${category.name}"></td>
+            <td class="col-category">
+                <th:block th:each="category, iterStat : ${idea.categories}">
+                    <span th:text="${category.name}"></span>
+                    <span th:if="${!iterStat.last}">, </span>
+                </th:block>
+            </td>
             <td class="col-key-features" th:text="${idea.keyFeatures}"></td>
             <td class="col-reference_links" th:if="${idea.referenceLinks != null}">
                 <a th:href="${idea.referenceLinks}" target="_blank" th:text="${idea.referenceLinks}"></a>
