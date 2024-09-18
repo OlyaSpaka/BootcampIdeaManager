@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -25,10 +26,10 @@ public class Competition {
     private String description;
 
     @Column(name="start_date", nullable = false)
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name="end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "amount_of_winners", nullable = false)
     private int amountOfWinners;
@@ -42,7 +43,7 @@ public class Competition {
     public Competition() {
     }
 
-    public Competition(String name, String description, Date startDate, Date endDate, int amountOfWinners) {
+    public Competition(String name, String description, LocalDate startDate, LocalDate endDate, int amountOfWinners) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;
@@ -78,6 +79,7 @@ public class Competition {
                 ", description='" + description + '\'' +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
+                ", amountOfWinners=" + amountOfWinners +
                 '}';
     }
 
@@ -88,4 +90,5 @@ public class Competition {
         Competition comp = (Competition) o;
         return Objects.equals(id, comp.id);
     }
+
 }

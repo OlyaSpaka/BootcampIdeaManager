@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @PreAuthorize("hasRole('ROLE_Admin')")
@@ -19,6 +20,7 @@ public class AdminToolsController {
 
     private UserService userService;
     private CompetitionService competitionService;
+    private int competitionId = 1; // hardcoded for now as we only have one bootcamp
 
     public AdminToolsController(UserService userService, CompetitionService competitionService) {
         this.userService = userService;
@@ -27,7 +29,7 @@ public class AdminToolsController {
 
     @GetMapping
     public String getAdminDashboard(Model model) {
-        Competition currentCompetition = competitionService.getCompetition(1);
+        Competition currentCompetition = competitionService.getCompetition(competitionId);
         User currentUser = userService.getCurrentUser();
         List<User> users = userService.getAllUsers();
         model.addAttribute("competition", currentCompetition);
@@ -36,9 +38,28 @@ public class AdminToolsController {
         return "admin-dashboard"; // Returns admin-dashboard.html
     }
 
-    @PutMapping("/admin/bootcamp/edit")
+    @PutMapping("/bootcamp/update")
+    public String updateBootcampDetails(@ModelAttribute Competition competition, RedirectAttributes redirectAttributes) {
+
+        try {
+            String name = competition.getName();
+            String description = competition.getDescription();
+            LocalDate startDate = competition.getStartDate();
+            LocalDate endDate = competition.getEndDate();
+            int amountOfWinners = competition.getAmountOfWinners();
+
+            competitionService.updateCompetitionContent(competitionId, description, name);
+            competitionService.updateCompetitionDate(competitionId, startDate, endDate);
+            competitionService.updateCompetitionNumberOfWinners(competitionId, amountOfWinners);
+
+            redirectAttributes.addFlashAttribute("successEdit", "Competition details updated successfully.");
 
 
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("unspecifiedErrorEdit", "Something went wrong. Try again later.");
+        }
+        return "redirect:/admin";
+    }
 
     @DeleteMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable Integer id, RedirectAttributes redirectAttributes) {

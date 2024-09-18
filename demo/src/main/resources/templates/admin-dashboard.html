@@ -47,6 +47,8 @@
         .container-box {
             background-color: #f8f9fa;
             padding: 20px;
+            min-height: 100vh;
+            max-height: 100vh;
             margin-bottom: 20px;
             border-radius: 10px;
         }
@@ -60,7 +62,7 @@
         <!-- Sidebar -->
         <div class="col-md-3 col-lg-2 sidebar bg-dark d-flex flex-column">
             <div>
-                <a href="/admin" class="text-white">Dashboard</a>
+                <a href="/admin" class="text-white">Admin Dashboard</a>
             </div>
             <div class="mt-auto mb-3">
                 <a href="/ideas" class="text-white">Home</a>
@@ -74,29 +76,36 @@
                 <!-- Edit Bootcamp Details -->
                 <div class="col-md-4">
                     <div class="container-box">
-                        <h4>Edit Bootcamp Details</h4>
-                        <form th:action="@{/admin/bootcamp}" th:object="${competition}" method="post" class="mt-4">
+                        <h4>Edit Details</h4>
+                        <div th:if="${unspecifiedErrorEdit}" class="alert alert-danger alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
+                            <span th:text="${unspecifiedErrorEdit}">Something went wrong. Try again later.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${successEdit}" class="alert alert-success alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
+                            <span th:text="${successEdit}">Bootcamp information updated successfully.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <form th:action="@{/admin/bootcamp/update}" th:object="${competition}" method="post" class="mt-4">
+                            <input type="hidden" name="_method" value="put" />
                             <div class="mb-3">
                                 <label for="name" class="form-label">Bootcamp Name</label>
-                                <input type="text" th:field="*{name}" class="form-control" id="name" required>
+                                <input type="text" th:field="*{name}" class="form-control" id="name">
                             </div>
                             <div class="mb-3">
                                 <label for="description" class="form-label">Description</label>
-                                <textarea th:field="*{description}" class="form-control" id="description" rows="2"
-                                          required></textarea>
+                                <textarea th:field="*{description}" class="form-control" id="description" rows="2"></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="startDate" class="form-label">Start Date</label>
-                                <input type="date" th:field="*{startDate}" class="form-control" id="startDate" required>
+                                <input type="date" name="startDate" th:value="*{startDate}" class="form-control" id="startDate">
                             </div>
                             <div class="mb-3">
                                 <label for="endDate" class="form-label">End Date</label>
-                                <input type="date" th:field="*{endDate}" class="form-control" id="endDate" required>
+                                <input type="date" th:value="*{endDate}" name="endDate" class="form-control" id="endDate">
                             </div>
                             <div class="mb-3">
-                                <label for="amountOfWinners" class="form-label">Amount of Winners</label>
-                                <input type="number" th:field="*{amountOfWinners}" class="form-control"
-                                       id="amountOfWinners" required>
+                                <label for="amountOfWinners" class="form-label">Number of Groups</label>
+                                <input type="number" th:value="*{amountOfWinners}" name="amountOfWinners" class="form-control" id="amountOfWinners" min="0">
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Save Changes</button>
                         </form>
