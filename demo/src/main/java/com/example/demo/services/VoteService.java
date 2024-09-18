@@ -111,13 +111,15 @@ public class VoteService {
     }
 
     public void addWinningIdeasToIdeaSelectionRepository(Integer competitionId) {
-        List<Idea> winningIdeaList = getWinningIdeas(competitionId);
-        for (Idea idea : winningIdeaList) {
-            IdeaSelection selectedIdea = new IdeaSelection(idea.getCreatedAt());
-            selectedIdea.setCompetition(competitionRepository.findById(competitionId).get());
-            selectedIdea.setIdea(idea);
+        if(ideaSelectionService.getSelectedIdeas(competitionId).isEmpty()) {
+            List<Idea> winningIdeaList = getWinningIdeas(competitionId);
+            for (Idea idea : winningIdeaList) {
+                IdeaSelection selectedIdea = new IdeaSelection(idea.getCreatedAt());
+                selectedIdea.setCompetition(competitionRepository.findById(competitionId).get());
+                selectedIdea.setIdea(idea);
 
-            ideaSelectionService.addIdeaSelection(selectedIdea);
+                ideaSelectionService.addIdeaSelection(selectedIdea);
+            }
         }
 
     }

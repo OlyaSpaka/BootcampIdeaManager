@@ -25,14 +25,6 @@ public class VoteController {
         voteService.deleteVote(id);
     }
 
-/*    @PutMapping(path = "{voteId}/vote")
-    public void updateVote(@PathVariable("voteId") Integer id,
-                           @RequestParam(required = false) Integer user_id,
-                           @RequestParam(required = false) Integer idea_id,
-                           @RequestParam(required = false) Integer voteType_id) {
-        voteService.updateVote(id,user_id,idea_id,voteType_id);
-
-    }*/
     @GetMapping
     public int showPoints(@RequestParam("ideaId")Integer ideaId) {
         return voteService.calculatePoints(ideaId);
