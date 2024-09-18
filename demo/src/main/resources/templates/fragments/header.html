@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security5">
 <head>
     <meta charset="UTF-8">
     <title>Common Fragments</title>
@@ -18,7 +19,8 @@
         </div>
         <div class="account-info">
             <h3 th:text="${user}"></h3>
-            <a th:href="${link1Href}" th:text="${link1Text}"></a>
+<!--            <a th:href="${link1Href}" th:text="${link1Text}"></a>-->
+            <a sec:authorize="hasRole('ROLE_User')" th:href="@{${link1Href}}" th:text="${link1Text}"></a>
             <a th:href="${link2Href}" th:text="${link2Text}"></a>
             <a th:href="${link3Href}" th:text="${link3Text}"></a>
         </div>
