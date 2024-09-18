@@ -19,9 +19,9 @@
     user=${user},
     link1Href='/ideas/new-idea',
     link1Text='Create new idea',
-    link2Href='/notready',
+    link2Href='/ideas/my-ideas',
     link2Text='Show my own ideas',
-    link3Href='/notready',
+    link3Href='/ideas/bookmarks',
     link3Text='Show my favourite ideas'
 )}"></div>
     <form method="get" action="/ideas" class="search-form">
@@ -52,7 +52,7 @@
             </td>
             <td class="col-description" th:text="${idea.description}"></td>
             <td class="col-category" th:each="category : ${idea.categories}"
-                                                th:text="${category.name}"></td>
+                th:text="${category.name}"></td>
             <td class="col-key-features" th:text="${idea.keyFeatures}"></td>
             <td class="col-reference_links" th:if="${idea.referenceLinks != null}">
                 <a th:href="${idea.referenceLinks}" target="_blank" th:text="${idea.referenceLinks}"></a>
@@ -60,11 +60,15 @@
             <td class="col-reference_links" th:if="${idea.referenceLinks == null}">
                 No references available
             </td>
-<!--                  <td class="col-favourite">-->
-<!--                    <input type="checkbox"-->
-<!--                           th:checked="${idea.bookmarked}"-->
-<!--                           onchange="toggleBookmark([[${idea.id}]], this)"/>-->
-<!--                  </td>-->
+            <td class="col-favourite">
+                <label>
+                    <input type="checkbox"
+                           th:checked="${bookmarkStatusMap[idea.id]}"
+                           th:data-id="${idea.id}"
+                           th:data-user-id="${user_id}"
+                           onchange="toggleBookmark(this)"/>
+                </label>
+            </td>
         </tr>
         </tbody>
     </table>
@@ -72,8 +76,6 @@
     <footer>
         <div th:replace="~{fragments/logout}"></div>
     </footer>
-
-
     <script>
         $(document).ready(function () {
             $("#ideasTable").tablesorter({
@@ -84,25 +86,50 @@
             });
         });
     </script>
-<!--    <script>-->
-<!--        function toggleBookmark(ideaId, checkbox) {-->
-<!--            const isBookmarked = checkbox.checked;-->
+    <script>
+        function toggleBookmark(checkbox) {
+            const ideaId = checkbox.getAttribute('data-id');
+            const userId = checkbox.getAttribute('data-user-id');
+            const isBookmarked = checkbox.checked;
 
-<!--            $.ajax({-->
-<!--                url: '/Bookmark/' + ideaId,-->
-<!--                type: 'POST',-->
-<!--                contentType: 'application/json',-->
-<!--                data: JSON.stringify({ bookmarked: isBookmarked }),-->
-<!--                success: function(response) {-->
-<!--                    console.log('Bookmark updated:', response);-->
-<!--                },-->
-<!--                error: function(xhr, status, error) {-->
-<!--                    console.error('AJAX Error:', status, error);-->
-<!--                    checkbox.checked = !isBookmarked;-->
-<!--                }-->
-<!--            });-->
-<!--        }-->
-<!--    </script>-->
+            if (isBookmarked) {
+                $.ajax({
+                    url: '/bookmark/add',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        ideaId: ideaId,
+                        userId: userId,
+                        bookmarked: true
+                    }),
+                    success: function (response) {
+                        console.log('Bookmark added:', response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        checkbox.checked = false;
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: '/bookmark/delete',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        ideaId: ideaId,
+                        userId: userId
+                    }),
+                    success: function (response) {
+                        console.log('Bookmark deleted:', response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        checkbox.checked = true;
+                    }
+                });
+            }
+        }
+    </script>
 </div>
 </body>
 </html>

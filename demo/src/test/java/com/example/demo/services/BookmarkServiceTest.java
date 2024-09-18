@@ -13,10 +13,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
+import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -34,82 +33,71 @@ public class BookmarkServiceTest {
     IdeaRepository ideaRepository;
     @Autowired
     CompetitionRepository competitionRepository;
+    @Autowired
+    AuthenticationService authenticationService;
 
-    private Bookmark bookmark;
     private User user;
     private Idea idea;
     private Competition competition;
 
     @BeforeEach
-    void setUp(){
-        bookmark = new Bookmark();
-        user = userRepository.save(new User("username", "email@example.com", "password"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(),3));
-        idea = new Idea();
-        idea.setCreatedAt(new Date());
-        idea.setTitle("Test Idea");
-        idea.setDescription("Test description");
-        idea.setKeyFeatures("Test features");
-        idea.setReferenceLinks("Test references");
-        user.addIdea(idea);
-        competition.addIdea(idea);
-        idea = ideaRepository.save(idea);
-        //User bookmarks his own idea. why not?
-        bookmark.setIdea(idea);
-        bookmark.setUser(user);
-
-        bookmarkRepository.save(bookmark);
+    void setUp() {
+        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(), 3));
+        user = createUser();
+        idea = createIdea(user);
     }
+
     @Test
-    void addBookmark(){
-        Bookmark testBookmark = new Bookmark();
-        Idea testIdea = new Idea();
-        testIdea.setCreatedAt(new Date());
-        testIdea.setTitle("Test Idea");
-        testIdea.setDescription("Test description");
-        testIdea.setKeyFeatures("Test features");
-        testIdea.setReferenceLinks("Test references");
-        user.addIdea(testIdea);
-        competition.addIdea(testIdea);
-        testIdea = ideaRepository.save(testIdea);
-        //User bookmarks another of his own idea
-        testBookmark.setIdea(testIdea);
-        testBookmark.setUser(user);
+    void addBookmark() {
+        bookmarkService.addBookmark(idea.getId(), user.getId());
 
-        bookmarkService.addBookmark(testBookmark);
-
-        List<Bookmark> bookmarkList = bookmarkRepository.findAll();
-        assertThat(bookmarkList).hasSize(2);
+        assertTrue(bookmarkRepository.findAll().stream().anyMatch(bookmark -> {
+            return bookmark.getIdea().getId().equals(idea.getId()) && bookmark.getUser().getId().equals(user.getId());
+        }));
     }
+
     @Test
-    void deleteBookmarkWhenExists(){
+    void deleteBookmark() {
         Bookmark bookmarkToDelete = new Bookmark();
-        Idea testIdea = new Idea();
-        testIdea.setCreatedAt(new Date());
-        testIdea.setTitle("Test Idea");
-        testIdea.setDescription("Test description");
-        testIdea.setKeyFeatures("Test features");
-        testIdea.setReferenceLinks("Test references");
-        user.addIdea(testIdea);
-        competition.addIdea(testIdea);
-        testIdea = ideaRepository.save(testIdea);
-
-        bookmarkToDelete.setIdea(testIdea);
+        bookmarkToDelete.setIdea(idea);
         bookmarkToDelete.setUser(user);
-
         bookmarkRepository.save(bookmarkToDelete);
 
-        bookmarkService.deleteBookmark(bookmarkToDelete.getId());
+        bookmarkService.deleteBookmark(bookmarkToDelete.getUser().getId(), bookmarkToDelete.getIdea().getId());
 
-        List<Bookmark> bookmarksAfter = bookmarkRepository.findAll();
-        assertThat(bookmarksAfter).doesNotContain(bookmarkToDelete);
+        assertFalse(bookmarkRepository.findAll().stream().anyMatch(bookmark -> {
+            return bookmark.getIdea().getId().equals(idea.getId()) && bookmark.getUser().getId().equals(user.getId());
+        }));
     }
-    @Test
-    void deleteBookmarkWhenNotExists(){
-        assertThrows(IllegalStateException.class, () -> bookmarkService.deleteBookmark(999));
+
+    public User createUser() {
+        try {
+            User testUser = new User();
+            String username = UUID.randomUUID().toString().substring(0, 15);
+            testUser.setUsername(username);
+            testUser.setEmail(UUID.randomUUID().toString().substring(0, 15) + "@example.com");
+            testUser.setPassword("password");
+            authenticationService.registerNewUser(testUser);
+            return userRepository.findByUsername(username).get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    public Idea createIdea(User user) {
+        Idea testIdea = new Idea();
+        testIdea.setCreatedAt(new Date());
+        testIdea.setTitle("Test Idea");
+        testIdea.setDescription("Test description");
+        testIdea.setKeyFeatures("Test features");
+        testIdea.setReferenceLinks("Test references");
+        testIdea.setUser(user);
+        testIdea.setCompetition(competition);
+        return ideaRepository.save(testIdea);
+    }
+
     @AfterEach
-    void cleanUp(){
+    void cleanUp() {
         bookmarkRepository.deleteAll();
         ideaRepository.deleteAll();
         competitionRepository.deleteAll();
