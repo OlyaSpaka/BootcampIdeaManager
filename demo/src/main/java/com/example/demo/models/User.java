@@ -1,21 +1,18 @@
 package com.example.demo.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Getter
@@ -27,19 +24,12 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Size(min = 6, max = 30, message = "Username must have between 6 and 30 characters.")
-    @NotEmpty(message = "Username field must be filled out.")
-    @Pattern(regexp = "^[a-zA-Z0-9._\\-?!]+$", message = "No special characters, except for .?!-_")
     @Column(unique = true, nullable = false, length = 30)
     private String username;
 
-    @Email
-    @NotEmpty(message = "Email field must be filled out.")
     @Column(unique = true, nullable = false, length = 40)
     private String email;
 
-    @Size(min=6, message = "Password must have at least 6 characters.")
-    @NotEmpty(message = "Password field must be filled out.")
     @Column(nullable = false)
     private String password;
 
@@ -55,7 +45,7 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<Idea> ideas = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role", // Join table name
             joinColumns = @JoinColumn(name = "user_id"), // Column in the join table referring to Idea
@@ -143,6 +133,7 @@ public class User implements UserDetails {
         return Objects.hash(id);
     }
 
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -165,6 +156,6 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName())).collect(Collectors.toSet());
     }
 }

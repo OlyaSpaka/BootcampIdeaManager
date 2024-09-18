@@ -6,6 +6,7 @@ import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.mapper.implementation.IdeaMapper;
 import com.example.demo.models.Category;
 import com.example.demo.models.Idea;
+import com.example.demo.models.User;
 import com.example.demo.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import com.example.demo.repositories.IdeaRepository;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -111,7 +114,7 @@ public class IdeaService {
     public List<OutputIdeaDTO> getFormattedIdeas(String search) {
         List<Idea> ideas = searchIdeas(search);
         List<OutputIdeaDTO> mappedIdeas = new ArrayList<>();
-        for (Idea idea : ideas){
+        for (Idea idea : ideas) {
             mappedIdeas.add(ideaMapper.map(idea));
         }
         return mappedIdeas;
@@ -124,11 +127,29 @@ public class IdeaService {
         return ideaMapper.map(idea);
     }
 
+    public List<Idea> displayIdeasByUser(User user) {
+        List<Idea> ideas = ideaRepository.findByUserId(user.getId());
+        if (ideas.isEmpty()) {
+            throw new NoSuchElementException("No ideas found for user: " + user.getId());
+        }
+        ideas.forEach(idea -> {
+            if (idea.getCreatedAt() != null) {
+                idea.setFormattedDate(formatDate(idea.getCreatedAt()));
+            }
+        });
+        return ideas;
+    }
+
     private List<Idea> searchIdeas(String search) {
         if (search == null || search.trim().isEmpty()) {
             return ideaRepository.findAll();
         } else {
             return ideaRepository.searchIdeas(search.toLowerCase());
         }
+    }
+
+    private String formatDate(Date createdAt) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("HH:mm dd.MM.yy");
+        return dateFormatter.format(createdAt);
     }
 }

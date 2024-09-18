@@ -6,12 +6,12 @@ import com.example.demo.models.Category;
 import com.example.demo.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class CategoryService {
-
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     @Autowired
@@ -30,6 +30,16 @@ public class CategoryService {
             throw new IllegalStateException("Category with Id " + id + " does not exist");
         } else {
             categoryRepository.deleteById(id);
+        }
+    }
+
+    @Transactional
+    public void updateCategoryName(Integer id,
+                                   String name) {
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new IllegalStateException(
+                "Category with Id " + id + " does not exist."));
+        if (name != null && !name.isEmpty()) {
+            category.setName(name);
         }
     }
 

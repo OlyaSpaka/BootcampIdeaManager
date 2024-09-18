@@ -78,31 +78,32 @@ class IdeaServiceTest {
         assertThat(ideas).hasSize(2); // Because setUp() already added one idea
         assertThat(ideas).extracting(Idea::getTitle).contains("New Idea");
     }
+/*
 
-//    @Test
-//    void testDeleteIdeaWhenExists() {
-//        ideaRepository.flush();
-//        // Arrange
-////        Idea ideaToDelete = new Idea();
-////        ideaToDelete.setCreatedAt(new Date());
-////        ideaToDelete.setTitle("Test Idea");
-////        ideaToDelete.setDescription("Test description");
-//
-////        username.addIdea(ideaToDelete);
-////        competition.addIdea(ideaToDelete);
-////
-////        ideaRepository.save(ideaToDelete);
-//
-//        List<Idea> ideasBefore = ideaRepository.findAll();
-//        assertThat(ideasBefore).contains(idea);
-//
-//        // Act
-//        ideaService.deleteIdea(idea.getId());
-//
-//        // Assert
-//        List<Idea> ideasAfter = ideaRepository.findAll();
-//        assertThat(ideasAfter).doesNotContain(idea);
-//    }
+    @Test
+    void testDeleteIdeaWhenExists() {
+        // Arrange
+        Idea ideaToDelete = new Idea();
+        ideaToDelete.setCreatedAt(new Date());
+        ideaToDelete.setTitle("Test Idea");
+        ideaToDelete.setDescription("Test description");
+
+        user.addIdea(ideaToDelete);
+        competition.addIdea(ideaToDelete);
+
+        ideaRepository.save(ideaToDelete);
+
+        List<Idea> ideasBefore = ideaRepository.findAll();
+        assertThat(ideasBefore).contains(ideaToDelete);
+
+        // Act
+        ideaService.deleteIdea(ideaToDelete.getId());
+
+        // Assert
+        List<Idea> ideasAfter = ideaRepository.findAll();
+        assertThat(ideasAfter).doesNotContain(ideaToDelete);
+    }
+*/
 
     @Test
     void testDeleteIdeaWhenNotExists() {
