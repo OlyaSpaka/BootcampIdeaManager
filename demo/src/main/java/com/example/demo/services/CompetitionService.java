@@ -73,4 +73,11 @@ public class CompetitionService {
                 .orElseThrow(() -> new IllegalStateException("Competition by id not found:" + id))
                 .getDescription();
     }
+
+    public Competition getCompetition(Integer id) {
+        return competitionRepository
+                .findById(id)
+                .orElseThrow(() -> new IllegalStateException("Competition by id not found:" + id));
+    }
+
 }
