@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,8 @@ public class InputIdeaDTO {
     String createdAt;
 
     //    @Pattern(regexp = "https?://.*", message = "Invalid picture URL")
-    String pictures;
+    private MultipartFile[] fileUpload;
+    private String pictures;
 
     @NotNull(message = "Competition is required")
     CompetitionDTO competition;
@@ -51,12 +53,11 @@ public class InputIdeaDTO {
     public InputIdeaDTO() {
     }
 
-    public InputIdeaDTO(String title, String description, String keyFeatures, String referenceLinks, String createdAt, String pictures) {
+    public InputIdeaDTO(String title, String description, String keyFeatures, String referenceLinks, String createdAt, MultipartFile[] fileUpload) {
         this.title = title;
         this.description = description;
         this.keyFeatures = keyFeatures;
         this.referenceLinks = referenceLinks;
-        this.createdAt = createdAt;
-        this.pictures = pictures;
+        this.fileUpload = fileUpload;
     }
 }

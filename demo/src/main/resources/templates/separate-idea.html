@@ -46,10 +46,15 @@
                                                target="_blank"></a></p>
             <div th:if="${ideaDTO.pictures}">
                 <p><strong>Images:</strong></p>
-                <div class="picture-gallery">
-                    <div th:each="picture : ${ideaDTO.pictures}">
-                        <img th:src="@{${picture}}" alt="Idea Picture" style="max-width: 100%; height: auto; margin-bottom: 10px;">
-                    </div>
+<!--                <div class="picture-gallery">-->
+<!--                    <div th:each="picture : ${ideaDTO.pictures}">-->
+<!--                        <img th:src="@{${picture}}" alt="Idea Picture" style="max-width: 100%; height: auto; margin-bottom: 10px;">-->
+<!--                    </div>-->
+<!--                </div>-->
+                <div class="uploaded-images-container">
+                    <th:block th:each="pictureUrl : ${ideaDTO.pictures.split(',')}">
+                        <img th:src="${pictureUrl}" alt="Uploaded Picture" />
+                    </th:block>
                 </div>
             </div>
 

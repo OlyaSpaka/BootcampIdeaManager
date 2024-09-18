@@ -20,7 +20,10 @@
     link3Href='/notready',
     link3Text=''
 )}"></div>
-    <form method="post" th:action="@{/ideas/new-idea/create}" th:object="${ideaDTO}">
+    <div class="form-group" th:if="${errorMsg!=null}">
+        <p th:text="|ERROR: ${errorMsg}|"></p>
+    </div>
+    <form method="post" th:action="@{/ideas/new-idea/create}" th:object="${ideaDTO}" enctype="multipart/form-data">
         <input type="hidden" name="competition.id" th:value="1">
         <input type="hidden" name="user.id" th:value="${user_id}">
         <input type="hidden" name="createdAt" th:value="${#dates.format(new java.util.Date(), 'HH:mm dd.MM.yy')}" />
@@ -80,12 +83,37 @@
             <div th:if="${#fields.hasErrors('competition')}" th:errors="*{competition}" class="error"></div>
         </div>
 
+        <div class="form-group">
+            <label for="fileUpload">Upload Picture(s)</label>
+            <input type="file" id="fileUpload" name="fileUpload" multiple accept="image/*" required>
+            <div th:if="${#fields.hasErrors('fileUpload')}" th:errors="*{fileUpload}" class="error"></div>
+        </div>
 
         <button type="submit">Submit Idea</button>
     </form>
     <footer>
         <a href="/ideas" class="footer-link">Back to ideas</a>
     </footer>
+    <script>
+        document.getElementById("fileUpload").addEventListener("change", function () {
+            const maxSize = 2 * 1024 * 1024; // 2MB max file size
+            const maxFiles = 5; // Max 5 files allowed
+            const files = this.files;
+
+            if (files.length > maxFiles) {
+                alert("You can upload a maximum of 5 images.");
+                this.value = ""; // Clear file input
+            } else {
+                for (let i = 0; i < files.length; i++) {
+                    if (files[i].size > maxSize) {
+                        alert("Each file must be smaller than 2MB.");
+                        this.value = ""; // Clear file input
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
 </div>
 </body>
 </html>

@@ -11,8 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -26,14 +28,16 @@ public class IdeaController {
     private final AuthenticationService authenticationService;
     private final CategoryService categoryService;
     private final BookmarkService bookmarkService;
+    private final AzureBlobStorageService blobService;
 
-    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, BookmarkService bookmarkService) {
+    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, BookmarkService bookmarkService, AzureBlobStorageService blobService) {
         this.ideaService = ideaService;
         this.competitionService = competitionService;
         this.commentService = commentService;
         this.authenticationService = authenticationService;
         this.categoryService = categoryService;
         this.bookmarkService = bookmarkService;
+        this.blobService = blobService;
     }
 
     @GetMapping
@@ -101,16 +105,36 @@ public class IdeaController {
     @PostMapping("/new-idea/create")
     public String addIdea(@Valid @ModelAttribute("ideaDTO") InputIdeaDTO inputIdeaDTO,
                           BindingResult bindingResult,
-                          RedirectAttributes redirectAttributes) {
+                          RedirectAttributes redirectAttributes,
+                          @RequestParam("fileUpload") MultipartFile[] files) {
         if (bindingResult.hasErrors()){
             redirectAttributes.addFlashAttribute("ideaDTO", inputIdeaDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ideaDTO", bindingResult);
             return "redirect:/ideas/new-idea";
         }
+
+        int maxFiles = 5;
+        long maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (files.length > maxFiles) {
+            redirectAttributes.addFlashAttribute("errorMsg", "You can upload a maximum of 5 images.");
+            return "redirect:/ideas/new-idea";
+        }
+
+        for (MultipartFile file : files) {
+            if (file.getSize() > maxSize) {
+                redirectAttributes.addFlashAttribute("errorMsg", "Each file must be smaller than 2MB.");
+                return "redirect:/ideas/new-idea";
+            }
+        }
+
         try {
+            List<String> fileUrls = blobService.uploadFiles(files);
+            inputIdeaDTO.setPictures(String.join(",", fileUrls));
+
             int id = ideaService.addNewIdea(inputIdeaDTO);
             return "redirect:/ideas/"+id;
-        } catch (IllegalArgumentException | ParseException e){
+        } catch (IllegalArgumentException | IOException | ParseException e){
             redirectAttributes.addFlashAttribute("errorMsg", e);
             return "redirect:/ideas/new-idea";
         }
