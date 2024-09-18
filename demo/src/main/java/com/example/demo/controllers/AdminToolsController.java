@@ -1,12 +1,15 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.general.CompetitionDTO;
 import com.example.demo.models.Competition;
 import com.example.demo.models.User;
 import com.example.demo.services.CompetitionService;
 import com.example.demo.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -39,14 +42,18 @@ public class AdminToolsController {
     }
 
     @PutMapping("/bootcamp/update")
-    public String updateBootcampDetails(@ModelAttribute Competition competition, RedirectAttributes redirectAttributes) {
+    public String updateBootcampDetails(@Valid @ModelAttribute CompetitionDTO competitionDTO, BindingResult result, RedirectAttributes redirectAttributes) {
 
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute("unspecifiedErrorEdit", "Form contains errors. Please try again.");
+            return "redirect:/admin";
+        }
         try {
-            String name = competition.getName();
-            String description = competition.getDescription();
-            LocalDate startDate = competition.getStartDate();
-            LocalDate endDate = competition.getEndDate();
-            int amountOfWinners = competition.getAmountOfWinners();
+            String name = competitionDTO.getName();
+            String description = competitionDTO.getDescription();
+            LocalDate startDate = competitionDTO.getStartDate();
+            LocalDate endDate = competitionDTO.getEndDate();
+            int amountOfWinners = competitionDTO.getAmountOfWinners();
 
             competitionService.updateCompetitionContent(competitionId, description, name);
             competitionService.updateCompetitionDate(competitionId, startDate, endDate);
@@ -66,7 +73,7 @@ public class AdminToolsController {
 
         User currentUser = userService.getCurrentUser();
 
-        if(currentUser.getId() == id) {
+        if (currentUser.getId() == id) {
             redirectAttributes.addFlashAttribute("error", "Failed to delete user.");
             return "redirect:/admin";
         }

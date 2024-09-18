@@ -1,5 +1,6 @@
 package com.example.demo.dto.general;
 
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,10 +11,16 @@ import java.util.Date;
 @Setter
 public class CompetitionDTO {
     Integer id;
+
+    @NotBlank(message = "Name is required")
     String name;
+
     String description;
+
     LocalDate startDate;
     LocalDate endDate;
+
+    @Positive
     int amountOfWinners;
 
     public CompetitionDTO() {
