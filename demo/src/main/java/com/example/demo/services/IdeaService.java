@@ -127,7 +127,8 @@ public class IdeaService {
         return ideaMapper.map(idea);
     }
 
-    public List<Idea> displayIdeasByUser(User user) {
+    public List<OutputIdeaDTO> displayIdeasByUser(User user) {
+        List<OutputIdeaDTO> resultList = new ArrayList<>();
         List<Idea> ideas = ideaRepository.findByUserId(user.getId());
         if (ideas.isEmpty()) {
             throw new NoSuchElementException("No ideas found for user: " + user.getId());
@@ -135,9 +136,10 @@ public class IdeaService {
         ideas.forEach(idea -> {
             if (idea.getCreatedAt() != null) {
                 idea.setFormattedDate(formatDate(idea.getCreatedAt()));
+                resultList.add(ideaMapper.map(idea));
             }
         });
-        return ideas;
+        return resultList;
     }
 
     private List<Idea> searchIdeas(String search) {

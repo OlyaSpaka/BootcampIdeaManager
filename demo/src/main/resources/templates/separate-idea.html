@@ -42,7 +42,7 @@
                                                 th:text="${category.name}"></span></p>
             <p><strong>Description:</strong> <span th:text="${ideaDTO.description}"></span></p>
             <p><strong>Key Features:</strong> <span th:text="${ideaDTO.keyFeatures}"></span></p>
-            <p><strong>References:</strong> <a th:href="${ideaDTO.referenceLinks}" th:text="${idea.referenceLinks}"
+            <p><strong>References:</strong> <a th:href="${ideaDTO.referenceLinks}" th:text="${ideaDTO.referenceLinks}"
                                                target="_blank"></a></p>
             <div th:if="${ideaDTO.pictures}">
                 <p><strong>Images:</strong></p>

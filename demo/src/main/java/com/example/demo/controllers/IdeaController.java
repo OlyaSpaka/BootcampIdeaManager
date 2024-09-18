@@ -5,8 +5,6 @@ import com.example.demo.dto.input.InputIdeaDTO;
 import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.models.User;
 import com.example.demo.services.*;
-import com.example.demo.models.Idea;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -52,7 +50,8 @@ public class IdeaController {
 
     @GetMapping("/my-ideas")
     public String listMyIdeas(Model model) {
-        List<Idea> userIdeas = ideaService.displayIdeasByUser(currentUser);
+        User currentUser = authenticationService.getCurrentUser();
+        List<OutputIdeaDTO> userIdeas = ideaService.displayIdeasByUser(currentUser);
         Map<Integer, Boolean> bookmarkStatusMap = bookmarkService.getBookmarkStatusMap(currentUser, userIdeas);
         addCommonAttributes(authenticationService.getCurrentUser(), model);
         model.addAttribute("ideas", userIdeas);
@@ -62,7 +61,8 @@ public class IdeaController {
 
     @GetMapping("/bookmarks")
     public String listBookmarkedIdeas(Model model) {
-        List<Idea> bookmarkedIdeas = bookmarkService.getUserBookmarkedIdeas(currentUser.getId());
+        User currentUser = authenticationService.getCurrentUser();
+        List<OutputIdeaDTO> bookmarkedIdeas = bookmarkService.getUserBookmarkedIdeas(currentUser.getId());
         Map<Integer, Boolean> bookmarkStatusMap = bookmarkService.getBookmarkStatusMap(currentUser, bookmarkedIdeas);
         addCommonAttributes(authenticationService.getCurrentUser(), model);
         model.addAttribute("ideas", bookmarkedIdeas);
@@ -73,9 +73,10 @@ public class IdeaController {
     @GetMapping("/{userId}")
     public String showUserIdea(@PathVariable Integer userId, Model model){
         User currentUser = authenticationService.getCurrentUser();
+        OutputIdeaDTO idea = ideaService.findById(userId);
         Map<Integer, Boolean> bookmarkStatusMap = bookmarkService.getBookmarkStatusMap(currentUser, List.of(idea));
         addCommonAttributes(currentUser, model);
-        model.addAttribute("ideaDTO", ideaService.findById(userId));
+        model.addAttribute("ideaDTO", idea);
         model.addAttribute("comments", commentService.showIdeaComments(userId));
         model.addAttribute("bookmarkStatusMap", bookmarkStatusMap);
         if (!model.containsAttribute("commentDTO")){

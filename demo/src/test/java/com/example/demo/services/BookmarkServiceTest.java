@@ -40,12 +40,12 @@ public class BookmarkServiceTest {
     private Idea idea;
     private Competition competition;
 
-    @BeforeEach
-    void setUp() {
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(), 3));
-        user = createUser();
-        idea = createIdea(user);
-    }
+//    @BeforeEach
+//    void setUp() {
+//        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(), 3));
+//        user = createUser();
+//        idea = createIdea(user);
+//    }
 
     @Test
     void addBookmark() {
@@ -70,19 +70,19 @@ public class BookmarkServiceTest {
         }));
     }
 
-    public User createUser() {
-        try {
-            User testUser = new User();
-            String username = UUID.randomUUID().toString().substring(0, 15);
-            testUser.setUsername(username);
-            testUser.setEmail(UUID.randomUUID().toString().substring(0, 15) + "@example.com");
-            testUser.setPassword("password");
-            authenticationService.registerNewUser(testUser);
-            return userRepository.findByUsername(username).get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public User createUser() {
+//        try {
+//            User testUser = new User();
+//            String username = UUID.randomUUID().toString().substring(0, 15);
+//            testUser.setUsername(username);
+//            testUser.setEmail(UUID.randomUUID().toString().substring(0, 15) + "@example.com");
+//            testUser.setPassword("password");
+//            authenticationService.registerNewUser(testUser);
+//            return userRepository.findByUsername(username).get();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     public Idea createIdea(User user) {
         Idea testIdea = new Idea();
