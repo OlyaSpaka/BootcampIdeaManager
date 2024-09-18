@@ -29,6 +29,12 @@
                     <input type="password" class="form-control" id="password" name="password" th:value="*{password}" placeholder="Enter your password" required>
                     <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-message text-danger"></p>
                 </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" th:value="*{confirmPassword}" placeholder="Confirm your password" required>
+                    <p th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error-message text-danger"></p>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100">Register</button>
             </form>
             <div th:if="${unspecifiederror}" class="alert alert-danger alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">

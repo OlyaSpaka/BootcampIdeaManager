@@ -1,84 +1,113 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Manager Tools</title>
-    <link rel="stylesheet" th:href="@{base-style.css}">
-    <link rel="stylesheet" th:href="@{admin-tools-style.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Tools</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<!--    <link rel="stylesheet" href="/css/auth-error-pages-style.css">-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</head>
+
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <div class="header">-->
+<!--        <h1>Manager Tools</h1>-->
+<!--        <h2 class="subtitle">Manage Bootcamps and Users</h2>-->
+<!--    </div>-->
+
+<!--    <div class="form-container">-->
+<!--        <h2>Create a New Bootcamp</h2>-->
+<!--        <form method="post" action="/create-bootcamp">-->
+<!--            <label for="bootcampName">Bootcamp Name:</label>-->
+<!--            <input type="text" id="bootcampName" name="bootcampName" required>-->
+<!--            <label for="clarificationMessage">Clarification Message:</label>-->
+<!--            <textarea id="clarificationMessage" name="clarificationMessage" rows="4" required></textarea>-->
+<!--            <label for="deadline">Deadline for Creating Ideas:</label>-->
+<!--            <input type="date" id="deadline" name="deadline" required>-->
+<!--            <button type="submit">Create Bootcamp</button>-->
+<!--        </form>-->
+<!--    </div>-->
+
+
+<!--    <div class="bootcamp-list">-->
+<!--        <h2>Bootcamps</h2>-->
+<!--        <ul>-->
+<!--            <li><a href="#" onclick="showBootcampDetails('bootcamp1')">Bootcamp 1</a></li>-->
+<!--            <li><a href="#" onclick="showBootcampDetails('bootcamp2')">Bootcamp 2</a></li>-->
+<!--            <li><a href="#" onclick="showBootcampDetails('bootcamp3')">Bootcamp 3</a></li>-->
+<!--        </ul>-->
+<!--    </div>-->
+
+<!--    <div id="bootcampDetails" class="bootcamp-details" style="display:none;">-->
+<!--        <h2>Bootcamp Details</h2>-->
+<!--        <div id="detailsContent">-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    function showBootcampDetails(bootcampId) {-->
+<!--        const detailsContent = document.getElementById('detailsContent');-->
+<!--        detailsContent.innerHTML = `-->
+<!--            <p>Details for ${bootcampId}</p>-->
+<!--            <button onclick="enterBootcamp('${bootcampId}')">Enter the Bootcamp</button>-->
+<!--            <button onclick="editBootcampMessage('${bootcampId}')">Edit Bootcamp Message</button>-->
+<!--            <button onclick="addUser('${bootcampId}')">Add User</button>-->
+<!--            <button onclick="deleteUser('${bootcampId}')">Delete User</button>-->
+<!--            <button onclick="deleteBootcamp('${bootcampId}')">Delete Bootcamp</button>-->
+<!--        `;-->
+<!--        document.getElementById('bootcampDetails').style.display = 'block';-->
+<!--    }-->
+
+<!--    function enterBootcamp(bootcampId) {-->
+<!--        console.log(`Enter the Bootcamp for: ${bootcampId}`);-->
+<!--    }-->
+
+<!--    function editBootcampMessage(bootcampId) {-->
+<!--        console.log(`Edit Bootcamp Message for: ${bootcampId}`);-->
+<!--    }-->
+
+<!--    function addUser(bootcampId) {-->
+<!--        console.log(`Add User to Bootcamp: ${bootcampId}`);-->
+<!--    }-->
+
+<!--    function deleteUser(bootcampId) {-->
+<!--        console.log(`Delete User from Bootcamp: ${bootcampId}`);-->
+<!--    }-->
+
+<!--    function deleteBootcamp(bootcampId) {-->
+<!--        console.log(`Delete Bootcamp: ${bootcampId}`);-->
+<!--    }-->
+<!--</script>-->
+<!--<footer>-->
+<!--    <a href="/logout" class="footer-link">Log off</a>-->
+<!--</footer>-->
+<!--</body>-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>Manager Tools</h1>
-        <h2 class="subtitle">Manage Bootcamps and Users</h2>
-    </div>
-
-    <div class="form-container">
-        <h2>Create a New Bootcamp</h2>
-        <form method="post" action="/create-bootcamp">
-            <label for="bootcampName">Bootcamp Name:</label>
-            <input type="text" id="bootcampName" name="bootcampName" required>
-            <label for="clarificationMessage">Clarification Message:</label>
-            <textarea id="clarificationMessage" name="clarificationMessage" rows="4" required></textarea>
-            <label for="deadline">Deadline for Creating Ideas:</label>
-            <input type="date" id="deadline" name="deadline" required>
-            <button type="submit">Create Bootcamp</button>
-        </form>
-    </div>
-
-
-    <div class="bootcamp-list">
-        <h2>Bootcamps</h2>
-        <ul>
-            <li><a href="#" onclick="showBootcampDetails('bootcamp1')">Bootcamp 1</a></li>
-            <li><a href="#" onclick="showBootcampDetails('bootcamp2')">Bootcamp 2</a></li>
-            <li><a href="#" onclick="showBootcampDetails('bootcamp3')">Bootcamp 3</a></li>
-        </ul>
-    </div>
-
-    <div id="bootcampDetails" class="bootcamp-details" style="display:none;">
-        <h2>Bootcamp Details</h2>
-        <div id="detailsContent">
-        </div>
-    </div>
+<div class="sidebar">
+    <h4>Admin Tools</h4>
+    <p>This is admin panel that only admin can see.</p>
+    <a href="#">Manage Users</a>
+    <a href="#">Manage Bootcamp</a>
 </div>
 
-<script>
-    function showBootcampDetails(bootcampId) {
-        const detailsContent = document.getElementById('detailsContent');
-        detailsContent.innerHTML = `
-            <p>Details for ${bootcampId}</p>
-            <button onclick="enterBootcamp('${bootcampId}')">Enter the Bootcamp</button>
-            <button onclick="editBootcampMessage('${bootcampId}')">Edit Bootcamp Message</button>
-            <button onclick="addUser('${bootcampId}')">Add User</button>
-            <button onclick="deleteUser('${bootcampId}')">Delete User</button>
-            <button onclick="deleteBootcamp('${bootcampId}')">Delete Bootcamp</button>
-        `;
-        document.getElementById('bootcampDetails').style.display = 'block';
-    }
-
-    function enterBootcamp(bootcampId) {
-        console.log(`Enter the Bootcamp for: ${bootcampId}`);
-    }
-
-    function editBootcampMessage(bootcampId) {
-        console.log(`Edit Bootcamp Message for: ${bootcampId}`);
-    }
-
-    function addUser(bootcampId) {
-        console.log(`Add User to Bootcamp: ${bootcampId}`);
-    }
-
-    function deleteUser(bootcampId) {
-        console.log(`Delete User from Bootcamp: ${bootcampId}`);
-    }
-
-    function deleteBootcamp(bootcampId) {
-        console.log(`Delete Bootcamp: ${bootcampId}`);
-    }
-</script>
-<footer>
-    <a href="/logout" class="footer-link">Log off</a>
-</footer>
+<div class="content">
+    <!-- Right content area (currently clear/empty) -->
+</div>
 </body>
+</html>
+
+
+
 </html>

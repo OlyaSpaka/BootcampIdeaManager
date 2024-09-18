@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.RegisterDTO;
 import com.example.demo.models.*;
 import com.example.demo.repositories.*;
 import org.junit.jupiter.api.AfterEach;
@@ -72,7 +73,7 @@ public class BookmarkServiceTest {
 
     public User createUser() {
         try {
-            User testUser = new User();
+            RegisterDTO testUser = new RegisterDTO();
             String username = UUID.randomUUID().toString().substring(0, 15);
             testUser.setUsername(username);
             testUser.setEmail(UUID.randomUUID().toString().substring(0, 15) + "@example.com");

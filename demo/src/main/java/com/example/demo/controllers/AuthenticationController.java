@@ -38,6 +38,9 @@ public class AuthenticationController {
     public String registerUser(@Valid @ModelAttribute("user") RegisterDTO registerDTO, BindingResult result,
                                RedirectAttributes redirectAttributes) {
 
+        if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
+            result.addError(new FieldError("user", "confirmPassword", "Passwords do not match."));
+        }
         if(authenticationService.isUsernameTaken(registerDTO.getUsername())) {
             result.addError(new FieldError("user", "username", "Username already in use.")); }
 
