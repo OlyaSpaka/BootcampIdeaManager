@@ -73,7 +73,7 @@ public class AdminToolsController {
 
         User currentUser = userService.getCurrentUser();
 
-        if (currentUser.getId() == id) {
+        if (currentUser.getId().equals(id)) {
             redirectAttributes.addFlashAttribute("error", "Failed to delete user.");
             return "redirect:/admin";
         }
