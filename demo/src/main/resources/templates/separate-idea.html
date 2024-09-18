@@ -48,7 +48,7 @@
             </div>
 
             <div class="idea-options" th:if="${ideaDTO.user.id == user_id}">
-                <form th:action="@{/edit-idea/{id}(id=${ideaDTO.id})}" method="get" class="edit-form">
+                <form th:action="@{/ideas/{id}/edit(id=${ideaDTO.id})}" method="get" class="edit-form">
                     <button type="submit" class="edit-btn">Edit Idea</button>
                 </form>
 

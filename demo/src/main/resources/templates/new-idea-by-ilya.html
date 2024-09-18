@@ -23,7 +23,7 @@
     <form method="post" th:action="@{/ideas/new-idea/create}" th:object="${ideaDTO}">
         <input type="hidden" name="competition.id" th:value="1">
         <input type="hidden" name="user.id" th:value="${user_id}">
-        <input type="hidden" name="createdAt" th:value="${#dates.format(new java.util.Date(), 'yyyy-MM-dd')}" />
+        <input type="hidden" name="createdAt" th:value="${#dates.format(new java.util.Date(), 'HH:mm dd.MM.yy')}" />
 
         <div class="form-group">
             <label for="title">Idea Title*</label>
@@ -69,9 +69,12 @@
 
         <div class="form-group">
             <label for="competition">Competition*</label>
-            <select id="competition" th:field="*{competition.id}" required>
+            <select id="competition" th:field="*{competition.id}" disabled required>
                 <th:block th:each="competition : ${competitions}">
-                    <option th:value="${competition.id}" th:text="${competition.name}">Competition Name</option>
+                    <option th:value="${competition.id}" th:text="${competition.name}"
+                            th:selected="${competition.id}">
+                        Competition Name
+                    </option>
                 </th:block>
             </select>
             <div th:if="${#fields.hasErrors('competition')}" th:errors="*{competition}" class="error"></div>

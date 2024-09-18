@@ -99,17 +99,28 @@ public class IdeaController {
             throw new IllegalStateException("Idea with Id " + id + " does not exist");
         }
         addCommonAttributes(model);
-        model.addAttribute("idea", idea);
+        model.addAttribute("allCategories", categoryService.getAllCategories());
+        model.addAttribute("ideaDTO", idea);
         return "edit-idea"; // Template name for the edit form
     }
 
     @PostMapping("/{ideaId}/update")
-    public void updateIdea(@PathVariable("ideaId") Integer id,
-                           @RequestParam(required = false) String description,
-                           @RequestParam(required = false) String title,
-                           @RequestParam(required = false) String keyFeatures,
-                           @RequestParam(required = false) String referenceLinks) {
-        ideaService.updateName(id, description, title, keyFeatures, referenceLinks);
+    public String updateIdea(@PathVariable("ideaId") Integer id,
+                           @Valid @ModelAttribute("ideaDTO")OutputIdeaDTO outputIdeaDTO,
+                           BindingResult bindingResult,
+                           RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()){
+            redirectAttributes.addFlashAttribute("ideaDTO", outputIdeaDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ideaDTO", bindingResult);
+            return "redirect:/ideas/"+id+"/edit";
+        }
+        try {
+            ideaService.updateName(id, outputIdeaDTO);
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/ideas/"+id+"/edit";
+        }
+        return "redirect:/ideas/"+id;
     }
     private void addCommonAttributes(Model model) {
         User user = authenticationService.getCurrentUser();
