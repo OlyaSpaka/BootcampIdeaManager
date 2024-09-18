@@ -44,7 +44,7 @@
             <p><strong>Key Features:</strong> <span th:text="${ideaDTO.keyFeatures}"></span></p>
             <p><strong>References:</strong> <a th:href="${ideaDTO.referenceLinks}" th:text="${ideaDTO.referenceLinks}"
                                                target="_blank"></a></p>
-            <div th:if="${ideaDTO.pictures}">
+            <div th:if="${ideaDTO.pictures!=null && !ideaDTO.pictures.isEmpty()}">
                 <p><strong>Images:</strong></p>
 <!--                <div class="picture-gallery">-->
 <!--                    <div th:each="picture : ${ideaDTO.pictures}">-->

@@ -16,8 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/ideas")
@@ -106,22 +105,25 @@ public class IdeaController {
     public String addIdea(@Valid @ModelAttribute("ideaDTO") InputIdeaDTO inputIdeaDTO,
                           BindingResult bindingResult,
                           RedirectAttributes redirectAttributes,
-                          @RequestParam("fileUpload") MultipartFile[] files) {
+                          @RequestParam(value = "fileUpload", required = false) MultipartFile[] files) {
         if (bindingResult.hasErrors()){
             redirectAttributes.addFlashAttribute("ideaDTO", inputIdeaDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ideaDTO", bindingResult);
             return "redirect:/ideas/new-idea";
         }
+        MultipartFile[] filteredFiles = Arrays.stream(files)
+                .filter(file -> !file.isEmpty() && file.getOriginalFilename() != null && !file.getOriginalFilename().isEmpty())
+                .toArray(MultipartFile[]::new);
 
         int maxFiles = 5;
         long maxSize = 2 * 1024 * 1024; // 2MB
 
-        if (files.length > maxFiles) {
+        if (filteredFiles.length > maxFiles) {
             redirectAttributes.addFlashAttribute("errorMsg", "You can upload a maximum of 5 images.");
             return "redirect:/ideas/new-idea";
         }
 
-        for (MultipartFile file : files) {
+        for (MultipartFile file : filteredFiles) {
             if (file.getSize() > maxSize) {
                 redirectAttributes.addFlashAttribute("errorMsg", "Each file must be smaller than 2MB.");
                 return "redirect:/ideas/new-idea";
@@ -129,8 +131,9 @@ public class IdeaController {
         }
 
         try {
-            List<String> fileUrls = blobService.uploadFiles(files);
-            inputIdeaDTO.setPictures(String.join(",", fileUrls));
+            List<String> fileUrls = blobService.uploadFiles(filteredFiles);
+            String joinResult = String.join(",", fileUrls);
+            inputIdeaDTO.setPictures(joinResult.isEmpty() ? null : joinResult);
 
             int id = ideaService.addNewIdea(inputIdeaDTO);
             return "redirect:/ideas/"+id;
@@ -144,6 +147,12 @@ public class IdeaController {
     @PostMapping("/{ideaId}/delete")
     public String deleteIdea(@PathVariable("ideaId") Integer id, RedirectAttributes redirectAttributes) {
         try {
+            OutputIdeaDTO idea = ideaService.findById(id);
+            if (idea.getPictures() != null && !idea.getPictures().isEmpty()){
+                for (String picture : idea.getPictures().split(",")){
+                    if (!picture.isEmpty()) blobService.deleteBlob(picture);
+                }
+            }
             ideaService.deleteIdea(id);
         } catch (IllegalStateException e){
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
@@ -168,19 +177,56 @@ public class IdeaController {
     @PreAuthorize("hasRole('ROLE_User')")
     @PostMapping("/{ideaId}/update")
     public String updateIdea(@PathVariable("ideaId") Integer id,
-                           @Valid @ModelAttribute("ideaDTO")OutputIdeaDTO outputIdeaDTO,
-                           BindingResult bindingResult,
-                           RedirectAttributes redirectAttributes) {
+                             @Valid @ModelAttribute("ideaDTO") OutputIdeaDTO outputIdeaDTO,
+                             @RequestParam(value = "picturesToRemove", required = false) String[] picturesToRemove,
+                             @RequestParam(value = "fileUpload", required = false) MultipartFile[] files,
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()){
             redirectAttributes.addFlashAttribute("ideaDTO", outputIdeaDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.ideaDTO", bindingResult);
             return "redirect:/ideas/"+id+"/edit";
         }
+        MultipartFile[] filteredFiles = (files != null) ? Arrays.stream(files)
+                .filter(file -> !file.isEmpty() && file.getOriginalFilename() != null && !file.getOriginalFilename().isEmpty())
+                .toArray(MultipartFile[]::new) : new MultipartFile[0];
         try {
-            ideaService.updateName(id, outputIdeaDTO);
-        } catch (IllegalStateException e) {
+            OutputIdeaDTO existingIdea = ideaService.findById(id);
+
+            // Handle deleted pictures
+            Set<String> existingPictures = new HashSet<>();
+            if (existingIdea.getPictures() != null && !existingIdea.getPictures().isEmpty()){
+                existingPictures = new HashSet<>(Arrays.asList(existingIdea.getPictures().split(",")));
+                if (picturesToRemove != null) {
+                    Set<String> picturesToRemoveSet = new HashSet<>(Arrays.asList(picturesToRemove));
+                    existingPictures.removeAll(picturesToRemoveSet);
+
+                    // Delete blobs
+                    for (String picture : picturesToRemoveSet) {
+                        if (!picture.trim().isEmpty()) {
+                            blobService.deleteBlob(picture);
+                            existingPictures.remove(picture);
+                        }
+                    }
+                }
+            }
+
+            // Upload new files and get their URLs
+            List<String> fileUrls = blobService.uploadFiles(filteredFiles);
+
+            // Combine existing pictures with new ones
+            existingPictures.addAll(fileUrls);
+
+            // Convert the set of picture URLs to a comma-separated string
+            String updatedPictures = String.join(",", existingPictures);
+            outputIdeaDTO.setPictures(updatedPictures.isEmpty() ?
+                    null : updatedPictures);
+
+            // Save the updated idea
+            ideaService.updateIdea(id, outputIdeaDTO);
+        } catch (IllegalStateException | IOException e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
-            return "redirect:/ideas/"+id+"/edit";
+            return "redirect:/ideas/" + id + "/edit";
         }
         return "redirect:/ideas/"+id;
     }

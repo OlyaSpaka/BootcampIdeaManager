@@ -85,7 +85,7 @@
 
         <div class="form-group">
             <label for="fileUpload">Upload Picture(s)</label>
-            <input type="file" id="fileUpload" name="fileUpload" multiple accept="image/*" required>
+            <input type="file" id="fileUpload" name="fileUpload" multiple accept="image/*">
             <div th:if="${#fields.hasErrors('fileUpload')}" th:errors="*{fileUpload}" class="error"></div>
         </div>
 

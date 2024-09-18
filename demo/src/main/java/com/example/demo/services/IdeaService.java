@@ -14,12 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.repositories.IdeaRepository;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,7 +61,7 @@ public class IdeaService {
     }
 
     @Transactional
-    public void updateName(Integer id,
+    public void updateIdea(Integer id,
                            String description,
                            String title,
                            String keyFeatures,
@@ -79,7 +75,7 @@ public class IdeaService {
     }
 
     @Transactional
-    public void updateName(Integer id,
+    public void updateIdea(Integer id,
                            OutputIdeaDTO ideaDTO) throws IllegalStateException {
         Idea idea = ideaRepository.findById(id).orElseThrow(() -> new IllegalStateException(
                 "account with Id " + id + " does not exist."));
@@ -104,6 +100,9 @@ public class IdeaService {
             );
             idea.setCategories(categories);
         }
+//        if (ideaDTO.getPictures() != null && !ideaDTO.getPictures().isEmpty()) {
+            idea.setPictures(ideaDTO.getPictures());
+//        }
         ideaRepository.save(idea);
     }
 
@@ -123,7 +122,6 @@ public class IdeaService {
     public OutputIdeaDTO findById(Integer id) {
         Idea idea = ideaRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Idea not found with id: " + id));
-
         return ideaMapper.map(idea);
     }
 
@@ -140,6 +138,19 @@ public class IdeaService {
             }
         });
         return resultList;
+    }
+
+    public void removePictures(Integer ideaId, List<String> removePictures) {
+        // Fetch idea, modify the list of pictures, and save the idea
+        Idea idea = ideaRepository.findById(ideaId)
+                .orElseThrow(() -> new IllegalStateException("Idea with id " + ideaId + " does not exist"));
+
+        List<String> updatedPictures = Arrays.stream(idea.getPictures().split(","))
+                .filter(picture -> !removePictures.contains(picture))
+                .collect(Collectors.toList());
+
+        idea.setPictures(String.join(",", updatedPictures));
+        ideaRepository.save(idea);
     }
 
     private List<Idea> searchIdeas(String search) {
