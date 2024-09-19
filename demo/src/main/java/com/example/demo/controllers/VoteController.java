@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping(path = "Vote")
+@RequestMapping(path = "/Vote")
 public class VoteController {
     private final VoteService voteService;
 
