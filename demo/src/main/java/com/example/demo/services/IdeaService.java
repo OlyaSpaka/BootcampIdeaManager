@@ -32,9 +32,9 @@ public class IdeaService {
         this.categoryRepository = categoryRepository;
     }
 
-    public void addNewIdea(Idea idea) {
-        ideaRepository.save(idea);
-    }
+//    public void addNewIdea(Idea idea) {
+//        ideaRepository.save(idea);
+//    }
 
     public Integer addNewIdea(InputIdeaDTO inputIdeaDTO) throws IllegalArgumentException, ParseException {
         Idea idea = ideaMapper.map(inputIdeaDTO);
@@ -58,20 +58,6 @@ public class IdeaService {
 
         // Delete the Idea
         ideaRepository.deleteById(id);
-    }
-
-    @Transactional
-    public void updateIdea(Integer id,
-                           String description,
-                           String title,
-                           String keyFeatures,
-                           String referenceLinks) {
-        Idea idea = ideaRepository.findById(id).orElseThrow(() -> new IllegalStateException(
-                "account with Id " + id + " does not exist."));
-        idea.setDescription(description);
-        idea.setKeyFeatures(keyFeatures);
-        idea.setTitle(title);
-        idea.setReferenceLinks(referenceLinks);
     }
 
     @Transactional
@@ -104,10 +90,6 @@ public class IdeaService {
             idea.setPictures(ideaDTO.getPictures());
 //        }
         ideaRepository.save(idea);
-    }
-
-    public List<Idea> showUserIdea(Integer userId) {
-        return ideaRepository.findByUserId(userId);
     }
 
     public List<OutputIdeaDTO> getFormattedIdeas(String search) {
