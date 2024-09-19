@@ -55,8 +55,8 @@ public class CompetitionServiceTest {
 
     @Test
     void deleteCompetitionWhenExists(){
-        LocalDate startDate = LocalDate.of(2024,9,01);
-        LocalDate endDate = LocalDate.of(2024,10,01);
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,10,1);
         Competition competitionsToDelete = new Competition();
         competitionsToDelete.setName("newCompetition");
         competitionsToDelete.setDescription("newDescription");

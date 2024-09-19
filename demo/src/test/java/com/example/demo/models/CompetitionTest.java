@@ -36,8 +36,8 @@ class CompetitionTest {
     @Transactional
     void setUp() {
         // Setup initial data
-        LocalDate startDate = LocalDate.of(2024,9,01);
-        LocalDate endDate = LocalDate.of(2024,10,01);
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,10,1);
         savedCompetition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         user = userRepository.save(new User("username", "email@example.com", "password"));
         idea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");

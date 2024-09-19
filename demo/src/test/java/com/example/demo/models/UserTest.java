@@ -35,8 +35,8 @@ class UserTest {
     @BeforeEach
     @Transactional
     public void setUp() {
-        LocalDate startDate = LocalDate.of(2024,9,01);
-        LocalDate endDate = LocalDate.of(2024,10,01);
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,10,1);
 
         Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         user = userRepository.save(new User("unittestuser", "email@example.com", "password"));
