@@ -2,8 +2,6 @@ package com.example.demo.controllers;
 
 import com.example.demo.services.UserService;
 import com.example.demo.models.User;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,11 +19,6 @@ public class UserController {
     @DeleteMapping(path = "{userId}")
     public void deleteUser(@PathVariable("userId") Integer id) {
         userService.deleteUser(id);
-    }
-
-    public User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return (User) auth.getPrincipal();
     }
 }
 

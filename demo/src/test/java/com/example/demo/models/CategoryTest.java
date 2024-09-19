@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +41,9 @@ class CategoryTest {
     void setUp() {
         // Setup initial data
         savedCategory = categoryRepository.save(new Category("Category Name"));
-        savedCompetition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,9,1);
+        savedCompetition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         savedUser = userRepository.save(new User("username", "email@example.com", "password"));
 
         savedIdea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");

@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.dto.general.CommentDTO;
 import com.example.demo.services.CommentService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +35,8 @@ public class CommentController {
     }
 
     @DeleteMapping(path = "{commentId}")
-    public void deleteComment(@PathVariable("commentId") Integer id) {
+    public ResponseEntity<?> deleteComment(@PathVariable("commentId") Integer id) {
         commentService.deleteComment(id);
+        return ResponseEntity.ok().build();
     }
-
-//    @GetMapping
-//    public List<Comment> showIdeaComments(@RequestParam("ideaId")Integer ideaId){
-//        return commentService.showIdeaComments(ideaId);
-//    }
 }

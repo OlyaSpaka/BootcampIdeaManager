@@ -31,6 +31,7 @@ public class CompetitionMapper implements CompetitionMapperInt {
         CompetitionDTO dto = new CompetitionDTO();
         dto.setId(competition.getId());
         dto.setName(competition.getName());
+        dto.setDescription(competition.getDescription());
         dto.setStartDate(competition.getStartDate());
         dto.setEndDate(competition.getEndDate());
         dto.setAmountOfWinners(competition.getAmountOfWinners());

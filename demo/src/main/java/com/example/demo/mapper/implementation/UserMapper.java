@@ -27,8 +27,8 @@ public class UserMapper implements UserMapperInt {
         User user = new User();
 
         user.setUsername(userDTO.getUsername());
-        user.setEmail(user.getEmail());
-        user.setPassword(user.getPassword());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
 
         return user;
     }

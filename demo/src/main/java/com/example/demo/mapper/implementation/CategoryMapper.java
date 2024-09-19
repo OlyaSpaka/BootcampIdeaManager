@@ -34,7 +34,9 @@ public class CategoryMapper implements CategoryMapperInt {
 
     @Override
     public List<OutputCategoryDTO> map(List<Category> categoryList){
-        if (categoryList == null || categoryList.isEmpty()) return null;
+        if (categoryList == null || categoryList.isEmpty()) {
+            return new ArrayList<>();  // Return an empty list instead of null
+        }
 
         List<OutputCategoryDTO> resultList = new ArrayList<>();
         for (Category category : categoryList){
