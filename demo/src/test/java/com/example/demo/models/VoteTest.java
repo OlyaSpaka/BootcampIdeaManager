@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +40,10 @@ class VoteTest {
     @BeforeEach
     @Transactional
     void setUp() {
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
+        LocalDate startDate = LocalDate.of(2024,9,10);
+        LocalDate endDate = LocalDate.of(2024,9,10);
+
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         user = userRepository.save(new User("unittestuser", "email@example.com", "password"));
         Idea idea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
 

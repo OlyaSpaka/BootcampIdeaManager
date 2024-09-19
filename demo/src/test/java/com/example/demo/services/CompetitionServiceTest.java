@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,13 +112,13 @@ class CompetitionServiceTest {
         // Arrange
         Integer id = 1;
         Competition competition = new Competition();
-        Date oldStartDate = new Date();
-        Date oldEndDate = new Date();
+        LocalDate oldStartDate = LocalDate.of(2024,9,1);
+        LocalDate oldEndDate = LocalDate.of(2024,10,1);
         competition.setStartDate(oldStartDate);
         competition.setEndDate(oldEndDate);
 
-        Date newStartDate = new Date(oldStartDate.getTime() + 100000);
-        Date newEndDate = new Date(oldEndDate.getTime() + 100000);
+        LocalDate newStartDate = LocalDate.of(2024,11,2);
+        LocalDate newEndDate = LocalDate.of(2024,12,2);
 
         when(competitionRepository.findById(id)).thenReturn(Optional.of(competition));
 

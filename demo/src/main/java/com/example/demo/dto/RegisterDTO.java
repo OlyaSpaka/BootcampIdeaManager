@@ -29,4 +29,6 @@ public class RegisterDTO {
     @NotEmpty(message = "Password field must be filled out.")
     private String password;
 
+    private String confirmPassword;
+
 }
