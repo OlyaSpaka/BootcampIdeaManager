@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS competition (
                                            id INT NOT NULL AUTO_INCREMENT,
                                            name VARCHAR(255) NOT NULL,
                                            description VARCHAR(255) NOT NULL,
-                                           start_date TIMESTAMP NOT NULL,
-                                           end_date TIMESTAMP,
+                                           start_date DATE NOT NULL,
+                                           end_date DATE,
                                            amount_of_winners INT NOT NULL,
                                            PRIMARY KEY (id)
 );

@@ -88,6 +88,4 @@ public class AdminToolsController {
         }
         return "redirect:/admin";
     }
-
-
 }

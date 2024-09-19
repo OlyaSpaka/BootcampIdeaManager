@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.Category;
 import com.example.demo.services.CategoryService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,11 +20,10 @@ public class CategoryController {
     public void deleteCategory(@PathVariable("categoryId") Integer id) {
         categoryService.deleteCategory(id);
     }
-
     @PutMapping(path = "{categoryId}/name")
-    public void updateCategoryName(@PathVariable("categoryId") Integer id,
-                                   @RequestParam(required = false) String name) {
+    public ResponseEntity<?> updateCategoryName(@PathVariable("categoryId") Integer id,
+                                             @RequestParam(required = false) String name) {
         categoryService.updateCategoryName(id, name);
+        return ResponseEntity.ok().build();
     }
-
 }
