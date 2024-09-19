@@ -101,7 +101,7 @@ public class VoteService {
         }
 
         Competition competition = competitionOpt.get();
-        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints();
+        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints(1);
 
         List<Map.Entry<Integer, Integer>> sortedIdeas = new ArrayList<>(ideasWithPointsCalculated.entrySet());
         sortedIdeas.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));

@@ -32,9 +32,8 @@ public class IdeaService {
     private final CategoryRepository categoryRepository;
 
     @Autowired
-    public IdeaService(IdeaRepository ideaRepository, IdeaSelectionService ideaSelectionService) {
     public IdeaService(IdeaRepository ideaRepository, IdeaMapper ideaMapper,
-                       CategoryRepository categoryRepository) {
+                       CategoryRepository categoryRepository, IdeaSelectionService ideaSelectionService) {
         this.ideaRepository = ideaRepository;
         this.ideaSelectionService = ideaSelectionService;
         this.ideaMapper = ideaMapper;

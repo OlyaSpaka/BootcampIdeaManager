@@ -31,8 +31,10 @@ public class IdeaController {
     private final CategoryService categoryService;
     private final BookmarkService bookmarkService;
     private final AzureBlobStorageService blobService;
+    private final VoteTypeService voteTypeService;
 
-    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, BookmarkService bookmarkService, AzureBlobStorageService blobService) {
+
+    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, BookmarkService bookmarkService, AzureBlobStorageService blobService, VoteTypeService voteTypeService) {
         this.ideaService = ideaService;
         this.competitionService = competitionService;
         this.commentService = commentService;
@@ -40,6 +42,7 @@ public class IdeaController {
         this.categoryService = categoryService;
         this.bookmarkService = bookmarkService;
         this.blobService = blobService;
+        this.voteTypeService = voteTypeService;
     }
 
     @GetMapping
@@ -243,23 +246,12 @@ public class IdeaController {
     @GetMapping("selected-ideas")
     public String listSelectedIdeas( Model model) {
         User user = authenticationService.getCurrentUser();
-        addCommonAttributes(model);
+        addCommonAttributes(user, model);
 
         List<Idea> ideas = ideaService.getSelectedIdeas(1);
         model.addAttribute("ideas", ideas);
 
         return "selected-ideas";
     }
-    @GetMapping("vote")
-    public String listSelectedIdeasToVote(@RequestParam(value = "search", required = false) String search, Model model) {
-        List<Idea> ideas = ideaService.getFormattedIdeas(search);
-        List<VoteType> voteTypes = voteTypeService.getVoteTypes();
-        HashMap<Integer,Integer> votePoints = voteService.getAllPoints(1);
-        addCommonAttributes(model);
-        model.addAttribute("ideas", ideas);
-        model.addAttribute("search", search);
-        model.addAttribute("voteTypes", voteTypes);
-        model.addAttribute("votePoints", votePoints);
-        return "vote";
-    }
+
 }
