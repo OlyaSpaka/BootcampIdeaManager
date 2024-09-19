@@ -30,13 +30,14 @@
             console.log("ideaId: " + ideaId);
             console.log("userId: " + userId);
             console.log("voteTypeId: " + voteTypeId);
+
             const voteData = {
-                idea: { id: ideaId },
-                user: { id: userId },
-                voteType: { id: voteTypeId }
+                idea: { id: ideaId },       // Ensure these match your DTO's expected structure
+                user: { id: userId },       // Ensure these match your DTO's expected structure
+                voteTypeDTO: { id: voteTypeId }  // Ensure this matches your DTO's expected structure
             };
 
-            fetch('/Vote', {
+            fetch('/vote', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -46,6 +47,7 @@
                 .then(response => {
                     if (response.ok) {
                         alert('Vote submitted successfully!');
+                        window.location.reload();
                     } else {
                         return response.json().then(data => {
                             console.error('Error details:', data);
@@ -108,7 +110,11 @@
             <!-- Vote Type Dropdown Column -->
             <td class="col-vote-type">
                 <select th:id="|voteTypeSelect-${idea.id}|">
-                    <option value="" selected disabled>Select a vote type</option>
+                    <option th:if="${userVotes[idea.id] == null}" value="" selected disabled>Select a vote type</option>
+                    <option th:if="${userVotes[idea.id] != null}" th:value="${userVotes[idea.id]}" selected>
+                        <!-- Get the points of the vote type that the user voted for -->
+                        <span th:text="${voteTypePoints[userVotes[idea.id]]}"></span>
+                    </option>
                     <option th:each="voteType : ${voteTypes}" th:value="${voteType.id}" th:text="${voteType.points}"></option>
                 </select>
             </td>

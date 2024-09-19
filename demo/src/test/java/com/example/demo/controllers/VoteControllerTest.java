@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.general.VoteDTO;
 import com.example.demo.models.Vote;
 import com.example.demo.services.VoteService;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ public class VoteControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(voteService, times(1)).addVote(any(Vote.class));
+        verify(voteService, times(1)).addVote(any(VoteDTO.class));
     }
 
     @Test
