@@ -3,9 +3,6 @@ package com.example.demo.controllers;
 import com.example.demo.services.VoteService;
 import com.example.demo.models.Vote;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-
 @RestController
 @RequestMapping(path = "/Vote")
 public class VoteController {

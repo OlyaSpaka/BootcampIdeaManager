@@ -1,87 +1,69 @@
 package com.example.demo.services;
 
-import com.example.demo.models.Role;
 import com.example.demo.models.VoteType;
-import com.example.demo.repositories.RoleRepository;
 import com.example.demo.repositories.VoteTypeRepository;
-import lombok.Cleanup;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
 public class VoteTypeServiceTest {
-
-
-    @Autowired
-    private VoteTypeService voteTypeService;
-
-    @Autowired
+    @Mock
     private VoteTypeRepository voteTypeRepository;
-    private VoteType voteTypeTest;
+
+    @InjectMocks
+    private VoteTypeService voteTypeService;
 
     @BeforeEach
     void setUp() {
-        voteTypeTest = new VoteType();
-        voteTypeTest.setName("TestName");
-        voteTypeTest.setPoints(5);
-
-        voteTypeRepository.save(voteTypeTest);
-
+        MockitoAnnotations.openMocks(this); // Initialize mocks before each test
     }
 
     @Test
-    void testAddVoteType(){
-        //Given
-       VoteType voteTypeNew = new VoteType();
-       voteTypeNew.setName("NewName");
-       voteTypeNew.setPoints(10);
+    void testAddVoteType() {
+        // Arrange
+        VoteType voteType = new VoteType();
+        voteType.setId(1);
+        voteType.setPoints(10);
+        when(voteTypeRepository.save(any(VoteType.class))).thenReturn(voteType);
 
-        //When
-        voteTypeService.addVoteType(voteTypeNew);
-        //Then
-        List<VoteType> voteTypes = voteTypeRepository.findAll();
-        assertThat(voteTypes).hasSize(2);
-        assertThat(voteTypes).extracting(VoteType::getName).contains("NewName");
+        // Act
+        voteTypeService.addVoteType(voteType);
+
+        // Assert
+        verify(voteTypeRepository, times(1)).save(voteType); // Verify save method is called once
     }
 
     @Test
-    void testDeleteVoteTypeWhenExists(){
-        VoteType voteTypeToDelete = new VoteType();
-        voteTypeToDelete.setName("NewName");
-        voteTypeToDelete.setPoints(10);
+    void testDeleteVoteType_Success() {
+        // Arrange
+        Integer voteTypeId = 1;
+        when(voteTypeRepository.existsById(voteTypeId)).thenReturn(true);
 
+        // Act
+        voteTypeService.deleteVoteType(voteTypeId);
 
-        voteTypeRepository.save(voteTypeToDelete);
-
-        voteTypeService.deleteVoteType(voteTypeToDelete.getId());
-        List<VoteType> voteTypesAfter = voteTypeRepository.findAll();
-        assertThat(voteTypesAfter).doesNotContain(voteTypeToDelete);
+        // Assert
+        verify(voteTypeRepository, times(1)).existsById(voteTypeId); // Verify existence check
+        verify(voteTypeRepository, times(1)).deleteById(voteTypeId); // Verify delete method is called
     }
 
     @Test
-    void testDeleteVoteTypeWhenNotExists(){
-        assertThrows(IllegalStateException.class, () -> voteTypeService.deleteVoteType(999));
-    }
+    void testDeleteVoteType_Failure() {
+        // Arrange
+        Integer voteTypeId = 1;
+        when(voteTypeRepository.existsById(voteTypeId)).thenReturn(false);
 
-    @AfterEach
-    void cleanUp(){
-        voteTypeRepository.deleteAll();
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> voteTypeService.deleteVoteType(voteTypeId));
+        assertEquals("VoteType with Id 1 does not exist", exception.getMessage());
 
+        // Verify that deleteById is never called if vote type doesn't exist
+        verify(voteTypeRepository, never()).deleteById(voteTypeId);
     }
 }

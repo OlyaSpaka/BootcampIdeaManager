@@ -2,6 +2,13 @@ package com.example.demo.services;
 
 import com.example.demo.models.*;
 import com.example.demo.repositories.*;
+import com.example.demo.models.Competition;
+import com.example.demo.models.Idea;
+import com.example.demo.models.IdeaSelection;
+import com.example.demo.models.Vote;
+import com.example.demo.repositories.CompetitionRepository;
+import com.example.demo.repositories.IdeaRepository;
+import com.example.demo.repositories.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +21,7 @@ public class VoteService {
     private final IdeaRepository ideaRepository;
     private final UserRepository userRepository;
     private final CompetitionRepository competitionRepository;
-    private IdeaSelectionService ideaSelectionService;
+    private final IdeaSelectionService ideaSelectionService;
 
     @Autowired
     public VoteService(VoteRepository voteRepository, IdeaRepository ideaRepository, UserRepository userRepository, CompetitionRepository competitionRepository, IdeaSelectionService ideaSelectionService) {
@@ -58,20 +65,6 @@ public class VoteService {
         }
     }
 
-  /*  @Transactional
-    public void updateVote(Integer id,
-                           Integer user_id,
-                           Integer idea_id,
-                           Integer voteType_id) {
-        Vote vote = voteRepository.findById(id).orElseThrow(() -> new IllegalStateException(
-              "Vote with Id " + id + " does not exist."));
-        vote.setUser(user_id);
-        vote.setVoteType(voteType_id);
-        vote.setIdea_id(idea_id);
-
-
-    }*/
-
     //Calculates total vote points of specific ideas.
     public int calculatePoints(Integer id) {
         List<Vote> voteList = voteRepository.findByIdeaId(id);
@@ -96,37 +89,48 @@ public class VoteService {
             hashMap.put(idea.getId(), calculatePoints(idea.getId()));
         }
         return hashMap;
-
     }
 
     public List<Idea> getWinningIdeas(Integer competitionId) {
         List<Idea> winningIdeaList = new ArrayList<>();
-        Optional<Competition> competition = competitionRepository.findById(competitionId);
-        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints(competitionId);
+        Optional<Competition> competitionOpt = competitionRepository.findById(competitionId);
+
+        // Check if competition exists
+        if (competitionOpt.isEmpty()) {
+            return winningIdeaList; // or throw an exception if competition must exist
+        }
+
+        Competition competition = competitionOpt.get();
+        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints();
 
         List<Map.Entry<Integer, Integer>> sortedIdeas = new ArrayList<>(ideasWithPointsCalculated.entrySet());
         sortedIdeas.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
 
         // Loop through the sorted list and add the corresponding ideas to the winningIdeaList
-        for (int i = 0; i < Math.min(competition.get().getAmountOfWinners(), sortedIdeas.size()); i++) {
+        for (int i = 0; i < Math.min(competition.getAmountOfWinners(), sortedIdeas.size()); i++) {
             Integer ideaId = sortedIdeas.get(i).getKey();
-            winningIdeaList.add(ideaRepository.findById(ideaId).orElse(null));
+            ideaRepository.findById(ideaId).ifPresent(winningIdeaList::add);
         }
 
         return winningIdeaList;
     }
 
     public void addWinningIdeasToIdeaSelectionRepository(Integer competitionId) {
-        if(ideaSelectionService.getSelectedIdeas(competitionId).isEmpty()) {
-            List<Idea> winningIdeaList = getWinningIdeas(competitionId);
-            for (Idea idea : winningIdeaList) {
-                IdeaSelection selectedIdea = new IdeaSelection(idea.getCreatedAt());
-                selectedIdea.setCompetition(competitionRepository.findById(competitionId).get());
-                selectedIdea.setIdea(idea);
+        List<Idea> winningIdeaList = getWinningIdeas(competitionId);
+        Optional<Competition> competitionOpt = competitionRepository.findById(competitionId);
 
-                ideaSelectionService.addIdeaSelection(selectedIdea);
-            }
+        if (competitionOpt.isEmpty()) {
+            return; // or throw an exception if competition must exist
         }
 
+        Competition competition = competitionOpt.get();
+
+        for (Idea idea : winningIdeaList) {
+            IdeaSelection selectedIdea = new IdeaSelection(idea.getCreatedAt());
+            selectedIdea.setCompetition(competition);
+            selectedIdea.setIdea(idea);
+
+            ideaSelectionService.addIdeaSelection(selectedIdea);
+        }
     }
 }

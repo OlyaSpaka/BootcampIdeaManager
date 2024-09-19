@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/auth-error-pages-style.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar bg-dark d-flex flex-column">
+            <div>
+                <a href="/admin" class="text-white"><i class="fas fa-tools"></i>   Admin Dashboard</a>
+            </div>
+            <div class="mt-auto mb-3">
+                <a href="/ideas" class="text-white"><i class="fa-solid fa-house"></i>   Home</a>
+                <a href="/auth/logout" class="text-white"><i class="fa-solid fa-right-from-bracket"></i>   Logout</a>
+            </div>
+        </div>
+
+        <!-- Admin Panel Content -->
+        <div class="col-md-9 col-lg-10 content-area">
+            <div class="row">
+                <!-- Edit Bootcamp Details -->
+                <div class="col-md-4">
+                    <div class="container-box-details">
+                        <h4>Edit Details</h4>
+                        <form th:action="@{/admin/bootcamp/update}" th:object="${competition}" method="post">
+                            <input type="hidden" name="_method" value="put" />
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Bootcamp Name</label>
+                                <input type="text" th:field="*{name}" class="form-control" id="name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea th:field="*{description}" class="form-control" id="description" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="date" name="startDate" th:value="*{startDate}" class="form-control" id="startDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label">End Date</label>
+                                <input type="date" th:value="*{endDate}" name="endDate" class="form-control" id="endDate">
+                            </div>
+                            <div class="mb-3">
+                                <label for="amountOfWinners" class="form-label">Number of Groups</label>
+                                <input type="number" th:value="*{amountOfWinners}" name="amountOfWinners" class="form-control" id="amountOfWinners" min="0">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                        </form>
+                        <div th:if="${unspecifiedErrorEdit}" class="alert alert-danger alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
+                            <span th:text="${unspecifiedErrorEdit}">Something went wrong. Try again later.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${successEdit}" class="alert alert-success alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
+                            <span th:text="${successEdit}">Bootcamp information updated successfully.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manage Users -->
+                <div class="col-md-8">
+                    <div class="container-box-users">
+                        <h4>Manage Users</h4>
+                        <div th:if="${success}" class="alert alert-success alert-dismissible fade show"
+                             style="margin-top: 1rem; margin-bottom: 1rem" role="alert">
+                            <span th:text="${success}">User deleted successfully!</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show"
+                             style="margin-top: 1rem; margin-bottom: 1rem" role="alert">
+                            <span th:text="${success}">Failed to delete user.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div class="scrollable-table-container">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Edit</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="user, iterStat : ${users}">
+                                <td th:text="${iterStat.count}"></td>
+                                <td class="truncate" th:text="${user.username}"></td>
+                                <td class="truncate" th:text="${user.email}"></td>
+                                <td th:text="${user.getRolesString()}"></td>
+                                <td>
+                                    <form th:if="${user.id != currentUser.id}"
+                                          th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post"
+                                          onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                        <input type="hidden" name="_method" value="delete"/>
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                            </div>
+                    </div>
+                    <div class="container-box-voting">
+                        <h4>Start Voting</h4>
+                        <form th:action="@{/admin}" method="post" onsubmit="return confirm('Are you sure you want to start the voting process?');">
+                            <button type="submit" class="btn btn-info">Start</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
-    public List<Bookmark> findByUserId(Integer userId);
+    List<Bookmark> findByUserId(Integer userId);
+    void deleteByIdeaIdAndUserId(Integer ideaId, Integer userId);
 }

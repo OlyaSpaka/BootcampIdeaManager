@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,9 +40,12 @@ class CommentTest {
     @BeforeEach
     @Transactional
     void setUp() {
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,9,1);
+
         // Setup initial data
         user = userRepository.save(new User("username", "email@example.com", "password"));
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         Idea newIdea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
 
         user.addIdea(newIdea);
@@ -72,7 +76,9 @@ class CommentTest {
     @Transactional
     void addComment() {
         // Create and persist new entities
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,9,1);
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         User newUser = new User("anotherUser", "another@example.com", "password");
         Idea newIdea = new Idea("New Idea", "Description", "Key Features", "References", new Date(), "Pictures");
 
@@ -92,7 +98,7 @@ class CommentTest {
         entityManager.persist(newUser);
         entityManager.flush();
 
-        // Verify that the new comment is associated with the new user and idea
+        // Verify that the new comment is associated with the new username and idea
         Comment retrievedComment = commentRepository.findById(comment.getId()).orElse(null);
         assertThat(retrievedComment).isNotNull();
         assertThat(retrievedComment.getUser()).isEqualTo(newUser);

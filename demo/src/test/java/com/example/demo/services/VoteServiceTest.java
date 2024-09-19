@@ -2,294 +2,250 @@ package com.example.demo.services;
 
 import com.example.demo.models.*;
 import com.example.demo.repositories.*;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.Date;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
 public class VoteServiceTest {
-
-    @Autowired
+    @InjectMocks
     private VoteService voteService;
-    @Autowired
+    @Mock
     private VoteRepository voteRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
+    @Mock
     private IdeaRepository ideaRepository;
-    @Autowired
-    private VoteTypeRepository voteTypeRepository;
-    @Autowired
+    @Mock
+    private IdeaSelectionService ideaSelectionService;
+    @Mock
     private CompetitionRepository competitionRepository;
-    @Autowired
-    private IdeaSelectionRepository ideaSelectionRepository;
-    private User userToVote;
-    private Idea idea;
-    private Vote vote;
-    private VoteType voteType;
-    private Competition competition;
-    private User ideaUser;
 
-    //This is confusing even for me... sorry
     @BeforeEach
-    // user adds vote to ideaUser's users first idea
     void setUp() {
-        ideaUser = userRepository.save(new User("ideaUsername", "email123@example.com", "password123"));
-        userToVote = userRepository.save(new User("username", "email@example.com", "password"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(), 2));
-        idea = new Idea();
-        idea.setCreatedAt(new Date());
-        idea.setTitle("Test Idea");
-        idea.setDescription("Test description");
-        idea.setKeyFeatures("Test features");
-        idea.setReferenceLinks("Test references");
-        ideaUser.addIdea(idea);
-        competition.addIdea(idea);
-        idea = ideaRepository.save(idea);
-        voteType = voteTypeRepository.save(new VoteType("name", 200));
-
-
-        // Setting up an Idea object for testing
-
-
-        System.out.println("Competition Id is  " + competition.getId());
-
-        vote = new Vote();
-        vote.setVoteType(voteType);
-        vote.setIdea(idea);
-        vote.setUser(userToVote);
-
-
-        vote = voteRepository.save(vote);
+        MockitoAnnotations.openMocks(this);
     }
 
-    //same user adds vote to ideaUser's second idea
     @Test
     void testAddFirstVote() {
-        Vote testVote = new Vote();
-        Idea newIdea = new Idea();
-        newIdea.setCreatedAt(new Date());
-        newIdea.setTitle("Test Idea");
-        newIdea.setDescription("Test description");
-        newIdea.setKeyFeatures("Test features");
-        newIdea.setReferenceLinks("Test references");
-        competition.addIdea(newIdea);
-        ideaUser.addIdea(newIdea);
-        newIdea = ideaRepository.save(newIdea);
+        // Arrange
+        User user = new User();
+        user.setId(1);
+        Idea idea = new Idea();
+        idea.setId(2);
+        idea.setUser(user); // Owner of the idea
 
+        Vote vote = new Vote();
+        vote.setUser(new User());
+        vote.setIdea(idea);
 
-        testVote.setIdea(newIdea);
-        testVote.setVoteType(voteType);
-        testVote.setUser(userToVote);
+        when(voteRepository.findByUserIdAndIdeaId(anyInt(), anyInt())).thenReturn(Optional.empty());
 
+        // Act
+        voteService.addVote(vote);
 
-        voteService.addVote(testVote);
-
-        List<Vote> votesAfter = voteRepository.findAll();
-        assertThat(votesAfter).hasSize(2);
-
-
+        // Assert
+        verify(voteRepository, times(1)).save(vote);
     }
 
     @Test
-        //Test if user can not add second vote on the same idea
-    void testAddSecondVote() {
-        Vote testVote = new Vote();
-        testVote.setIdea(idea);
-        testVote.setVoteType(voteType);
-        testVote.setUser(userToVote);
+    void testAddVote_UserVotesOwnIdea() {
+        // Arrange
+        User user = new User();
+        user.setId(1);
+        Idea idea = new Idea();
+        idea.setId(1); // Same ID as user
+        idea.setUser(user);
 
-        assertThrows(IllegalStateException.class, () -> voteService.addVote(testVote));
+        Vote vote = new Vote();
+        vote.setUser(user);
+        vote.setIdea(idea);
 
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> voteService.addVote(vote));
+        verify(voteRepository, never()).save(vote);
     }
 
     @Test
-    void testAddVoteOnYourIdea() {
-        Vote testVote = new Vote();
-        testVote.setIdea(idea);
-        testVote.setVoteType(voteType);
-        testVote.setUser(ideaUser);
+    void testAddVote_UserAlreadyVoted() {
+        // Arrange
+        User user = new User();
+        user.setId(1);
+        Idea idea = new Idea();
+        idea.setId(2);
+        idea.setUser(new User());
 
-        assertThrows(IllegalStateException.class, () -> voteService.addVote(testVote));
+        Vote vote = new Vote();
+        vote.setUser(user);
+        vote.setIdea(idea);
+
+        when(voteRepository.findByUserIdAndIdeaId(anyInt(), anyInt())).thenReturn(Optional.of(vote));
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> voteService.addVote(vote));
+        verify(voteRepository, never()).save(vote);
     }
 
     @Test
-    void testDeleteVoteWhenExist() {
-        Vote voteToDelete = new Vote();
-        voteToDelete.setIdea(idea);
-        voteToDelete.setVoteType(voteType);
-        voteToDelete.setUser(ideaUser);
+    void testDeleteVote() {
+        // Arrange
+        Integer voteId = 1;
+        when(voteRepository.existsById(voteId)).thenReturn(true);
 
-        voteRepository.save(voteToDelete);
-        List<Vote> votesBefore = voteRepository.findAll();
-        assertThat(votesBefore).contains(voteToDelete);
-        voteService.deleteVote(voteToDelete.getId());
+        // Act
+        voteService.deleteVote(voteId);
 
-        List<Vote> votesAfter = voteRepository.findAll();
-        assertThat(votesAfter).doesNotContain(voteToDelete);
+        // Assert
+        verify(voteRepository, times(1)).deleteById(voteId);
     }
 
     @Test
-    void testCheckIdeaVotePoints() {
-        VoteType newVoteType = voteTypeRepository.save(new VoteType("very good idea", 55));
-        Vote testVote = new Vote();
-        testVote.setIdea(idea);
-        testVote.setVoteType(newVoteType);
-        testVote.setUser(ideaUser);
+    void testDeleteVote_NotExists() {
+        // Arrange
+        Integer voteId = 1;
+        when(voteRepository.existsById(voteId)).thenReturn(false);
 
-        voteRepository.save(testVote);
-        int expectedPoints = 100 + 55; // Total points from the original vote and the new vote
-        int calculatedPoints = voteService.calculatePoints(idea.getId());
-        assertThat(calculatedPoints).isEqualTo(expectedPoints);
-
-
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> voteService.deleteVote(voteId));
+        verify(voteRepository, never()).deleteById(voteId);
     }
-
-
     @Test
-    void testGetCompetitionWinningIdeasWhenExists() {
-        // Create more vote types with different points
-        VoteType lowVoteType = voteTypeRepository.save(new VoteType("low points", 50));
-        VoteType highVoteType = voteTypeRepository.save(new VoteType("high points", 150));
-
-        // Create more ideas and assign votes with varying points
-        Idea secondIdea = new Idea();
-        secondIdea.setCreatedAt(new Date());
-        secondIdea.setTitle("Second Test Idea");
-        secondIdea.setDescription("Test description");
-        secondIdea.setKeyFeatures("Test features");
-        secondIdea.setReferenceLinks("Test references");
-        ideaUser.addIdea(secondIdea);
-        competition.addIdea(secondIdea);
-        secondIdea = ideaRepository.save(secondIdea);
-
-        Idea thirdIdea = new Idea();
-        thirdIdea.setCreatedAt(new Date());
-        thirdIdea.setTitle("Third Test Idea");
-        thirdIdea.setDescription("Test description");
-        thirdIdea.setKeyFeatures("Test features");
-        thirdIdea.setReferenceLinks("Test references");
-        ideaUser.addIdea(thirdIdea);
-        competition.addIdea(thirdIdea);
-        thirdIdea = ideaRepository.save(thirdIdea);
-
-        // Add votes with different point values for each idea
+    void testCalculatePoints() {
+        // Arrange
+        Integer ideaId = 1;
         Vote vote1 = new Vote();
-        vote1.setIdea(idea);  // First idea from setUp()
-        vote1.setVoteType(lowVoteType);
-        vote1.setUser(userToVote);
-        voteRepository.save(vote1);
+        VoteType voteType1 = new VoteType();
+        voteType1.setPoints(10);
+        vote1.setVoteType(voteType1);
 
         Vote vote2 = new Vote();
-        vote2.setIdea(secondIdea);  // Second idea
-        vote2.setVoteType(highVoteType);
-        vote2.setUser(userToVote);
-        voteRepository.save(vote2);
+        VoteType voteType2 = new VoteType();
+        voteType2.setPoints(20);
+        vote2.setVoteType(voteType2);
 
-        Vote vote3 = new Vote();
-        vote3.setIdea(thirdIdea);  // Third idea
-        vote3.setVoteType(voteType);  // Default voteType with 100 points
-        vote3.setUser(userToVote);
-        voteRepository.save(vote3);
+        List<Vote> votes = Arrays.asList(vote1, vote2);
+        when(voteRepository.findByIdeaId(ideaId)).thenReturn(votes);
 
-        // Test getWinningIdeas() for the top 2 ideas by vote points
-        List<Idea> winningIdeas = voteService.getWinningIdeas(competition.getId());
-        for(Idea idea :winningIdeas){
-            System.out.println("Idea id:" + idea.getId() + "Idea points:" + voteService.calculatePoints(idea.getId()));
-        }
-        // Verify that the top 2 ideas are returned in descending order of points
-        assertThat(winningIdeas).hasSize(2);
-        assertThat(winningIdeas.get(0).getId()).isEqualTo(idea.getId()); // Second idea should be first (150 points)
-        assertThat(winningIdeas.get(1).getId()).isEqualTo(thirdIdea.getId()); // Third idea should be second (100 points)
+        // Act
+        int totalPoints = voteService.calculatePoints(ideaId);
+
+        // Assert
+        assertEquals(30, totalPoints);
     }
 
     @Test
-    void testAddWinningIdeasToIdeaSelectionRepository() {
-        // Given: Setup necessary data
-        VoteType highVoteType = voteTypeRepository.save(new VoteType("High Points", 300));
-        VoteType lowVoteType = voteTypeRepository.save(new VoteType("Low Points", 50));
-
-        // Create more ideas
+    void testGetAllPoints() {
+        // Arrange
         Idea idea1 = new Idea();
-        idea1.setCreatedAt(new Date());
-        idea1.setTitle("High Points Idea");
-        idea1.setDescription("Idea with high points");
-        idea1.setKeyFeatures("Key Features");
-        idea1.setReferenceLinks("Reference Links");
-        ideaUser.addIdea(idea1);
-        competition.addIdea(idea1);
-        idea1 = ideaRepository.save(idea1);
+        idea1.setId(1);
+        Idea idea2 = new Idea();
+        idea2.setId(2);
+
+        VoteType voteType1 = new VoteType();
+        voteType1.setPoints(10);
+
+        Vote vote1_1 = new Vote();
+        vote1_1.setVoteType(voteType1);
+        Vote vote2_1 = new Vote();
+        vote2_1.setVoteType(voteType1);
+        Vote vote2_2 = new Vote();
+        vote2_2.setVoteType(voteType1);
+
+        List<Vote> votes1 = List.of(vote1_1);
+        List<Vote> votes2 = List.of(vote2_1,vote2_2);
+
+        List<Idea> ideas = Arrays.asList(idea1, idea2);
+
+        when(ideaRepository.findAll()).thenReturn(ideas);
+        when(voteRepository.findByIdeaId(1)).thenReturn(votes1);
+        when(voteRepository.findByIdeaId(2)).thenReturn(votes2);
+
+        // Act
+        HashMap<Integer, Integer> pointsMap = voteService.getAllPoints();
+
+        // Assert
+        assertEquals(10, pointsMap.get(1));
+        assertEquals(20, pointsMap.get(2));
+    }
+
+    @Test
+    void testGetWinningIdeas() {
+        // Arrange
+        Integer competitionId = 1;
+        Competition competition = new Competition();
+        competition.setAmountOfWinners(1);
+
+        VoteType voteType1 = new VoteType();
+        voteType1.setPoints(10);
+
+        Vote vote1 = new Vote();
+        vote1.setVoteType(voteType1);
+
+        Idea idea1 = new Idea();
+        idea1.setId(1);
+        idea1.addVote(vote1);
+
+        Vote vote2 = new Vote();
+        vote2.setVoteType(voteType1);
 
         Idea idea2 = new Idea();
-        idea2.setCreatedAt(new Date());
-        idea2.setTitle("Low Points Idea");
-        idea2.setDescription("Idea with low points");
-        idea2.setKeyFeatures("Key Features");
-        idea2.setReferenceLinks("Reference Links");
-        ideaUser.addIdea(idea2);
-        competition.addIdea(idea2);
-        idea2 = ideaRepository.save(idea2);
+        idea2.setId(2);
+        idea2.addVote(vote2);
 
-        // Cast votes
-        Vote vote1 = new Vote();
-        vote1.setIdea(idea1);
-        vote1.setVoteType(highVoteType);
-        vote1.setUser(userToVote);
-        voteRepository.save(vote1);
+        List<Idea> ideas = Arrays.asList(idea1, idea2);
 
-        Vote vote2 = new Vote();
-        vote2.setIdea(idea2);
-        vote2.setVoteType(lowVoteType);
-        vote2.setUser(userToVote);
-        voteRepository.save(vote2);
+        when(competitionRepository.findById(competitionId)).thenReturn(Optional.of(competition));
+        when(ideaRepository.findAll()).thenReturn(ideas);
+        when(voteRepository.findByIdeaId(1)).thenReturn(List.of(vote1));
+        when(voteRepository.findByIdeaId(2)).thenReturn(List.of(vote2));
+        when(ideaRepository.findById(1)).thenReturn(Optional.of(idea1));
+        when(ideaRepository.findById(2)).thenReturn(Optional.of(idea2));
 
-        // Call the method under test
-        voteService.addWinningIdeasToIdeaSelectionRepository(competition.getId());
+        // Act
+        List<Idea> winningIdeas = voteService.getWinningIdeas(competitionId);
 
-        // Verify that IdeaSelectionService.addIdeaSelection() was called
-        // with the correct IdeaSelection objects
-        List<IdeaSelection> ideaSelections = ideaSelectionRepository.findAll();
-        assertThat(ideaSelections).hasSize(2);
+        // Assert
+        assertEquals(1, winningIdeas.size());
+        assertEquals(1, winningIdeas.get(0).getId());
+    }
+    @Test
+    void testAddWinningIdeasToIdeaSelectionRepository() {
+        // Arrange
+        Integer competitionId = 1;
+        Idea idea1 = new Idea();
+        idea1.setId(1);
+        idea1.setCreatedAt(Date.from(Instant.now()));
 
-        // Verify that IdeaSelection objects have been created with the expected values
-        for (IdeaSelection ideaSelection : ideaSelections) {
-            assertThat(ideaSelection.getCompetition()).isEqualTo(competition);
-            assertThat(competition.getIdeas()).contains(ideaSelection.getIdea());
-        }
+        Competition competition = new Competition();
+        competition.setId(competitionId);
+        competition.setAmountOfWinners(1); // Set the number of winners expected
 
+        List<Idea> winningIdeas = List.of(idea1);
 
-        IdeaSelection firstSelection = ideaSelections.get(0);
-        IdeaSelection secondSelection = ideaSelections.get(1);
+        // Mocking
+        when(competitionRepository.findById(competitionId)).thenReturn(Optional.of(competition));
+        when(voteService.getWinningIdeas(competitionId)).thenReturn(winningIdeas);
+        when(competitionRepository.findById(competitionId)).thenReturn(Optional.of(competition));
+        when(ideaRepository.findById(1)).thenReturn(Optional.of(idea1));
 
-        assertThat(firstSelection.getIdea().getId()).isEqualTo(idea1.getId());
-        assertThat(secondSelection.getIdea().getId()).isEqualTo(idea.getId());
-        assertThat(firstSelection.getIdea().getId()).isNotEqualTo(secondSelection.getIdea().getId());
+        // Act
+        voteService.addWinningIdeasToIdeaSelectionRepository(competitionId);
+
+        // Assert
+        verify(ideaSelectionService, times(1)).addIdeaSelection(any(IdeaSelection.class));
+        ArgumentCaptor<IdeaSelection> ideaSelectionCaptor = ArgumentCaptor.forClass(IdeaSelection.class);
+        verify(ideaSelectionService).addIdeaSelection(ideaSelectionCaptor.capture());
+
+        IdeaSelection capturedIdeaSelection = ideaSelectionCaptor.getValue();
+        assertEquals(idea1, capturedIdeaSelection.getIdea());
+        assertEquals(competition, capturedIdeaSelection.getCompetition());
     }
 
-
-
-    @AfterEach
-    void cleanUp() {
-        voteRepository.deleteAll();
-        ideaRepository.deleteAll();
-        competitionRepository.deleteAll();
-        userRepository.deleteAll();
-        voteTypeRepository.deleteAll();
-
-    }
 }

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,8 +41,10 @@ class BookmarkTest {
     @Transactional
     void setUp() {
         // Setup initial data
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,9,1);
         Idea newIdea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
-        competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
+        competition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         user = userRepository.save(new User("username", "email@example.com", "password"));
 
         user.addIdea(newIdea);
@@ -91,7 +94,7 @@ class BookmarkTest {
         entityManager.flush();
         entityManager.clear();
 
-        // Verify that the new bookmark is associated with the new user and idea
+        // Verify that the new bookmark is associated with the new username and idea
         Bookmark retrievedBookmark = bookmarkRepository.findById(bookmark.getId()).orElse(null);
         assertThat(retrievedBookmark).isNotNull();
         assertThat(retrievedBookmark.getUser()).isEqualTo(newUser);

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,7 +35,10 @@ class UserTest {
     @BeforeEach
     @Transactional
     public void setUp() {
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,10,1);
+
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         user = userRepository.save(new User("unittestuser", "email@example.com", "password"));
         Idea idea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
 
@@ -149,7 +153,7 @@ class UserTest {
 
         entityManager.persist(role);
 
-//        entityManager.persist(user); // Save Idea and associated Vote
+//        entityManager.persist(username); // Save Idea and associated Vote
         entityManager.flush(); // Ensure changes are committed
 
         User pulledUser = userRepository.findById(user.getId()).orElse(null);

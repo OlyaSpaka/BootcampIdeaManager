@@ -2,81 +2,67 @@ package com.example.demo.services;
 
 import com.example.demo.models.Role;
 import com.example.demo.repositories.RoleRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
 public class RoleServiceTest {
 
-    @Autowired
-    private RoleService roleService;
-
-    @Autowired
+    @Mock
     private RoleRepository roleRepository;
-    private Role testRole;
+
+    @InjectMocks
+    private RoleService roleService;
 
     @BeforeEach
     void setUp() {
-        testRole = new Role();
-        testRole.setName("TestRole");
+        MockitoAnnotations.openMocks(this);
+    }
+    @Test
+    void testAddRole() {
+        // Arrange
+        Role role = new Role();
+        role.setId(1);
+        role.setName("Admin");
+        when(roleRepository.save(any(Role.class))).thenReturn(role);
 
-        roleRepository.save(testRole);
+        // Act
+        roleService.addRole(role);
 
+        // Assert
+        verify(roleRepository, times(1)).save(role); // Verify save method is called once
     }
 
     @Test
-    void testAddNewRole() {
+    void testDeleteRole_Success() {
+        // Arrange
+        Integer roleId = 1;
+        when(roleRepository.existsById(roleId)).thenReturn(true);
 
-        //Given
-        Role newRole = new Role();
-        newRole.setName("NewRole");
+        // Act
+        roleService.deleteRole(roleId);
 
-        //When
-        roleService.addRole(newRole);
-        //Then
-        List<Role> roles = roleRepository.findAll();
-        assertThat(roles).hasSize(2);
-        assertThat(roles).extracting(Role::getName).contains("NewRole");
+        // Assert
+        verify(roleRepository, times(1)).existsById(roleId);
+        verify(roleRepository, times(1)).deleteById(roleId);
     }
 
     @Test
-    void testDeleteRoleWhenExists(){
-        //Given
-        Role roleToDelete = new Role();
-        roleToDelete.setName("NewRole");
+    void testDeleteRole_Failure() {
+        // Arrange
+        Integer roleId = 1;
+        when(roleRepository.existsById(roleId)).thenReturn(false);
 
-        roleRepository.save(roleToDelete);
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> roleService.deleteRole(roleId));
+        assertEquals("Role with Id 1 does not exist", exception.getMessage());
 
-        //When
-        roleService.deleteRole(roleToDelete.getId());
-
-        //Then
-
-        List<Role> rolesAfter = roleRepository.findAll();
-        assertThat(rolesAfter).doesNotContain(roleToDelete);
-    }
-
-    @Test
-    void testDeleteRoleWhenNotExists(){
-        assertThrows(IllegalStateException.class, () -> roleService.deleteRole(999));
-    }
-    @AfterEach
-    void cleanUp() {
-        roleRepository.deleteAll();
+        verify(roleRepository, never()).deleteById(roleId);
     }
 }

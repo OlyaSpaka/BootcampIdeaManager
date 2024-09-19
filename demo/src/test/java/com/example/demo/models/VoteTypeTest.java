@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +37,9 @@ public class VoteTypeTest {
 
     @BeforeEach
     void setUp() {
-        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", new Date(), new Date(), 3));
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,9,1);
+        Competition competition = competitionRepository.save(new Competition("Competition Name", "Description", startDate, endDate, 3));
         user = userRepository.save(new User("username", "email@example.com", "password"));
         idea = new Idea("Idea Title", "Idea Description", "Key Features", "References", new Date(), "Pictures");
 

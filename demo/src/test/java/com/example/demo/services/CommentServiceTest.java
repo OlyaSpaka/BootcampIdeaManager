@@ -1,125 +1,128 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.general.CommentDTO;
+import com.example.demo.mapper.implementation.CommentMapper;
 import com.example.demo.models.Comment;
-import com.example.demo.models.Competition;
-import com.example.demo.models.Idea;
-import com.example.demo.models.User;
 import com.example.demo.repositories.CommentRepository;
-import com.example.demo.repositories.CompetitionRepository;
-import com.example.demo.repositories.IdeaRepository;
-import com.example.demo.repositories.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
-public class CommentServiceTest {
-    @Autowired
-    CommentService commentService;
-    @Autowired
-    CommentRepository commentRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    IdeaRepository ideaRepository;
-    @Autowired
-    CompetitionRepository competitionRepository;
+class CommentServiceTest {
 
-    private Comment comment;
-    private User user;
-    private Idea idea;
-    private Competition competition;
+    @Mock
+    private CommentRepository commentRepository;
+
+    @Mock
+    private CommentMapper commentMapper;
+
+    @InjectMocks
+    private CommentService commentService;
 
     @BeforeEach
     void setUp() {
-        comment = new Comment();
-        user = userRepository.save(new User("username", "email@example.com", "password"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(),3));
-        idea = new Idea();
-        idea.setCreatedAt(new Date());
-        idea.setTitle("Test Idea");
-        idea.setDescription("Test description");
-        idea.setKeyFeatures("Test features");
-        idea.setReferenceLinks("Test references");
-        user.addIdea(idea);
-        competition.addIdea(idea);
-        idea = ideaRepository.save(idea);
-
-        comment.setContent("Very nice idea");
-        comment.setUser(user);
-        comment.setIdea(idea);
-
-        commentRepository.save(comment);
-
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void testAddComment() {
-        Comment testComment = new Comment();
-        testComment.setIdea(idea);
-        testComment.setUser(user);
-        testComment.setContent("Just want to repeat it is a very nice idea");
+        // Arrange
+        CommentDTO commentDTO = new CommentDTO();
+        Comment comment = new Comment();
+        when(commentMapper.map(commentDTO)).thenReturn(comment);
+        when(commentRepository.save(any(Comment.class))).thenReturn(comment);
 
-        commentService.addComment(testComment);
-        List<Comment> commentList = commentRepository.findAll();
-        assertThat(commentList).hasSize(2);
+        // Act
+        commentService.addComment(commentDTO);
+
+        // Assert
+        verify(commentMapper, times(1)).map(commentDTO);
+        verify(commentRepository, times(1)).save(comment);
     }
 
     @Test
-    void testDeleteCommentWhenExists() {
-        Comment commentToDelete = new Comment();
-        commentToDelete.setIdea(idea);
-        commentToDelete.setUser(user);
-        commentToDelete.setContent("Just want to repeat it is a very nice idea");
+    void testDeleteComment() {
+        // Arrange
+        Integer id = 1;
+        when(commentRepository.existsById(id)).thenReturn(true);
 
-        commentRepository.save(commentToDelete);
+        // Act
+        commentService.deleteComment(id);
 
-        commentService.deleteComment(commentToDelete.getId());
-        List<Comment> commentsAfter = commentRepository.findAll();
-        assertThat(commentsAfter).doesNotContain(commentToDelete);
+        // Assert
+        verify(commentRepository, times(1)).existsById(id);
+        verify(commentRepository, times(1)).deleteById(id);
     }
 
     @Test
-    void testDeleteCommentWhenNotExists() {
-        assertThrows(IllegalStateException.class, () -> commentService.deleteComment(999));
+    void testDeleteComment_NotFound() {
+        // Arrange
+        Integer id = 1;
+        when(commentRepository.existsById(id)).thenReturn(false);
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalStateException.class, () -> commentService.deleteComment(id));
+        assertEquals("Comment with Id " + id + " does not exist", exception.getMessage());
+
+        verify(commentRepository, times(1)).existsById(id);
+        verify(commentRepository, never()).deleteById(any());
     }
 
     @Test
-    void testUpdateCommentWhenExists() {
-        // When
-        commentService.updateComment(comment.getId(), "This is updated comment");
+    void testUpdateComment() {
+        // Arrange
+        Integer id = 1;
+        Comment comment = new Comment();
+        comment.setContent("Old Content");
 
-        // Then
-        Comment updatedComment = commentRepository.findById(comment.getId()).orElseThrow();
-        assertThat(updatedComment.getContent()).isEqualTo("This is updated comment");
+        when(commentRepository.findById(id)).thenReturn(Optional.of(comment));
+
+        // Act
+        commentService.updateComment(id, "New Content");
+
+        // Assert
+        assertEquals("New Content", comment.getContent());
+        verify(commentRepository, times(1)).findById(id);
     }
+
     @Test
-    void testUpdateCommentWhenNotExists() {
-        assertThrows(IllegalStateException.class, () -> commentService.updateComment(9999, "invalid comment"));
+    void testUpdateComment_NotFound() {
+        // Arrange
+        Integer id = 1;
+        when(commentRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalStateException.class, () -> commentService.updateComment(id, "New Content"));
+        assertEquals("comment with Id " + id + " does not exist.", exception.getMessage());
+
+        verify(commentRepository, times(1)).findById(id);
     }
 
+    @Test
+    void testShowIdeaComments() {
+        // Arrange
+        Integer ideaId = 1;
+        List<Comment> comments = List.of(new Comment(), new Comment());
+        List<CommentDTO> commentDTOs = List.of(new CommentDTO(), new CommentDTO());
 
-    @AfterEach
-    void cleanUp() {
-        commentRepository.deleteAll();
-        ideaRepository.deleteAll();
-        competitionRepository.deleteAll();
-        userRepository.deleteAll();
+        when(commentRepository.findByIdeaId(ideaId)).thenReturn(comments);
+        when(commentMapper.map(any(Comment.class))).thenReturn(new CommentDTO());
 
+        // Act
+        List<CommentDTO> result = commentService.showIdeaComments(ideaId);
+
+        // Assert
+        assertEquals(commentDTOs.size(), result.size());
+        verify(commentRepository, times(1)).findByIdeaId(ideaId);
+        verify(commentMapper, times(comments.size())).map(any(Comment.class));
     }
 }

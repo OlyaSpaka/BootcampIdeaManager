@@ -4,6 +4,7 @@ import com.example.demo.models.Competition;
 import com.example.demo.services.CompetitionService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @RestController
@@ -37,8 +38,8 @@ public class CompetitionController {
 
     @PutMapping(path = "{competitionId}/date")
     public void updateCompetitionDate(@PathVariable("competitionId") Integer id,
-                                         @RequestParam(required = false) Date start,
-                                         @RequestParam(required = false) Date end) {
+                                         @RequestParam(required = false) LocalDate start,
+                                         @RequestParam(required = false) LocalDate end) {
         competitionService.updateCompetitionDate(id, start, end);
 
     }

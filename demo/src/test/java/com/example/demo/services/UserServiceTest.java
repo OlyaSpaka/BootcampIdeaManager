@@ -2,80 +2,66 @@ package com.example.demo.services;
 
 import com.example.demo.models.User;
 import com.example.demo.repositories.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
 public class UserServiceTest {
-    @Autowired
-    private UserService userService;
-    @Autowired
+    @Mock
     private UserRepository userRepository;
 
-    private User user = new User();
+    @InjectMocks
+    private UserService userService;
 
     @BeforeEach
-    void setUp(){
-        user.setUsername("username");
-        user.setEmail("email@email");
-        user.setPassword("password");
-        userRepository.save(user);
+    void setUp() {
+        MockitoAnnotations.openMocks(this); // Initialize mocks before each test
     }
 
     @Test
-    void addUser(){
-        User testUser = new User();
-        testUser.setUsername("newUser");
-        testUser.setEmail("newEmail@google.com");
-        testUser.setPassword("newPassword");
+    void testAddUser() {
+        // Arrange
+        User user = new User();
+        user.setId(1);
+        user.setUsername("testUser");
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
-        userService.addUser(testUser);
+        // Act
+        userService.addUser(user);
 
-        List<User> userList = userRepository.findAll();
-        assertThat(userList).hasSize(2);
-        assertThat(userList).extracting(User::getUsername).contains("newUser");
+        // Assert
+        verify(userRepository, times(1)).save(user); // Verify save method is called once
     }
     @Test
-    void deleteUserWhenExists(){
-        User userToDelete = new User();
-        userToDelete.setUsername("newUser");
-        userToDelete.setEmail("newEmai11l@verygoodmood.com");
-        userToDelete.setPassword("newPassword");
+    void testDeleteUser_Success() {
+        // Arrange
+        Integer userId = 1;
+        when(userRepository.existsById(userId)).thenReturn(true);
 
-        userRepository.save(userToDelete);
+        // Act
+        userService.deleteUser(userId);
 
-        List<User> userListBefore = userRepository.findAll();
-        assertThat(userListBefore).hasSize(2);
-        userService.deleteUser(userToDelete.getId());
-        List<User> userListAfter = userRepository.findAll();
-        assertThat(userListAfter).hasSize(1);
-        assertThat(userListAfter).doesNotContain(userToDelete);
-
+        // Assert
+        verify(userRepository, times(1)).existsById(userId); // Verify existence check
+        verify(userRepository, times(1)).deleteById(userId); // Verify delete method is called
     }
     @Test
-    void deleteUserWhenNotExists(){
-        assertThrows(IllegalStateException.class, () -> userService.deleteUser(999));
+    void testDeleteUser_Failure() {
+        // Arrange
+        Integer userId = 1;
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> userService.deleteUser(userId));
+        assertEquals("User with Id 1 does not exist", exception.getMessage());
+
+        // Verify that deleteById is never called if user doesn't exist
+        verify(userRepository, never()).deleteById(userId);
     }
-    @AfterEach
-    void cleanUp(){
-        userRepository.deleteAll();
-    }
-
-
-
 }
