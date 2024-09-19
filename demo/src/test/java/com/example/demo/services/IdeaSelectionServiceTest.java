@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +49,9 @@ public class IdeaSelectionServiceTest {
     @BeforeEach
     void setUp() {
         ideaUser = userRepository.save(new User("ideaUsername", "email123@example.com", "password123"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(),3));
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,9,1);
+        competition = competitionRepository.save(new Competition("title", "description", startDate,endDate,3));
         idea = new Idea();
         idea.setCreatedAt(new Date());
         idea.setTitle("Test Idea");

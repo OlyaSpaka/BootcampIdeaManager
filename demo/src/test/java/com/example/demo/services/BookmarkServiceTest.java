@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -43,7 +44,9 @@ public class BookmarkServiceTest {
 
     @BeforeEach
     void setUp() {
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(), 3));
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,9,1);
+        competition = competitionRepository.save(new Competition("title", "description", startDate, endDate,3));
         user = createUser();
         idea = createIdea(user);
     }

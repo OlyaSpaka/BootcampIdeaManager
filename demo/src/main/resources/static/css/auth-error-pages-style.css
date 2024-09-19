@@ -12,6 +12,8 @@ thead {
     background-color: #3A5B22;
     color: white;
     position: sticky;   /* Makes the <thead> stick to the top */
+    top: 0;             /* Stick to the very top */
+    z-index: 1;         /* Ensure the header stays above table content */
 }
 
 h4 {

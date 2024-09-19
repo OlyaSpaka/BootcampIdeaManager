@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -49,9 +50,11 @@ public class VoteServiceTest {
     @BeforeEach
     // user adds vote to ideaUser's users first idea
     void setUp() {
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,9,1);
         ideaUser = userRepository.save(new User("ideaUsername", "email123@example.com", "password123"));
         userToVote = userRepository.save(new User("username", "email@example.com", "password"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(), 2));
+        competition = competitionRepository.save(new Competition("title", "description", startDate, endDate, 3));
         idea = new Idea();
         idea.setCreatedAt(new Date());
         idea.setTitle("Test Idea");

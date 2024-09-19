@@ -74,11 +74,11 @@
         <!-- Sidebar -->
         <div class="col-md-3 col-lg-2 sidebar bg-dark d-flex flex-column">
             <div>
-                <a href="/admin" class="text-white"><i class="fas fa-tools"></i>Admin Dashboard</a>
+                <a href="/admin" class="text-white"><i class="fas fa-tools"></i>   Admin Dashboard</a>
             </div>
             <div class="mt-auto mb-3">
-                <a href="/ideas" class="text-white"><i class="fa-solid fa-house"></i>Home</a>
-                <a href="/auth/logout" class="text-white"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+                <a href="/ideas" class="text-white"><i class="fa-solid fa-house"></i>   Home</a>
+                <a href="/auth/logout" class="text-white"><i class="fa-solid fa-right-from-bracket"></i>   Logout</a>
             </div>
         </div>
 
@@ -154,7 +154,7 @@
                                 <td th:text="${iterStat.count}"></td>
                                 <td class="truncate" th:text="${user.username}"></td>
                                 <td class="truncate" th:text="${user.email}"></td>
-                                <td th:text="${user.getAuthorities()}"></td>
+                                <td th:text="${user.getRolesString()}"></td>
                                 <td>
                                     <form th:if="${user.id != currentUser.id}"
                                           th:action="@{/admin/users/delete/{id}(id=${user.id})}" method="post"
@@ -167,7 +167,7 @@
                             </tbody>
                         </table>
                             </div>
-                        <div class="card border-danger">
+                        <div class="card border-danger mt-3">
                             <div class="card-body">
                                 <h5 class="card-title">Delete All Users</h5>
                                 <p class="card-text">Are you sure you want to delete all users? This action cannot be undone.</p>
