@@ -174,7 +174,7 @@ textarea::placeholder {
     box-sizing: border-box;
     min-height: calc(75vh - 40px);
     max-height: calc(75vh - 40px);
-    overflow: hidden; /* Ensure no overflow outside container */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }

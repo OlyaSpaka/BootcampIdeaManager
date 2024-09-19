@@ -40,7 +40,7 @@ public class AdminToolsController {
         model.addAttribute("competition", currentCompetition);
         model.addAttribute("users", users);
         model.addAttribute("currentUser", currentUser);
-        return "admin-dashboard"; // Returns admin-dashboard.html
+        return "admin-dashboard";
     }
 
     @PutMapping("/bootcamp/update")
