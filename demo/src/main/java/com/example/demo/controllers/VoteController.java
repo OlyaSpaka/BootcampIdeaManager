@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Controller
-@RequestMapping(path = "/Vote")
+@RequestMapping(path = "/vote")
 public class VoteController {
     private final VoteService voteService;
     private final IdeaService ideaService;
