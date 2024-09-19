@@ -13,6 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -32,16 +33,20 @@ public class CompetitionServiceTest {
 
     @BeforeEach
     void setUp(){
-        competition = competitionRepository.save(new Competition("title","description", new Date(), new Date(),3));
+        LocalDate startDate = LocalDate.of(2024,9,01);
+        LocalDate endDate = LocalDate.of(2024,10,01);
+        competition = competitionRepository.save(new Competition("title","description", startDate, endDate,3));
         competitionRepository.save(competition);
     }
     @Test
     void addCompetition(){
+        LocalDate startDate = LocalDate.of(2024,9,01);
+        LocalDate endDate = LocalDate.of(2024,10,01);
         Competition newCompetition = new Competition();
         newCompetition.setName("newCompetition");
         newCompetition.setDescription("newDescription");
-        newCompetition.setStartDate(new Date());
-        newCompetition.setEndDate(new Date());
+        newCompetition.setStartDate(startDate);
+        newCompetition.setEndDate(endDate);
 
         competitionService.addCompetition(newCompetition);
 
@@ -52,11 +57,14 @@ public class CompetitionServiceTest {
 
     @Test
     void deleteCompetitionWhenExists(){
+        LocalDate startDate = LocalDate.of(2024,9,01);
+        LocalDate endDate = LocalDate.of(2024,10,01);
         Competition competitionsToDelete = new Competition();
         competitionsToDelete.setName("newCompetition");
         competitionsToDelete.setDescription("newDescription");
-        competitionsToDelete.setStartDate(new Date());
-        competitionsToDelete.setEndDate(new Date());
+        competitionsToDelete.setStartDate(startDate);
+        competitionsToDelete.setEndDate(endDate);
+
 
 
         competitionRepository.save(competitionsToDelete);

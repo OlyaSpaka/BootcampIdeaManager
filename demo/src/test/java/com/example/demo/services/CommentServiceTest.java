@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -48,8 +49,10 @@ public class CommentServiceTest {
     @BeforeEach
     void setUp() {
         comment = new Comment();
+        LocalDate startDate = LocalDate.of(2024,9,01);
+        LocalDate endDate = LocalDate.of(2024,10,01);
         user = userRepository.save(new User("username", "email@example.com", "password"));
-        competition = competitionRepository.save(new Competition("title", "description", new Date(), new Date(),3));
+        competition = competitionRepository.save(new Competition("title", "description", startDate, endDate,3));
         idea = new Idea();
         idea.setCreatedAt(new Date());
         idea.setTitle("Test Idea");
