@@ -1,78 +1,167 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.general.CompetitionDTO;
+import com.example.demo.mapper.implementation.CompetitionMapper;
 import com.example.demo.models.Competition;
-import com.example.demo.models.VoteType;
 import com.example.demo.repositories.CompetitionRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
-public class CompetitionServiceTest {
-    @Autowired
+class CompetitionServiceTest {
+    @Mock
+    private CompetitionRepository competitionRepository;
+    @Mock
+    private CompetitionMapper competitionMapper;
+    @InjectMocks
     private CompetitionService competitionService;
-    @Autowired
-    CompetitionRepository competitionRepository;
-    private Competition competition;
-
     @BeforeEach
-    void setUp(){
-        competition = competitionRepository.save(new Competition("title","description", new Date(), new Date(),3));
-        competitionRepository.save(competition);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
     @Test
-    void addCompetition(){
-        Competition newCompetition = new Competition();
-        newCompetition.setName("newCompetition");
-        newCompetition.setDescription("newDescription");
-        newCompetition.setStartDate(new Date());
-        newCompetition.setEndDate(new Date());
+    void testAddCompetition() {
+        // Arrange
+        Competition competition = new Competition();
+        when(competitionRepository.save(any(Competition.class))).thenReturn(competition);
 
-        competitionService.addCompetition(newCompetition);
+        // Act
+        competitionService.addCompetition(competition);
 
-        List<Competition> competitions = competitionRepository.findAll();
-        assertThat(competitions).hasSize(2);
-        assertThat(competitions).extracting(Competition::getName).contains("newCompetition");
+        // Assert
+        verify(competitionRepository, times(1)).save(competition);
     }
 
     @Test
-    void deleteCompetitionWhenExists(){
-        Competition competitionsToDelete = new Competition();
-        competitionsToDelete.setName("newCompetition");
-        competitionsToDelete.setDescription("newDescription");
-        competitionsToDelete.setStartDate(new Date());
-        competitionsToDelete.setEndDate(new Date());
+    void testDeleteCompetition() {
+        // Arrange
+        Integer id = 1;
+        when(competitionRepository.existsById(id)).thenReturn(true);
 
+        // Act
+        competitionService.deleteCompetition(id);
 
-        competitionRepository.save(competitionsToDelete);
-
-        competitionService.deleteCompetition(competitionsToDelete.getId());
-        List<Competition> competitionsAfter = competitionRepository.findAll();
-        assertThat(competitionsAfter).doesNotContain(competitionsToDelete);
+        // Assert
+        verify(competitionRepository, times(1)).existsById(id);
+        verify(competitionRepository, times(1)).deleteById(id);
     }
+
     @Test
-    void deleteCompetitionWhenNotExists(){
-        assertThrows(IllegalStateException.class, () -> competitionService.deleteCompetition(999));
+    void testDeleteCompetition_NotFound() {
+        // Arrange
+        Integer id = 1;
+        when(competitionRepository.existsById(id)).thenReturn(false);
+
+        // Act & Assert
+        Exception exception = assertThrows(IllegalStateException.class, () -> competitionService.deleteCompetition(id));
+        assertEquals("Competition with Id " + id + " does not exist", exception.getMessage());
+
+        verify(competitionRepository, times(1)).existsById(id);
+        verify(competitionRepository, never()).deleteById(any());
     }
 
-    @AfterEach
-    void cleanUp(){
-        competitionRepository.deleteAll();
+    @Test
+    void testFindAllCompetitions() {
+        // Arrange
+        List<Competition> competitions = List.of(new Competition(), new Competition());
+        List<CompetitionDTO> competitionDTOs = List.of(new CompetitionDTO(), new CompetitionDTO());
 
+        when(competitionRepository.findAll()).thenReturn(competitions);
+        when(competitionMapper.map(competitions)).thenReturn(competitionDTOs);
+
+        // Act
+        List<CompetitionDTO> result = competitionService.findAll();
+
+        // Assert
+        assertEquals(competitionDTOs, result);
+        verify(competitionRepository, times(1)).findAll();
+        verify(competitionMapper, times(1)).map(competitions);
+    }
+
+    @Test
+    void testUpdateCompetitionContent() {
+        // Arrange
+        Integer id = 1;
+        Competition competition = new Competition();
+        competition.setName("Old Name");
+        competition.setDescription("Old Description");
+
+        when(competitionRepository.findById(id)).thenReturn(Optional.of(competition));
+
+        // Act
+        competitionService.updateCompetitionContent(id, "New Description", "New Name");
+
+        // Assert
+        assertEquals("New Name", competition.getName());
+        assertEquals("New Description", competition.getDescription());
+        verify(competitionRepository, times(1)).findById(id);
+    }
+
+    @Test
+    void testUpdateCompetitionDate() {
+        // Arrange
+        Integer id = 1;
+        Competition competition = new Competition();
+        Date oldStartDate = new Date();
+        Date oldEndDate = new Date();
+        competition.setStartDate(oldStartDate);
+        competition.setEndDate(oldEndDate);
+
+        Date newStartDate = new Date(oldStartDate.getTime() + 100000);
+        Date newEndDate = new Date(oldEndDate.getTime() + 100000);
+
+        when(competitionRepository.findById(id)).thenReturn(Optional.of(competition));
+
+        // Act
+        competitionService.updateCompetitionDate(id, newStartDate, newEndDate);
+
+        // Assert
+        assertEquals(newStartDate, competition.getStartDate());
+        assertEquals(newEndDate, competition.getEndDate());
+        verify(competitionRepository, times(1)).findById(id);
+    }
+
+    @Test
+    void testGetCompetitionName() {
+        // Arrange
+        Integer id = 1;
+        Competition competition = new Competition();
+        competition.setName("Competition Name");
+
+        when(competitionRepository.findById(id)).thenReturn(Optional.of(competition));
+
+        // Act
+        String name = competitionService.getCompetitionName(id);
+
+        // Assert
+        assertEquals("Competition Name", name);
+        verify(competitionRepository, times(1)).findById(id);
+    }
+
+    @Test
+    void testGetCompetitionDescription() {
+        // Arrange
+        Integer id = 1;
+        Competition competition = new Competition();
+        competition.setDescription("Competition Description");
+
+        when(competitionRepository.findById(id)).thenReturn(Optional.of(competition));
+
+        // Act
+        String description = competitionService.getCompetitionDescription(id);
+
+        // Assert
+        assertEquals("Competition Description", description);
+        verify(competitionRepository, times(1)).findById(id);
     }
 }
