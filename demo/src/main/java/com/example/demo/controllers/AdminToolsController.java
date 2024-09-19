@@ -61,7 +61,7 @@ public class AdminToolsController {
             competitionService.updateCompetitionDate(competitionId, startDate, endDate);
             competitionService.updateCompetitionNumberOfWinners(competitionId, amountOfWinners);
 
-            redirectAttributes.addFlashAttribute("successEdit", "Competition details updated successfully.");
+            redirectAttributes.addFlashAttribute("successEdit", "Details updated successfully.");
 
 
         } catch (Exception e) {
@@ -88,5 +88,6 @@ public class AdminToolsController {
         }
         return "redirect:/admin";
     }
+
 
 }

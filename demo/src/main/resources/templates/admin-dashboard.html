@@ -7,70 +7,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/auth-error-pages-style.css">
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-            max-height: 100vh;
-            flex-direction: column;
-        }
-
-        .sidebar {
-            background-color: #343a40;
-            min-height: 100vh;
-            max-height: 100vh;
-            padding-top: 20px;
-        }
-
-        .sidebar a {
-            color: white;
-            padding: 15px;
-            display: block;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover {
-            background-color: #495057;
-        }
-
-        .content-area {
-            padding: 20px;
-            max-height: 100vh;
-            min-height: 100vh;
-            overflow: auto;
-        }
-        .truncate {
-            white-space: nowrap; /* Prevent text from wrapping */
-            overflow: hidden; /* Hide overflow */
-            text-overflow: ellipsis; /* Add ellipsis (...) */
-            max-width: 200px; /* Set a fixed width */
-        }
-
-        .container-box {
-            background-color: #f8f9fa;
-            padding: 20px;
-            max-height: calc(100vh - 20px);
-            margin-bottom: 20px;
-            border-radius: 10px;
-            overflow: auto;
-        }
-
-        .scrollable-table-container {
-            max-height: 400px; /* Adjust height as needed */
-            overflow-y: auto; /* Vertical scrolling */
-            overflow-x: auto; /* Horizontal scrolling (if needed) */
-        }
-        table {
-            width: 100%; /* Ensure the table uses the full width of its container */
-        }
-
-    </style>
 </head>
 <body>
-
 <div class="container-fluid">
     <div class="row">
-
         <!-- Sidebar -->
         <div class="col-md-3 col-lg-2 sidebar bg-dark d-flex flex-column">
             <div>
@@ -87,17 +27,9 @@
             <div class="row">
                 <!-- Edit Bootcamp Details -->
                 <div class="col-md-4">
-                    <div class="container-box">
+                    <div class="container-box-details">
                         <h4>Edit Details</h4>
-                        <div th:if="${unspecifiedErrorEdit}" class="alert alert-danger alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
-                            <span th:text="${unspecifiedErrorEdit}">Something went wrong. Try again later.</span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        <div th:if="${successEdit}" class="alert alert-success alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
-                            <span th:text="${successEdit}">Bootcamp information updated successfully.</span>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                        <form th:action="@{/admin/bootcamp/update}" th:object="${competition}" method="post" class="mt-4">
+                        <form th:action="@{/admin/bootcamp/update}" th:object="${competition}" method="post">
                             <input type="hidden" name="_method" value="put" />
                             <div class="mb-3">
                                 <label for="name" class="form-label">Bootcamp Name</label>
@@ -121,12 +53,20 @@
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Save Changes</button>
                         </form>
+                        <div th:if="${unspecifiedErrorEdit}" class="alert alert-danger alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
+                            <span th:text="${unspecifiedErrorEdit}">Something went wrong. Try again later.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        <div th:if="${successEdit}" class="alert alert-success alert-dismissible fade show" style="margin-top: 1rem; margin-bottom: 0" role="alert">
+                            <span th:text="${successEdit}">Bootcamp information updated successfully.</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Manage Users -->
                 <div class="col-md-8">
-                    <div class="container-box">
+                    <div class="container-box-users">
                         <h4>Manage Users</h4>
                         <div th:if="${success}" class="alert alert-success alert-dismissible fade show"
                              style="margin-top: 1rem; margin-bottom: 1rem" role="alert">
@@ -167,24 +107,18 @@
                             </tbody>
                         </table>
                             </div>
-                        <div class="card border-danger mt-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Delete All Users</h5>
-                                <p class="card-text">Are you sure you want to delete all users? This action cannot be undone.</p>
-                                <form th:action="@{/admin/users/delete/all}" method="post"
-                                      onsubmit="return confirm('Are you sure you want to delete all users?');">
-                                    <input type="hidden" name="_method" value="delete"/>
-                                    <button type="submit" class="btn btn-danger">Delete All Users</button>
-                                </form>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="container-box-voting">
+                        <h4>Start Voting</h4>
+                        <form th:action="@{/admin/users/delete/all}" method="post" onsubmit="return confirm('Are you sure you want to start the voting process?');">
+                            <button type="submit" class="btn btn-info">Start</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
