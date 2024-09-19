@@ -1,136 +1,68 @@
 package com.example.demo.services;
 
-import com.example.demo.models.Competition;
-import com.example.demo.models.Idea;
 import com.example.demo.models.IdeaSelection;
-import com.example.demo.models.User;
-import com.example.demo.repositories.CompetitionRepository;
-import com.example.demo.repositories.IdeaRepository;
 import com.example.demo.repositories.IdeaSelectionRepository;
-import com.example.demo.repositories.UserRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@ActiveProfiles("test")
-@SpringBootTest
-@Transactional
-public class IdeaSelectionServiceTest {
-    @Autowired
-    private IdeaSelectionService ideaSelectionService;
-    @Autowired
+class IdeaSelectionServiceTest {
+
+    @Mock
     private IdeaSelectionRepository ideaSelectionRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    private CompetitionRepository competitionRepository;
-    @Autowired
-    private IdeaRepository ideaRepository;
-    IdeaSelection ideaSelection;
-    User ideaUser;
-    Competition competition;
-    Idea idea;
 
+    @InjectMocks
+    private IdeaSelectionService ideaSelectionService;
 
     @BeforeEach
     void setUp() {
-        ideaUser = userRepository.save(new User("ideaUsername", "email123@example.com", "password123"));
-        LocalDate startDate = LocalDate.of(2024,9,1);
-        LocalDate endDate = LocalDate.of(2024,9,1);
-        competition = competitionRepository.save(new Competition("title", "description", startDate,endDate,3));
-        idea = new Idea();
-        idea.setCreatedAt(new Date());
-        idea.setTitle("Test Idea");
-        idea.setDescription("Test description");
-        idea.setKeyFeatures("Test features");
-        idea.setReferenceLinks("Test references");
-        ideaUser.addIdea(idea);
-        competition.addIdea(idea);
-        idea = ideaRepository.save(idea);
-        ideaSelection = new IdeaSelection();
-        ideaSelection.setIdea(idea);
-        ideaSelection.setCompetition(competition);
-        ideaSelection.setDate(new Date());
-
-        ideaSelectionRepository.save(ideaSelection);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void addNewIdeaSelection() {
-        Idea testIdea = new Idea();
-        testIdea.setCreatedAt(new Date());
-        testIdea.setTitle("Test Idea");
-        testIdea.setDescription("Test description");
-        testIdea.setKeyFeatures("Test features");
-        testIdea.setReferenceLinks("Test references");
-        ideaUser.addIdea(testIdea);
-        competition.addIdea(testIdea);
-        testIdea = ideaRepository.save(testIdea);
-        IdeaSelection testIdeaSelection = new IdeaSelection();
-        testIdeaSelection.setIdea(testIdea);
-        testIdeaSelection.setCompetition(competition);
-        testIdeaSelection.setDate(new Date());
-
-        ideaSelectionService.addIdeaSelection(testIdeaSelection);
-
-        List<IdeaSelection> ideaSelectionListAfter = ideaSelectionRepository.findAll();
-        assertThat(ideaSelectionListAfter).hasSize(2);
-    }
-
-    @Test
-    void testDeleteIdeaSelectionWhenExists() {
-        Idea testIdea = new Idea();
-        testIdea.setCreatedAt(new Date());
-        testIdea.setTitle("Test Idea");
-        testIdea.setDescription("Test description");
-        testIdea.setKeyFeatures("Test features");
-        testIdea.setReferenceLinks("Test references");
-        ideaUser.addIdea(testIdea);
-        competition.addIdea(testIdea);
-        testIdea = ideaRepository.save(testIdea);
-        IdeaSelection ideaSelectionToDelete = new IdeaSelection();
-        ideaSelectionToDelete.setIdea(testIdea);
-        ideaSelectionToDelete.setCompetition(competition);
-        ideaSelectionToDelete.setDate(new Date());
-
-        ideaSelectionRepository.save(ideaSelectionToDelete);
+    void testAddIdeaSelection() {
+        // Arrange
+        IdeaSelection ideaSelection = new IdeaSelection();
+        ideaSelection.setId(1);
+        when(ideaSelectionRepository.save(any(IdeaSelection.class))).thenReturn(ideaSelection);
 
         // Act
-        ideaSelectionService.deleteIdeaSelection(ideaSelectionToDelete.getId());
+        ideaSelectionService.addIdeaSelection(ideaSelection);
 
         // Assert
-        List<IdeaSelection> ideaSelectionAfter = ideaSelectionRepository.findAll();
-        assertThat(ideaSelectionAfter).doesNotContain(ideaSelectionToDelete);
+        verify(ideaSelectionRepository, times(1)).save(ideaSelection);
     }
 
     @Test
-    void testDeleteIdeaSelectionWhenNotExists() {
-        assertThrows(IllegalStateException.class, () -> ideaSelectionService.deleteIdeaSelection(999));
+    void testDeleteIdeaSelection_Success() {
+        // Arrange
+        Integer ideaSelectionId = 1;
+        when(ideaSelectionRepository.existsById(ideaSelectionId)).thenReturn(true);
+
+        // Act
+        ideaSelectionService.deleteIdeaSelection(ideaSelectionId);
+
+        // Assert
+        verify(ideaSelectionRepository, times(1)).existsById(ideaSelectionId);
+        verify(ideaSelectionRepository, times(1)).deleteById(ideaSelectionId);
     }
 
-    @AfterEach
-    void cleanUp() {
-        ideaSelectionRepository.deleteAll();
-        ideaRepository.deleteAll();
+    @Test
+    void testDeleteIdeaSelection_Failure() {
+        // Arrange
+        Integer ideaSelectionId = 1;
+        when(ideaSelectionRepository.existsById(ideaSelectionId)).thenReturn(false);
 
+        // Act & Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> ideaSelectionService.deleteIdeaSelection(ideaSelectionId));
+        assertEquals("IdeaSelection with Id 1 does not exist", exception.getMessage());
 
-        competitionRepository.deleteAll();
-        userRepository.deleteAll();
-
-
+        verify(ideaSelectionRepository, never()).deleteById(ideaSelectionId);
     }
 }

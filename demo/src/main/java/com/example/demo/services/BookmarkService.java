@@ -19,9 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class BookmarkService {
-
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
     private final IdeaRepository ideaRepository;
@@ -48,6 +46,7 @@ public class BookmarkService {
         bookmarkRepository.save(bookmark);
     }
 
+    @Transactional
     public void deleteBookmark(Integer ideaId, Integer userId) {
         bookmarkRepository.deleteByIdeaIdAndUserId(ideaId, userId);
     }
@@ -80,5 +79,4 @@ public class BookmarkService {
 
         return bookmarkStatusMap;
     }
-
 }
