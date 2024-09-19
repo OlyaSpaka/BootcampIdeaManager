@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Competition Group Selection</title>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+    <link rel="stylesheet" th:href="@{/ideas-style.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Prioritize Your Group Preferences</h1>
+    <p>Please rank the groups from your most preferred (1) to least preferred.</p>
+
+    <input type="hidden" id="userId" th:value="${userId}"/>
+
+    <form id="preferencesForm">
+        <table id="ideasTable">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Priority</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="idea : ${ideas}">
+                <td th:text="${idea.title}"></td>
+                <td th:text="${idea.user.username}"></td>
+                <td>
+                    <input type="number"
+                           class="priority-input"
+                           th:name="'priorities[' + ${idea.id} + ']'"
+                           min="1"
+                           th:max="${ideas.size()}"
+                           required />
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div>
+            <button type="submit">Submit Preferences</button>
+        </div>
+    </form>
+
+    <footer>
+        <div th:replace="~{fragments/logout}"></div>
+    </footer>
+
+    <script>
+        $(document).ready(function () {
+            $('#preferencesForm').on('submit', function (event) {
+                event.preventDefault();
+
+                let priorities = {};
+                let valid = true;
+                const inputs = $('.priority-input');
+
+                let seen = new Set();
+
+                inputs.each(function () {
+                    const value = parseInt($(this).val());
+
+                    if (isNaN(value)) {
+                        alert('Please fill in all priorities.');
+                        $(this).addClass('error');
+                        valid = false;
+                        return false;
+                    }
+
+                    if (seen.has(value)) {
+                        alert('Each priority must be unique.');
+                        $(this).addClass('error');
+                        valid = false;
+                        return false;
+                    }
+
+                    $(this).removeClass('error');
+                    seen.add(value);
+                    priorities[$(this).attr('name').split('[')[1].split(']')[0]] = value;
+                });
+
+                if (!valid) {
+                    return;
+                }
+
+                const submissionTime = new Date().toISOString();
+                const userId = $('#userId').val();
+
+                const requestData = {
+                    userId: userId,
+                    submissionTime: submissionTime,
+                    priorities: priorities
+                };
+
+                $('button[type="submit"]').prop('disabled', true).text('Submitting...');
+
+                $.ajax({
+                    url: '/user-selection/submit-preferences',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        alert('Preferences submitted successfully!');
+                        window.location.reload();
+                        window.location.href = "/user-selection/preferences-waiting-page";
+                    },
+                    error: function (xhr, status, error) {
+                        alert('An error occurred while submitting preferences.');
+                        console.error('Error:', status, error);
+                        $('button[type="submit"]').prop('disabled', false).text('Submit Preferences');
+                    }
+                });
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Selection Results</title>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+</head>
+<body>
+<div class="container">
+<!--    <div th:replace="~{fragments/header :: header(-->
+<!--            title='Selection Results',-->
+<!--            subtitle=${competitionName},-->
+<!--            message=${competitionDescription},-->
+<!--            user=${username},-->
+<!--            link1Href='/user-selection',-->
+<!--            link1Text='Back to Selection'-->
+<!--        )}"></div>-->
+
+    <h1>Your preferences are recorded!</h1>
+    <p>Please wait until all users have voted to see the final results.</p>
+    <p>You'll see the results on the <a href="/user-selection/results">result page</a> when they are ready.</p>
+</div>
+
+<footer>
+    <div th:replace="~{fragments/logout}"></div>
+</footer>
+</body>
+</html>

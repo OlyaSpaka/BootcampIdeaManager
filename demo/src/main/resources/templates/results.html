@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Selection Results</title>
+  <link rel="stylesheet" th:href="@{/default-style.css}">
+</head>
+<body>
+<!--<div class="container">-->
+<!--  <div th:replace="~{fragments/header :: header(-->
+<!--    title='Selection Results',-->
+<!--    subtitle=${competitionName},-->
+<!--    message=${competitionDescription},-->
+<!--    user=${username},-->
+<!--    link1Href='/user-selection',-->
+<!--    link1Text='Back to Selection'-->
+<!--)}"></div>-->
+
+  <h2>Assigned Ideas and Users</h2>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Idea Title</th>
+      <th>Assigned Users</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="groupAssignment : ${groupAssignments}">
+      <td th:text="${groupAssignment.ideaTitle}"></td>
+      <td>
+        <ul>
+          <li th:each="username : ${groupAssignment.usernames}" th:text="${username}"></li>
+        </ul>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <footer>
+    <div th:replace="~{fragments/logout}"></div>
+  </footer>
+</div>
+</body>
+</html>
