@@ -31,15 +31,15 @@ public class CompetitionServiceTest {
 
     @BeforeEach
     void setUp(){
-        LocalDate startDate = LocalDate.of(2024,9,01);
-        LocalDate endDate = LocalDate.of(2024,10,01);
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,10,1);
         competition = competitionRepository.save(new Competition("title","description", startDate, endDate,3));
         competitionRepository.save(competition);
     }
     @Test
     void addCompetition(){
-        LocalDate startDate = LocalDate.of(2024,9,01);
-        LocalDate endDate = LocalDate.of(2024,10,01);
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,10,1);
         Competition newCompetition = new Competition();
         newCompetition.setName("newCompetition");
         newCompetition.setDescription("newDescription");

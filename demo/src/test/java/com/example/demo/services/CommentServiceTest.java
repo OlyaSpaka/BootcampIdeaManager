@@ -49,8 +49,8 @@ public class CommentServiceTest {
     @BeforeEach
     void setUp() {
         comment = new Comment();
-        LocalDate startDate = LocalDate.of(2024,9,01);
-        LocalDate endDate = LocalDate.of(2024,10,01);
+        LocalDate startDate = LocalDate.of(2024,9,1);
+        LocalDate endDate = LocalDate.of(2024,10,1);
         user = userRepository.save(new User("username", "email@example.com", "password"));
         competition = competitionRepository.save(new Competition("title", "description", startDate, endDate,3));
         idea = new Idea();
