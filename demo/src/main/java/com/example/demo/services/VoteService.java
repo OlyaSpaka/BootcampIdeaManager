@@ -82,9 +82,16 @@ public class VoteService {
         }
         return points;
     }
-
-    public HashMap<Integer, Integer> getAllPoints() {
-        List<Idea> ideaList = ideaRepository.findAll();
+    public List<Integer> getIdeaPoints(Integer competitionId){
+        List<Integer> pointList = new ArrayList<>();
+        List<Idea> ideaList = ideaRepository.findByCompetitionId(competitionId);
+        for (Idea idea : ideaList) {
+            pointList.add(calculatePoints(idea.getId()));
+        }
+        return pointList;
+    }
+    public HashMap<Integer, Integer> getAllPoints(Integer competitionId) {
+        List<Idea> ideaList = ideaRepository.findByCompetitionId(competitionId);
         HashMap<Integer, Integer> hashMap = new HashMap<>();
         for (Idea idea : ideaList) {
             hashMap.put(idea.getId(), calculatePoints(idea.getId()));
@@ -96,7 +103,7 @@ public class VoteService {
     public List<Idea> getWinningIdeas(Integer competitionId) {
         List<Idea> winningIdeaList = new ArrayList<>();
         Optional<Competition> competition = competitionRepository.findById(competitionId);
-        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints();
+        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints(competitionId);
 
         List<Map.Entry<Integer, Integer>> sortedIdeas = new ArrayList<>(ideasWithPointsCalculated.entrySet());
         sortedIdeas.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));

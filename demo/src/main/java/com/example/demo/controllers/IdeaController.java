@@ -1,7 +1,9 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.IdeaDTO;
+import com.example.demo.models.Competition;
 import com.example.demo.models.User;
+import com.example.demo.models.VoteType;
 import com.example.demo.services.*;
 import com.example.demo.models.Idea;
 import jakarta.validation.Valid;
@@ -11,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Controller
@@ -21,13 +24,17 @@ public class IdeaController {
     private final CommentService commentService;
     private final AuthenticationService authenticationService;
     private final CategoryService categoryService;
+    private final VoteTypeService voteTypeService;
+    private final VoteService voteService;
 
-    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService) {
+    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, VoteTypeService voteTypeService, VoteService voteService) {
         this.ideaService = ideaService;
         this.competitionService = competitionService;
         this.commentService = commentService;
         this.authenticationService = authenticationService;
         this.categoryService = categoryService;
+        this.voteTypeService = voteTypeService;
+        this.voteService = voteService;
     }
 
     @GetMapping
@@ -84,4 +91,28 @@ public class IdeaController {
         model.addAttribute("competitionName", competitionService.getCompetitionName(1));
         model.addAttribute("competitionDescription", competitionService.getCompetitionDescription(1));
     }
+
+    @GetMapping("selected-ideas")
+    public String listSelectedIdeas( Model model) {
+        User user = authenticationService.getCurrentUser();
+        addCommonAttributes(model);
+
+        List<Idea> ideas = ideaService.getSelectedIdeas(1);
+        model.addAttribute("ideas", ideas);
+
+        return "selected-ideas";
+    }
+    @GetMapping("vote")
+    public String listSelectedIdeasToVote(@RequestParam(value = "search", required = false) String search, Model model) {
+        List<Idea> ideas = ideaService.getFormattedIdeas(search);
+        List<VoteType> voteTypes = voteTypeService.getVoteTypes();
+        HashMap<Integer,Integer> votePoints = voteService.getAllPoints(1);
+        addCommonAttributes(model);
+        model.addAttribute("ideas", ideas);
+        model.addAttribute("search", search);
+        model.addAttribute("voteTypes", voteTypes);
+        model.addAttribute("votePoints", votePoints);
+        return "vote";
+    }
+
 }

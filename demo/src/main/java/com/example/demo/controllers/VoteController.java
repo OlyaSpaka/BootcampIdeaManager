@@ -30,8 +30,9 @@ public class VoteController {
         return voteService.calculatePoints(ideaId);
     }
 
-    public HashMap<Integer,Integer> getAllPoints(){
-        return voteService.getAllPoints();
+    public HashMap<Integer,Integer> getAllPoints(Integer competitionId){
+        return voteService.getAllPoints(competitionId);
 
     }
+
 }
