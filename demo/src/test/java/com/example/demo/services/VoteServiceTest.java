@@ -168,7 +168,7 @@ public class VoteServiceTest {
         when(voteRepository.findByIdeaId(2)).thenReturn(votes2);
 
         // Act
-        HashMap<Integer, Integer> pointsMap = voteService.getAllPoints();
+        HashMap<Integer, Integer> pointsMap = voteService.getAllPoints(1);
 
         // Assert
         assertEquals(10, pointsMap.get(1));

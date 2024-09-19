@@ -4,7 +4,10 @@ import com.example.demo.dto.general.CommentDTO;
 import com.example.demo.dto.input.InputIdeaDTO;
 import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.models.User;
+import com.example.demo.models.VoteType;
 import com.example.demo.services.*;
+import com.example.demo.models.Idea;
+import com.example.demo.models.VoteType;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -28,8 +31,10 @@ public class IdeaController {
     private final CategoryService categoryService;
     private final BookmarkService bookmarkService;
     private final AzureBlobStorageService blobService;
+    private final VoteTypeService voteTypeService;
 
-    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, BookmarkService bookmarkService, AzureBlobStorageService blobService) {
+
+    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, BookmarkService bookmarkService, AzureBlobStorageService blobService, VoteTypeService voteTypeService) {
         this.ideaService = ideaService;
         this.competitionService = competitionService;
         this.commentService = commentService;
@@ -37,6 +42,7 @@ public class IdeaController {
         this.categoryService = categoryService;
         this.bookmarkService = bookmarkService;
         this.blobService = blobService;
+        this.voteTypeService = voteTypeService;
     }
 
     @GetMapping
@@ -236,4 +242,16 @@ public class IdeaController {
         model.addAttribute("competitionName", competitionService.getCompetitionName(1));
         model.addAttribute("competitionDescription", competitionService.getCompetitionDescription(1));
     }
+
+    @GetMapping("selected-ideas")
+    public String listSelectedIdeas( Model model) {
+        User user = authenticationService.getCurrentUser();
+        addCommonAttributes(user, model);
+
+        List<Idea> ideas = ideaService.getSelectedIdeas(1);
+        model.addAttribute("ideas", ideas);
+
+        return "selected-ideas";
+    }
+
 }

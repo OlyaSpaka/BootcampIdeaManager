@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bootcamp Ideas</title>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+    <link rel="stylesheet" th:href="@{/ideas-style.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css">
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.vote-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const ideaId = this.getAttribute('data-idea-id');
+                    const userId = this.getAttribute('data-user-id');
+                    const voteTypeElement = document.getElementById('voteTypeSelect-' + ideaId);
+                    if (voteTypeElement) {
+                        submitVote(ideaId, userId, voteTypeElement.value);
+                    } else {
+                        console.error('Element not found');
+                    }
+                });
+            });
+        });
+
+        function submitVote(ideaId, userId, voteTypeId) {
+            console.log(voteTypeId);
+            console.log("ideaId: " + ideaId);
+            console.log("userId: " + userId);
+            console.log("voteTypeId: " + voteTypeId);
+            const voteData = {
+                idea: { id: ideaId },
+                user: { id: userId },
+                voteType: { id: voteTypeId }
+            };
+
+            fetch('/Vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(voteData)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Vote submitted successfully!');
+                    } else {
+                        return response.json().then(data => {
+                            console.error('Error details:', data);
+                            alert('Failed to submit vote: ' + data.message);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error: ' + error);
+                });
+        }
+    </script>
+
+</head>
+<body>
+<div class="container">
+    <div th:replace="~{fragments/header :: header(
+        title='Bootcamp Ideas',
+        subtitle=${competitionName},
+        message=${competitionDescription},
+        user=${user},
+        link1Href='/ideas/new-idea',
+        link1Text='Create new idea',
+        link2Href='/notready',
+        link2Text='Show my own ideas',
+        link3Href='/notready',
+        link3Text='Show my favourite ideas'
+    )}"></div>
+
+    <form method="get" action="/ideas" class="search-form">
+        <div class="search-container">
+            <input type="text" name="search" placeholder="Search by keywords" autofocus/>
+            <button type="submit">Search</button>
+        </div>
+    </form>
+
+    <table id="ideasTable" class="tablesorter">
+        <thead>
+        <tr>
+            <th class="col-vote">Vote</th>
+            <th class="col-vote-type">Vote Type</th>
+            <th class="col-total-points">Total Points</th> <!-- New Column Header -->
+            <th class="col-author">Author</th>
+            <th class="col-title">Title</th>
+            <th class="col-description">Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="idea : ${ideas}">
+            <!-- Vote Button Column -->
+            <td class="col-vote">
+                <button type="button"
+                        class="vote-button"
+                        th:data-idea-id="${idea.id}"
+                        th:data-user-id="${user_id}">
+                    Vote
+                </button>
+            </td>
+            <!-- Vote Type Dropdown Column -->
+            <td class="col-vote-type">
+                <select th:id="|voteTypeSelect-${idea.id}|">
+                    <option value="" selected disabled>Select a vote type</option>
+                    <option th:each="voteType : ${voteTypes}" th:value="${voteType.id}" th:text="${voteType.points}"></option>
+                </select>
+            </td>
+            <!-- Total Points Column -->
+            <td class="col-total-points" th:text="${votePoints[idea.id]}"></td> <!-- Display Points -->
+            <!-- Author -->
+            <td class="col-author" th:text="${idea.user.username}"></td>
+            <!-- Title -->
+            <td class="col-title">
+                <a th:href="@{/ideas/{id}(id=${idea.id})}" th:text="${idea.title}"></a>
+            </td>
+            <!-- Description -->
+            <td class="col-description" th:text="${idea.description}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        <div th:replace="~{fragments/logout}"></div>
+    </footer>
+
+    <script>
+        $(document).ready(function () {
+            $("#ideasTable").tablesorter({
+                headers: {
+                    0: { sorter: false },
+                    1: { sorter: false },
+                    2: { sorter: "text" },
+                    3: { sorter: "text" },
+                    4: { sorter: "text" }
+                }
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

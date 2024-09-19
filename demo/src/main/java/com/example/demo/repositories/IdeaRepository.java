@@ -23,6 +23,7 @@ public interface IdeaRepository extends JpaRepository<Idea, Integer> {
                                 LOWER(COALESCE(i.referenceLinks, '')) LIKE %:search%
             """)
     List<Idea> searchIdeas(@Param("search") String search);
+    List<Idea> findByCompetitionId(Integer competitionId);
 
     Set<Idea> findAllByIdIn(Set<Integer> set);
 }

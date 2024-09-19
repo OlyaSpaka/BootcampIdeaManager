@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.models.*;
+import com.example.demo.repositories.*;
 import com.example.demo.models.Competition;
 import com.example.demo.models.Idea;
 import com.example.demo.models.IdeaSelection;
@@ -17,27 +19,34 @@ public class VoteService {
 
     private final VoteRepository voteRepository;
     private final IdeaRepository ideaRepository;
+    private final UserRepository userRepository;
     private final CompetitionRepository competitionRepository;
     private final IdeaSelectionService ideaSelectionService;
 
     @Autowired
-    public VoteService(VoteRepository voteRepository, IdeaRepository ideaRepository, CompetitionRepository competitionRepository, IdeaSelectionService ideaSelectionService) {
+    public VoteService(VoteRepository voteRepository, IdeaRepository ideaRepository, UserRepository userRepository, CompetitionRepository competitionRepository, IdeaSelectionService ideaSelectionService) {
         this.voteRepository = voteRepository;
         this.ideaRepository = ideaRepository;
+        this.userRepository = userRepository;
         this.competitionRepository = competitionRepository;
         this.ideaSelectionService = ideaSelectionService;
     }
 
     public void addVote(Vote vote) {
+        User user = userRepository.findById(vote.getUser().getId()).get();
+        Idea idea = ideaRepository.findById(vote.getIdea().getId()).get();
         // Check if the user is not voting on their own idea
-        if (!Objects.equals(vote.getUser().getId(), vote.getIdea().getUser().getId())) {
+        if (!Objects.equals(user.getId(), idea.getUser().getId())) {
+
             // Check if the user has already voted on the same idea
-            Optional<Vote> existingVote = voteRepository.findByUserIdAndIdeaId(vote.getUser().getId(), vote.getIdea().getId());
+            Optional<Vote> existingVote = voteRepository.findByUserIdAndIdeaId(user.getId(), idea.getId());
             if (existingVote.isPresent()) {
                 // User has already voted on this idea, do not allow voting twice
                 throw new IllegalStateException("User has already voted on this idea.");
             } else {
                 // If the user has not voted on the idea, save the new vote
+                user.addVote(vote);
+                idea.addVote(vote);
                 voteRepository.save(vote);
             }
         } else {
@@ -65,9 +74,16 @@ public class VoteService {
         }
         return points;
     }
-
-    public HashMap<Integer, Integer> getAllPoints() {
-        List<Idea> ideaList = ideaRepository.findAll();
+    public List<Integer> getIdeaPoints(Integer competitionId){
+        List<Integer> pointList = new ArrayList<>();
+        List<Idea> ideaList = ideaRepository.findByCompetitionId(competitionId);
+        for (Idea idea : ideaList) {
+            pointList.add(calculatePoints(idea.getId()));
+        }
+        return pointList;
+    }
+    public HashMap<Integer, Integer> getAllPoints(Integer competitionId) {
+        List<Idea> ideaList = ideaRepository.findByCompetitionId(competitionId);
         HashMap<Integer, Integer> hashMap = new HashMap<>();
         for (Idea idea : ideaList) {
             hashMap.put(idea.getId(), calculatePoints(idea.getId()));
@@ -85,7 +101,7 @@ public class VoteService {
         }
 
         Competition competition = competitionOpt.get();
-        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints();
+        HashMap<Integer, Integer> ideasWithPointsCalculated = getAllPoints(1);
 
         List<Map.Entry<Integer, Integer>> sortedIdeas = new ArrayList<>(ideasWithPointsCalculated.entrySet());
         sortedIdeas.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
