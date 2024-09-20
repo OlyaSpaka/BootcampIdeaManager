@@ -10,6 +10,8 @@ import com.example.demo.services.IdeaService;
 import com.example.demo.services.VoteService;
 import com.example.demo.services.VoteTypeService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -50,8 +52,14 @@ public class VoteController {
     }
 
     @DeleteMapping(path = "{voteId}")
-    public void deleteVote(@PathVariable("voteId") Integer id) {
-        voteService.deleteVote(id);
+    public ResponseEntity<Void> deleteVote(@PathVariable("voteId") Integer id) {
+        try {
+            voteService.deleteVote(id);
+            return ResponseEntity.noContent().build();  // 204 No Content
+        } catch (Exception e) {
+            // Log the error if necessary
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();  // 500 Internal Server Error
+        }
     }
 
     @GetMapping
@@ -67,12 +75,13 @@ public class VoteController {
     @GetMapping("/vote")
     public String listSelectedIdeasToVote(@RequestParam(value = "search", required = false) String search, Model model) {
         User user = authenticationService.getCurrentUser();
-//        List<VoteDTO> voteDTOS = voteService.findByUserId(user.getId());
+       List<VoteDTO> voteDTOS = voteService.findByUserId(user.getId());
         List<OutputIdeaDTO> votedByUser = voteService.findIdeasByUserId(user.getId());
         List<OutputIdeaDTO> ideas = ideaService.getFormattedIdeas(search);
         List<VoteType> voteTypes = voteTypeService.getVoteTypes();
+        List<VoteType> voteTypesLeft = voteService.voteTypesLeft(user.getId());
         HashMap<Integer, Integer> votePoints = voteService.getAllPoints(1);
-
+        List<Vote> votes = voteService.findUserVotes(user.getId());
         Map<Integer, Integer> userVotes = new HashMap<>();
         Map<Integer, Integer> voteTypePoints = voteTypes.stream()
                 .collect(Collectors.toMap(VoteType::getId, VoteType::getPoints));
@@ -81,13 +90,30 @@ public class VoteController {
             idea.getVotes().forEach(vote -> userVotes.put(idea.getId(), vote.getVoteTypeDTO().getId()));
         }
 
+        Map<Integer, Integer> votesMap = new HashMap<>();
+
+        for (Vote vote : votes) {
+            votesMap.put(vote.getIdea().getId(), vote.getId());
+        }
+        boolean blocked = voteTypesLeft.isEmpty();
+        Map<Integer, Boolean> userIdeaMap = new HashMap<>();
+
+
+        for (OutputIdeaDTO idea : ideas) {
+            boolean isUserIdea = idea.getUser().getId().equals(user.getId());
+            userIdeaMap.put(idea.getId(), isUserIdea);
+        }
+        model.addAttribute("userIdeaMap", userIdeaMap);
+
         addCommonAttributes(user, model);
         model.addAttribute("ideas", ideas);
+        model.addAttribute("votesOfUsers", votesMap);
         model.addAttribute("userVotes", userVotes);
         model.addAttribute("voteTypePoints", voteTypePoints);
         model.addAttribute("search", search);
-        model.addAttribute("voteTypes", voteTypes);
+        model.addAttribute("voteTypes", voteTypesLeft);
         model.addAttribute("votePoints", votePoints);
+        model.addAttribute("blocked",blocked);
         return "vote";
     }
 

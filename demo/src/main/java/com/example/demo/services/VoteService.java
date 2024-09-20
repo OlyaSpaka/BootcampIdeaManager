@@ -5,15 +5,14 @@ import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.mapper.implementation.IdeaMapper;
 import com.example.demo.mapper.implementation.VoteMapper;
 import com.example.demo.models.*;
-import com.example.demo.repositories.*;
 import com.example.demo.repositories.CompetitionRepository;
 import com.example.demo.repositories.IdeaRepository;
 import com.example.demo.repositories.VoteRepository;
+import com.example.demo.repositories.VoteTypeRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -28,9 +27,10 @@ public class VoteService {
     private final IdeaSelectionService ideaSelectionService;
     private final VoteMapper voteMapper;
     private final IdeaMapper ideaMapper;
+    private final VoteTypeService voteTypeService;
 
     @Autowired
-    public VoteService(VoteRepository voteRepository, IdeaRepository ideaRepository, VoteTypeRepository voteTypeRepository, CompetitionRepository competitionRepository, IdeaSelectionService ideaSelectionService, VoteMapper voteMapper, IdeaMapper ideaMapper) {
+    public VoteService(VoteRepository voteRepository, IdeaRepository ideaRepository, VoteTypeRepository voteTypeRepository, CompetitionRepository competitionRepository, IdeaSelectionService ideaSelectionService, VoteMapper voteMapper, IdeaMapper ideaMapper, VoteTypeService voteTypeService) {
         this.voteRepository = voteRepository;
         this.ideaRepository = ideaRepository;
         this.voteTypeRepository = voteTypeRepository;
@@ -38,18 +38,18 @@ public class VoteService {
         this.ideaSelectionService = ideaSelectionService;
         this.voteMapper = voteMapper;
         this.ideaMapper = ideaMapper;
+        this.voteTypeService = voteTypeService;
     }
 
-    @Transactional
+
     public void addVote(VoteDTO voteDTO) {
         // Convert VoteDTO to Vote entity
         Vote newVote = voteMapper.map(voteDTO);
 
         // Check if the user is trying to vote on their own idea
-        if (Objects.equals(newVote.getUser().getId(), newVote.getIdea().getId())) {
+        if (Objects.equals(newVote.getUser().getId(), newVote.getIdea().getUser().getId())) {
             throw new IllegalStateException("User cannot vote on their own idea.");
         }
-
         // Find existing vote by user and idea
         Optional<Vote> existingVoteOpt = voteRepository.findByUserIdAndIdeaId(
                 newVote.getUser().getId(),
@@ -58,24 +58,14 @@ public class VoteService {
 
         if (existingVoteOpt.isPresent()) {
             // If an existing vote is found, check if it needs to be updated
-            Vote existingVote = existingVoteOpt.get();
-            if (!Objects.equals(existingVote.getVoteType().getId(), newVote.getVoteType().getId())) {
-                // Update the existing vote type
-                VoteType voteType = voteTypeRepository.findById(newVote.getVoteType().getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid vote type"));
 
-                voteType.addVote(existingVote);
+            throw new IllegalStateException("User has already voted on this idea with the same vote type.");
 
-                entityManager.merge(existingVote);
-                entityManager.flush();
-            } else {
-                throw new IllegalStateException("User has already voted on this idea with the same vote type.");
-            }
         } else {
             // No existing vote found, so save the new vote
             voteRepository.save(newVote);
-            entityManager.flush();
         }
+
     }
 
     public void deleteVote(Integer id) {
@@ -157,17 +147,18 @@ public class VoteService {
             ideaSelectionService.addIdeaSelection(selectedIdea);
         }
     }
-//    public List<VoteDTO> findByUserId(Integer id){
-//        List<VoteDTO> resultList = new ArrayList<>();
-//        List<Vote> votes = voteRepository.findByUserId(id);
-//
-//        for (Vote v : votes){
-//            VoteDTO voteDTO = voteMapper.map(v);
-//            resultList.add(voteDTO);
-//        }
-//
-//        return resultList;
-//    }
+
+    public List<VoteDTO> findByUserId(Integer id) {
+        List<VoteDTO> resultList = new ArrayList<>();
+        List<Vote> votes = voteRepository.findByUserId(id);
+
+        for (Vote v : votes) {
+            VoteDTO voteDTO = voteMapper.map(v);
+            resultList.add(voteDTO);
+        }
+
+        return resultList;
+    }
 
     public List<OutputIdeaDTO> findIdeasByUserId(Integer id) {
         List<OutputIdeaDTO> resultList = new ArrayList<>();
@@ -180,6 +171,25 @@ public class VoteService {
             resultList.add(ideaDTO);
         }
 
+
         return resultList;
+    }
+
+    public List<Vote> findUserVotes(Integer userId) {
+        return voteRepository.findByUserId(userId);
+    }
+
+    public List<Vote> findVotesByUserIdAndIdeaId(Integer userId, Integer ideaId) {
+        return voteRepository.findVotesByUserIdAndIdeaId(userId, ideaId);
+    }
+    public List<VoteType> voteTypesLeft(Integer userId){
+        List<VoteType> voteTypes = voteTypeService.getVoteTypes();
+
+        List<Vote> votes = findUserVotes(userId);
+
+        for(Vote v : votes){
+            voteTypes.remove(v.getVoteType());
+        }
+        return voteTypes;
     }
 }
