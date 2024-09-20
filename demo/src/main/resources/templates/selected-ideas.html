@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bootcamp Ideas</title>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+    <link rel="stylesheet" th:href="@{/ideas-style.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css">
+</head>
+<body>
+<div class="container">
+    <div th:replace="~{fragments/header :: header(
+    title='Bootcamp Ideas',
+    subtitle=${competitionName},
+    message=${competitionDescription},
+    user=${user},
+    link1Href='/ideas/new-idea',
+    link1Text='Create new idea',
+    link2Href='/ideas/my-ideas'',
+    link2Text='Show my own ideas',
+    link3Href='/ideas/bookmarks',
+    link3Text='Show my favourite ideas'
+)}"></div>
+    <form method="get" action="/ideas" class="search-form">
+        <div class="search-container">
+            <input type="text" name="search" placeholder="Search by keywords" autofocus/>
+            <button type="submit">Search</button>
+        </div>
+    </form>
+    <table id="ideasTable" class="tablesorter">
+        <thead>
+        <tr>
+            <th class="col-date">Time Created</th>
+            <th class="col-author">Author</th>
+            <th class="col-title">Title</th>
+            <th class="col-description">Description</th>
+            <th class="col-category">Category</th>
+            <th class="col-key-features">Key Features</th>
+            <th class="col-reference_links">References</th>
+            <th class="col-favourite">Favourite</th>
+            <th class="col-vote">Vote</th>
+        </tr>
+
+        </thead>
+        <tbody>
+        <tr th:each="idea : ${ideas}">
+            <td class="col-date" th:text="${idea.formattedDate}"></td>
+            <td class="col-author" th:text="${idea.user.username}"></td>
+            <td class="col-title">
+                <a th:href="@{/ideas/{id}(id=${idea.id})}" th:text="${idea.title}"></a>
+            </td>
+            <td class="col-description" th:text="${idea.description}"></td>
+            <td class="col-category" th:each="category : ${idea.categories}"
+                th:text="${category.name}"></td>
+            <td class="col-key-features" th:text="${idea.keyFeatures}"></td>
+            <td class="col-reference_links" th:if="${idea.referenceLinks != null}">
+                <a th:href="${idea.referenceLinks}" target="_blank" th:text="${idea.referenceLinks}"></a>
+            </td>
+            <td class="col-reference_links" th:if="${idea.referenceLinks == null}">
+                No references available
+            </td>
+            <!--                  <td class="col-favourite">-->
+            <!--                    <input type="checkbox"-->
+            <!--                           th:checked="${idea.bookmarked}"-->
+            <!--                           onchange="toggleBookmark([[${idea.id}]], this)"/>-->
+            <!--                  </td>-->
+        </tr>
+        </tbody>
+    </table>
+    <footer>
+        <div th:replace="~{fragments/logout}"></div>
+    </footer>
+
+
+    <script>
+        $(document).ready(function () {
+            $("#ideasTable").tablesorter({
+                headers: {
+                    0: {sorter: "shortDate"},
+                    1: {sorter: "text"}
+                }
+            });
+        });
+    </script>
+    <!--    <script>-->
+    <!--        function toggleBookmark(ideaId, checkbox) {-->
+    <!--            const isBookmarked = checkbox.checked;-->
+
+    <!--            $.ajax({-->
+    <!--                url: '/Bookmark/' + ideaId,-->
+    <!--                type: 'POST',-->
+    <!--                contentType: 'application/json',-->
+    <!--                data: JSON.stringify({ bookmarked: isBookmarked }),-->
+    <!--                success: function(response) {-->
+    <!--                    console.log('Bookmark updated:', response);-->
+    <!--                },-->
+    <!--                error: function(xhr, status, error) {-->
+    <!--                    console.error('AJAX Error:', status, error);-->
+    <!--                    checkbox.checked = !isBookmarked;-->
+    <!--                }-->
+    <!--            });-->
+    <!--        }-->
+    <!--    </script>-->
+</div>
+</body>
+</html>

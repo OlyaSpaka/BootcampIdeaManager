@@ -6,6 +6,8 @@ import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.mapper.implementation.IdeaMapper;
 import com.example.demo.models.Category;
 import com.example.demo.models.Idea;
+import com.example.demo.models.IdeaSelection;
+import com.example.demo.repositories.IdeaRepository;
 import com.example.demo.models.User;
 import com.example.demo.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,18 +18,24 @@ import com.example.demo.repositories.IdeaRepository;
 import java.text.ParseException;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class IdeaService {
     private final IdeaRepository ideaRepository;
+    private final IdeaSelectionService ideaSelectionService;
     private final IdeaMapper ideaMapper;
     private final CategoryRepository categoryRepository;
 
     @Autowired
     public IdeaService(IdeaRepository ideaRepository, IdeaMapper ideaMapper,
-                       CategoryRepository categoryRepository) {
+                       CategoryRepository categoryRepository, IdeaSelectionService ideaSelectionService) {
         this.ideaRepository = ideaRepository;
+        this.ideaSelectionService = ideaSelectionService;
         this.ideaMapper = ideaMapper;
         this.categoryRepository = categoryRepository;
     }
@@ -156,6 +164,19 @@ public class IdeaService {
         } else {
             return ideaRepository.searchIdeas(search.toLowerCase());
         }
+    }
+    public List<Idea> getSelectedIdeas(Integer competitionId){
+        List<Idea> selectedIdeasFull = new ArrayList<>();
+        List<IdeaSelection> selectedIdeas = ideaSelectionService.getSelectedIdeas(competitionId);
+
+        for(IdeaSelection ideaSelection : selectedIdeas){
+            for(Idea idea : ideaRepository.findAll()){
+                if(Objects.equals(idea.getId(), ideaSelection.getId())){
+                    selectedIdeasFull.add(idea);
+                }
+            }
+        }
+        return selectedIdeasFull;
     }
 
     private String formatDate(Date createdAt) {

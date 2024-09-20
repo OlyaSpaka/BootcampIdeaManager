@@ -1,9 +1,12 @@
 package com.example.demo.services;
 
+import com.example.demo.models.Comment;
 import com.example.demo.models.IdeaSelection;
 import com.example.demo.repositories.IdeaSelectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class IdeaSelectionService {
@@ -27,4 +30,10 @@ public class IdeaSelectionService {
             ideaSelectionRepository.deleteById(id);
         }
     }
+
+    public List<IdeaSelection> getSelectedIdeas(Integer competitionId) {
+        return ideaSelectionRepository.findByCompetitionId(competitionId);
+    }
+
+
 }

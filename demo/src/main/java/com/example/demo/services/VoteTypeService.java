@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.demo.repositories.VoteTypeRepository;
 
+import java.util.List;
+
 @Service
 public class VoteTypeService {
 
@@ -25,5 +27,8 @@ public class VoteTypeService {
         } else {
             voteTypeRepository.deleteById(id);
         }
+    }
+    public List<VoteType> getVoteTypes(){
+       return voteTypeRepository.findAll();
     }
 }
