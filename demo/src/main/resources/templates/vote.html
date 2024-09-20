@@ -95,13 +95,18 @@
         user=${user},
         link1Href='/ideas/new-idea',
         link1Text='Create new idea',
-       link2Href='/ideas/my-ideas',
+        link2Href='/ideas/my-ideas',
         link2Text='Show my own ideas',
         link3Href='/ideas/bookmarks',
         link3Text='Show my favourite ideas'
     )}"></div>
 
-    <form method="get" action="/ideas" class="search-form">
+    <!-- Moved "See all ideas" button here -->
+    <form method="get" th:action="@{/ideas}" style="margin-bottom: 20px;">
+        <button type="submit">See all ideas</button>
+    </form>
+
+    <form method="get" action="/vote/vote" class="search-form">
         <div class="search-container">
             <input type="text" name="search" placeholder="Search by keywords" autofocus/>
             <button type="submit">Search</button>
@@ -113,7 +118,7 @@
         <tr>
             <th class="col-vote">Vote</th>
             <th class="col-vote-type">Vote Type</th>
-            <th class="col-total-points">Total Points</th> <!-- New Column Header -->
+            <th class="col-total-points">Total Points</th>
             <th class="col-author">Author</th>
             <th class="col-title">Title</th>
             <th class="col-description">Description</th>
@@ -124,16 +129,13 @@
             <!-- Vote Button Column -->
             <td class="col-vote">
                 <span th:if="${userIdeaMap[idea.id]}" style="color: orange;">You cannot vote on your own idea!</span>
-                <!-- Replace with colored text -->
                 <button type="button"
                         class="vote-button"
                         th:data-idea-id="${idea.id}"
                         th:data-user-id="${user_id}"
                         th:if="${!blocked && !userIdeaMap[idea.id] && votesOfUsers[idea.id] == null}">
-                    <!-- Hide if blocked or it's the user's idea -->
                     Vote
                 </button>
-                <!-- Delete Button: Show only if a vote with the current ideaId exists in votesOfUsers -->
                 <button type="button"
                         class="delete-button"
                         th:data-vote-id="${votesOfUsers[idea.id]}"
@@ -145,7 +147,7 @@
             </td>
             <td class="col-vote-type">
                 <select th:id="|voteTypeSelect-${idea.id}|"
-                        th:disabled="${blocked}"> <!-- Disable if blocked -->
+                        th:disabled="${blocked || userIdeaMap[idea.id] || votesOfUsers[idea.id] != null}">
                     <option th:if="${userVotes[idea.id] == null}" value="" selected disabled>Select a vote type</option>
                     <option th:if="${userVotes[idea.id] != null}" th:value="${userVotes[idea.id]}" selected>
                         <span th:text="${voteTypePoints[userVotes[idea.id]]}"></span>
@@ -154,15 +156,11 @@
                             th:text="${voteType.points}"></option>
                 </select>
             </td>
-            <!-- Total Points Column -->
-            <td class="col-total-points" th:text="${votePoints[idea.id]}"></td> <!-- Display Points -->
-            <!-- Author -->
+            <td class="col-total-points" th:text="${votePoints[idea.id]}"></td>
             <td class="col-author" th:text="${idea.user.username}"></td>
-            <!-- Title -->
             <td class="col-title">
                 <a th:href="@{/ideas/{id}(id=${idea.id})}" th:text="${idea.title}"></a>
             </td>
-            <!-- Description -->
             <td class="col-description" th:text="${idea.description}"></td>
         </tr>
         </tbody>
@@ -187,4 +185,5 @@
     </script>
 </div>
 </body>
+
 </html>
