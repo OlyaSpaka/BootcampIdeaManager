@@ -42,6 +42,10 @@ public class IdeaControllerTest {
 
     @MockBean
     private CommentService commentService;
+    @MockBean
+    private UserSelectionService userSelectionService;
+    @MockBean
+    private VoteTypeService voteTypeService;
 
     @MockBean
     private AuthenticationService authenticationService;

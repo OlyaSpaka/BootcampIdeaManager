@@ -107,3 +107,19 @@ CREATE TABLE IF NOT EXISTS vote (
                                     FOREIGN KEY (User_id) REFERENCES appuser(id),
                                     FOREIGN KEY (VoteType_id) REFERENCES votetype(id)
 );
+CREATE TABLE user_selection_priorities (
+                                           id INT AUTO_INCREMENT PRIMARY KEY,
+                                           User_id INT NOT NULL,
+                                           idea_selection_id INT DEFAULT NULL,
+                                           Priority INT NOT NULL,
+                                           submitted_at TIMESTAMP NOT NULL,
+                                           CONSTRAINT fk_idea_selection_id FOREIGN KEY (idea_selection_id) REFERENCES idea_selection(id),
+                                           CONSTRAINT Priority_user FOREIGN KEY (User_id) REFERENCES appuser(id)
+);
+CREATE TABLE user_selection_results (
+                                        User_id INT NOT NULL,
+                                        Idea_Selection_id INT NOT NULL,
+                                        PRIMARY KEY (User_id, Idea_Selection_id),
+                                        FOREIGN KEY (User_id) REFERENCES appuser(id),
+                                        FOREIGN KEY (Idea_Selection_id) REFERENCES idea_selection(id)
+);

@@ -62,10 +62,10 @@ public class VoteController {
         }
     }
 
-    @GetMapping
-    public int showPoints(@RequestParam("ideaId")Integer ideaId) {
-        return voteService.calculatePoints(ideaId);
-    }
+//    @GetMapping
+//    public String showPoints(@RequestParam("ideaId")Integer ideaId) {
+//        return String.valueOf(voteService.calculatePoints(ideaId));
+//    }
     private void addCommonAttributes(User currentUser, Model model) {
         model.addAttribute("username", currentUser.getUsername());
         model.addAttribute("user_id", currentUser.getId());

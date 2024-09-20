@@ -1,6 +1,7 @@
 package com.example.demo.mapper.implementation;
 
 import com.example.demo.dto.general.CompetitionDTO;
+import com.example.demo.dto.general.VoteDTO;
 import com.example.demo.dto.input.InputCategoryDTO;
 import com.example.demo.dto.input.InputIdeaDTO;
 import com.example.demo.dto.output.OutputCategoryDTO;
@@ -9,10 +10,7 @@ import com.example.demo.dto.output.OutputUserDTO;
 import com.example.demo.mapper.interf.CategoryMapperInt;
 import com.example.demo.mapper.interf.CompetitionMapperInt;
 import com.example.demo.mapper.interf.UserMapperInt;
-import com.example.demo.models.Category;
-import com.example.demo.models.Idea;
-import com.example.demo.models.User;
-import com.example.demo.models.Competition;
+import com.example.demo.models.*;
 import com.example.demo.repositories.CategoryRepository;
 import com.example.demo.repositories.CompetitionRepository;
 import com.example.demo.repositories.UserRepository;
@@ -42,7 +40,8 @@ class IdeaMapperTest {
 
     @Mock
     private CategoryMapperInt categoryMapper;
-
+    @Mock
+    private VoteMapper voteMapper;
     @Mock
     private CompetitionMapperInt competitionMapper;
 
@@ -139,6 +138,12 @@ class IdeaMapperTest {
         idea.setCompetition(competition);
         idea.setCategories(Set.of(category1, category2));
 
+        Vote vote1 = new Vote();
+        vote1.setId(1);
+        Vote vote2 = new Vote();
+        vote2.setId(2);
+        idea.setVotes(Set.of(vote1, vote2));
+
         OutputUserDTO userDTO = new OutputUserDTO();
         userDTO.setId(1);
         userDTO.setUsername("john_doe");
@@ -151,6 +156,14 @@ class IdeaMapperTest {
         categoryDTO1.setId(1);
         OutputCategoryDTO categoryDTO2 = new OutputCategoryDTO();
         categoryDTO1.setId(2);
+
+        VoteDTO voteDTO1 = new VoteDTO();
+        voteDTO1.setId(1);
+        VoteDTO voteDTO2 = new VoteDTO();
+        voteDTO2.setId(2);
+        when(voteMapper.map(vote1)).thenReturn(voteDTO1);
+        when(voteMapper.map(vote2)).thenReturn(voteDTO2);
+
         when(categoryMapper.map(category1)).thenReturn(categoryDTO1);
         when(categoryMapper.map(category2)).thenReturn(categoryDTO2);
 
