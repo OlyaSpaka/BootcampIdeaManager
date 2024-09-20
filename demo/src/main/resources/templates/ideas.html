@@ -76,10 +76,23 @@
         </tr>
         </tbody>
     </table>
-
     <footer>
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a th:href="@{/user-selection/results}"
+               th:if="${results}"
+               class="footer-link-right"
+               th:text="'View selection results'"></a>
+            <span th:if="${!results}" class="footer-link-right">Selection results will come soon</span>
+
+            <a th:href="@{/user-selection}"
+               th:if="${preferences}"
+               class="footer-link-right"
+               th:text="'Go to group selection'"></a>
+            <span th:if="${!preferences}" class="footer-link-right">Group selection starts soon</span>
+        </div>
         <div th:replace="~{fragments/logout}"></div>
     </footer>
+
     <script>
         $(document).ready(function () {
             $("#ideasTable").tablesorter({

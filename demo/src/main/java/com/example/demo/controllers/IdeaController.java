@@ -30,17 +30,22 @@ public class IdeaController {
     private final AuthenticationService authenticationService;
     private final CategoryService categoryService;
     private final BookmarkService bookmarkService;
+    private final UserSelectionService userSelectionService;
     private final AzureBlobStorageService blobService;
     private final VoteTypeService voteTypeService;
 
 
-    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, BookmarkService bookmarkService, AzureBlobStorageService blobService, VoteTypeService voteTypeService) {
+    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService,
+                          AuthenticationService authenticationService, CategoryService categoryService,
+                          BookmarkService bookmarkService, UserSelectionService userSelectionService,
+                          AzureBlobStorageService blobService, VoteTypeService voteTypeService) {
         this.ideaService = ideaService;
         this.competitionService = competitionService;
         this.commentService = commentService;
         this.authenticationService = authenticationService;
         this.categoryService = categoryService;
         this.bookmarkService = bookmarkService;
+        this.userSelectionService = userSelectionService;
         this.blobService = blobService;
         this.voteTypeService = voteTypeService;
     }
@@ -51,6 +56,8 @@ public class IdeaController {
         User currentUser = authenticationService.getCurrentUser();
         Map<Integer, Boolean> bookmarkStatusMap = bookmarkService.getBookmarkStatusMap(currentUser, ideas);
         addCommonAttributes(currentUser, model);
+        model.addAttribute("results", userSelectionService.resultsPresent());
+        model.addAttribute("preferences", userSelectionService.preferenceChoiceActive());
         model.addAttribute("ideas", ideas);
         model.addAttribute("bookmarkStatusMap", bookmarkStatusMap);
         model.addAttribute("search", search);

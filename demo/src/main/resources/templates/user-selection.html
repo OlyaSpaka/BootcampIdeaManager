@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Competition Group Selection</title>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+    <link rel="stylesheet" th:href="@{/ideas-style.css}">
+    <style>
+        .container {
+            max-width: 80%;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: white;
+            border-radius: 10px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: white;
+            font-size: 1.2em;
+            padding: 10px 20px;
+
+            .admin-note {
+                color: grey;
+                margin-top: 10px;
+                margin-bottom: 0;
+            }
+
+            .account-info {
+                text-align: center;
+                color: grey;
+                margin-top: 10px;
+            }
+
+            .container {
+                max-width: 85%;
+                margin: 0 auto;
+                padding: 10px 20px;
+                background-color: white;
+                border-radius: 10px;
+            }
+
+            h1, h2 {
+                text-align: center;
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .priority-col {
+            width: 10%;
+            text-align: center;
+        }
+
+        .title-col, .author-col {
+            text-align: center;
+        }
+
+        .author-col {
+            width: 15%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .description-col {
+            width: 50%;
+            white-space: normal;
+        }
+
+        .priority-input {
+            width: 70px;
+            height: 40px;
+            font-size: 1.2em;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
+            background-color: white;
+            border-radius: 0 0 10px 10px;
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .error {
+            border-color: red;
+        }
+
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <!-- Header block -->
+    <header class="header">
+        <h1 th:text="'Prioritize the ideas'"></h1>
+        <div class="admin-header">
+            <div class="admin-note" th:if="${competitionDescription != ''}">
+                <p class="admin-note-label">Bootcamp description:</p>
+                <p class="admin-note" th:text="${competitionDescription}"></p>
+            </div>
+            <div class="account-info">
+                <h3 th:text="${username}"></h3>
+            </div>
+        </div>
+    </header>
+
+    <p>Please rank the groups from your most preferred (1) to least preferred.</p>
+    <input type="hidden" id="userId" th:value="${userId}"/>
+    <form id="preferencesForm">
+        <table id="ideasTable">
+            <thead>
+            <tr>
+                <th class="priority-col">Priority</th>
+                <th class="title-col">Title</th>
+                <th class="author-col">Author</th>
+                <th class="description-col">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="idea : ${ideas}">
+                <td class="priority-col">
+                    <input type="number"
+                           class="priority-input"
+                           th:name="'priorities[' + ${idea.id} + ']'"
+                           min="1"
+                           th:max="${ideas.size()}"
+                           required />
+                </td>
+                <td class="title-col" th:text="${idea.title}"></td>
+                <td class="author-col" th:text="${idea.user.username}"></td>
+                <td class="description-col" th:text="${idea.description}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button type="submit" th:disabled="${hasUserSubmitted}"
+                    th:text="${hasUserSubmitted} ? 'You have already submitted' : 'Submit Preferences'">
+            </button>
+        </div>
+    </form>
+
+    <footer>
+        <div th:replace="~{fragments/logout}"></div>
+    </footer>
+
+    <script>
+        $(document).ready(function () {
+            $('#preferencesForm').on('submit', function (event) {
+                event.preventDefault();
+
+                let priorities = {};
+                let valid = true;
+                const inputs = $('.priority-input');
+
+                let seen = new Set();
+
+                inputs.each(function () {
+                    const value = parseInt($(this).val());
+
+                    if (isNaN(value)) {
+                        alert('Please fill in all priorities.');
+                        $(this).addClass('error');
+                        valid = false;
+                        return false;
+                    }
+
+                    if (seen.has(value)) {
+                        alert('Each priority must be unique.');
+                        $(this).addClass('error');
+                        valid = false;
+                        return false;
+                    }
+
+                    $(this).removeClass('error');
+                    seen.add(value);
+                    priorities[$(this).attr('name').split('[')[1].split(']')[0]] = value;
+                });
+
+                if (!valid) {
+                    return;
+                }
+
+                const submissionTime = new Date().toISOString();
+                const userId = $('#userId').val();
+
+                const requestData = {
+                    userId: userId,
+                    submissionTime: submissionTime,
+                    priorities: priorities
+                };
+
+                $('button[type="submit"]').prop('disabled', true).text('Submitting...');
+
+                $.ajax({
+                    url: '/user-selection/submit-preferences',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        alert('Preferences submitted successfully!');
+                        window.location.reload();
+                        window.location.href = "/user-selection/preferences-waiting-page";
+                    },
+                    error: function (xhr, status, error) {
+                        alert('An error occurred while submitting preferences: you already voted');
+                        console.error('Error:', status, error);
+                        $('button[type="submit"]').prop('disabled', false).text('Submit Preferences');
+                    }
+                });
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

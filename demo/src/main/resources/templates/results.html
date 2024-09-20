@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Selection Results</title>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+    <style>
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: white;
+            font-size: 1.2em;
+            padding: 10px 20px;
+        }
+
+        .admin-note {
+            color: grey;
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+
+        .account-info {
+            text-align: center;
+            color: grey;
+            margin-top: 10px;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: white;
+            border-radius: 10px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: grey;
+            color: white;
+            text-align: center;
+        }
+
+        .title-col {
+            width: 50%;
+            text-align: center;
+        }
+
+        .users-col {
+            width: 50%;
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        li {
+            padding: 2px 0;
+        }
+
+        td ul li {
+            text-align: left;
+            padding-left: 15px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1 th:text="'Bootcamp final groups'"></h1>
+        <div class="admin-header">
+            <div class="admin-note" th:if="${competitionDescription != ''}">
+                <p class="admin-note-label">Bootcamp description:</p>
+                <p class="admin-note" th:text="${competitionDescription}"></p>
+            </div>
+            <div class="account-info">
+                <h3 th:text="${username}"></h3>
+            </div>
+        </div>
+    </header>
+    <h1>Assigned Ideas and Users</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th class="title-col">Idea Title</th>
+            <th class="users-col">Assigned Users</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="groupAssignment : ${groupAssignments}">
+            <td class="title-col" th:text="${groupAssignment.ideaTitle}"></td>
+            <td class="users-col">
+                <ul>
+                    <li th:each="username, iterStat : ${groupAssignment.usernames}" th:text="${iterStat.index + 1} + '. ' + ${username}"></li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <footer>
+        <div th:replace="~{fragments/logout}"></div>
+    </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Selection Results</title>
+    <style>
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: white;
+            font-size: 1.2em;
+            padding: 10px 20px;
+
+            .admin-note {
+                color: grey;
+                margin-top: 10px;
+                margin-bottom: 0;
+            }
+
+            .account-info {
+                text-align: center;
+                color: grey;
+                margin-top: 10px;
+            }
+
+            .container {
+                max-width: 85%;
+                margin: 0 auto;
+                padding: 10px 20px;
+                background-color: white;
+                border-radius: 10px;
+            }
+
+            h1, h2 {
+                text-align: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/default-style.css}">
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1 th:text="'Selection results are coming soon'"></h1>
+        <div class="admin-header">
+            <div class="admin-note" th:if="${competitionDescription != ''}">
+                <p class="admin-note-label">Bootcamp description:</p>
+                <p class="admin-note" th:text="${competitionDescription}"></p>
+            </div>
+            <div class="account-info">
+                <h3 th:text="${username}"></h3>
+            </div>
+        </div>
+    </header>
+    <div class="content">
+        <h1>Your preferences are recorded!</h1>
+        <p>Please wait until all users have voted to see the final results.</p>
+        <p>You'll see the results on the <a href="/user-selection/results">result page</a> when they are ready.</p>
+    </div>
+    <footer>
+        <div th:replace="~{fragments/logout}"></div>
+    </footer>
+</div>
+</body>
+</html>

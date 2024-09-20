@@ -130,6 +130,21 @@ public class IdeaService {
         return resultList;
     }
 
+    public List<OutputIdeaDTO> findSelectedIdeas() {
+        List<OutputIdeaDTO> resultList = new ArrayList<>();
+        List<Idea> ideas = ideaRepository.findSelectedIdeas();
+        if (ideas.isEmpty()) {
+            throw new NoSuchElementException("No selected ideas present");
+        }
+        ideas.forEach(idea -> {
+            if (idea.getCreatedAt() != null) {
+                idea.setFormattedDate(formatDate(idea.getCreatedAt()));
+                resultList.add(ideaMapper.map(idea));
+            }
+        });
+        return resultList;
+    }
+
     public void removePictures(Integer ideaId, List<String> removePictures) {
         // Fetch idea, modify the list of pictures, and save the idea
         Idea idea = ideaRepository.findById(ideaId)
