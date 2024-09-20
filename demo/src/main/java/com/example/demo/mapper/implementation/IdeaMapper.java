@@ -30,15 +30,17 @@ public class IdeaMapper implements IdeaMapperInt {
     private final CategoryMapperInt categoryMapper;
     private final CompetitionMapperInt competitionMapper;
     private final UserMapperInt userMapper;
+    private final VoteMapper voteMapper;
 
     private IdeaMapper(CompetitionRepository competitionRepository, UserRepository userRepository, CategoryRepository categoryRepository,
-                      @Lazy CategoryMapperInt categoryMapper,@Lazy CompetitionMapperInt competitionMapper,@Lazy UserMapperInt userMapper) {
+                       @Lazy CategoryMapperInt categoryMapper, @Lazy CompetitionMapperInt competitionMapper, @Lazy UserMapperInt userMapper, VoteMapper voteMapper) {
         this.competitionRepository = competitionRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
         this.competitionMapper = competitionMapper;
         this.userMapper = userMapper;
+        this.voteMapper = voteMapper;
     }
 
     @Override
@@ -110,6 +112,8 @@ public class IdeaMapper implements IdeaMapperInt {
                         .map(categoryMapper::map)
                         .collect(Collectors.toSet())
         );
+        outputIdeaDTO.setVotes(idea.getVotes().stream()
+                .map(voteMapper::map).toList());
 
         return outputIdeaDTO;
     }

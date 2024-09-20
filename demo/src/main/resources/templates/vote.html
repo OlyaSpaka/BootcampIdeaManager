@@ -7,7 +7,8 @@
     <link rel="stylesheet" th:href="@{/ideas-style.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/css/theme.default.min.css">
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -24,19 +25,28 @@
                 });
             });
         });
+                document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const voteId = this.getAttribute('data-vote-id'); ;
+                    deleteVote(voteId);
+                });
+            });
+        });
 
         function submitVote(ideaId, userId, voteTypeId) {
             console.log(voteTypeId);
             console.log("ideaId: " + ideaId);
             console.log("userId: " + userId);
             console.log("voteTypeId: " + voteTypeId);
+
             const voteData = {
-                idea: { id: ideaId },
-                user: { id: userId },
-                voteType: { id: voteTypeId }
+                idea: { id: ideaId },       // Ensure these match your DTO's expected structure
+                user: { id: userId },       // Ensure these match your DTO's expected structure
+                voteTypeDTO: { id: voteTypeId }  // Ensure this matches your DTO's expected structure
             };
 
-            fetch('/Vote', {
+            fetch('/vote', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -45,19 +55,34 @@
             })
                 .then(response => {
                     if (response.ok) {
-                        alert('Vote submitted successfully!');
+                        window.location.reload();
                     } else {
                         return response.json().then(data => {
                             console.error('Error details:', data);
-                            alert('Failed to submit vote: ' + data.message);
                         });
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error: ' + error);
                 });
         }
+        function deleteVote(voteId) {
+    fetch(`/vote/${voteId}`, {
+        method: 'DELETE',
+    })
+        .then(response => {
+            if (response.ok) {
+                window.location.reload();  // Refresh the page to reflect the change
+            } else {
+                return response.text().then(errorMessage => {
+                    console.error('Error details:', errorMessage);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
     </script>
 
 </head>
@@ -76,7 +101,12 @@
         link3Text='Show my favourite ideas'
     )}"></div>
 
-    <form method="get" action="/ideas" class="search-form">
+    <!-- Moved "See all ideas" button here -->
+    <form method="get" th:action="@{/ideas}" style="margin-bottom: 20px;">
+        <button type="submit">See all ideas</button>
+    </form>
+
+    <form method="get" action="/vote/vote" class="search-form">
         <div class="search-container">
             <input type="text" name="search" placeholder="Search by keywords" autofocus/>
             <button type="submit">Search</button>
@@ -88,7 +118,7 @@
         <tr>
             <th class="col-vote">Vote</th>
             <th class="col-vote-type">Vote Type</th>
-            <th class="col-total-points">Total Points</th> <!-- New Column Header -->
+            <th class="col-total-points">Total Points</th>
             <th class="col-author">Author</th>
             <th class="col-title">Title</th>
             <th class="col-description">Description</th>
@@ -98,29 +128,39 @@
         <tr th:each="idea : ${ideas}">
             <!-- Vote Button Column -->
             <td class="col-vote">
+                <span th:if="${userIdeaMap[idea.id]}" style="color: orange;">You cannot vote on your own idea!</span>
                 <button type="button"
                         class="vote-button"
                         th:data-idea-id="${idea.id}"
-                        th:data-user-id="${user_id}">
+                        th:data-user-id="${user_id}"
+                        th:if="${!blocked && !userIdeaMap[idea.id] && votesOfUsers[idea.id] == null}">
                     Vote
                 </button>
+                <button type="button"
+                        class="delete-button"
+                        th:data-vote-id="${votesOfUsers[idea.id]}"
+                        th:if="${votesOfUsers[idea.id] != null}"
+                        style="background-color: red; color: white; margin-left: 5px;"
+                        th:data-idea-id="${idea.id}">
+                    Delete
+                </button>
             </td>
-            <!-- Vote Type Dropdown Column -->
             <td class="col-vote-type">
-                <select th:id="|voteTypeSelect-${idea.id}|">
-                    <option value="" selected disabled>Select a vote type</option>
-                    <option th:each="voteType : ${voteTypes}" th:value="${voteType.id}" th:text="${voteType.points}"></option>
+                <select th:id="|voteTypeSelect-${idea.id}|"
+                        th:disabled="${blocked || userIdeaMap[idea.id] || votesOfUsers[idea.id] != null}">
+                    <option th:if="${userVotes[idea.id] == null}" value="" selected disabled>Select a vote type</option>
+                    <option th:if="${userVotes[idea.id] != null}" th:value="${userVotes[idea.id]}" selected>
+                        <span th:text="${voteTypePoints[userVotes[idea.id]]}"></span>
+                    </option>
+                    <option th:each="voteType : ${voteTypes}" th:value="${voteType.id}"
+                            th:text="${voteType.points}"></option>
                 </select>
             </td>
-            <!-- Total Points Column -->
-            <td class="col-total-points" th:text="${votePoints[idea.id]}"></td> <!-- Display Points -->
-            <!-- Author -->
+            <td class="col-total-points" th:text="${votePoints[idea.id]}"></td>
             <td class="col-author" th:text="${idea.user.username}"></td>
-            <!-- Title -->
             <td class="col-title">
                 <a th:href="@{/ideas/{id}(id=${idea.id})}" th:text="${idea.title}"></a>
             </td>
-            <!-- Description -->
             <td class="col-description" th:text="${idea.description}"></td>
         </tr>
         </tbody>
@@ -145,4 +185,5 @@
     </script>
 </div>
 </body>
+
 </html>
