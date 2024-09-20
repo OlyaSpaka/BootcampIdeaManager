@@ -2,9 +2,8 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.GroupAssignmentsDTO;
 import com.example.demo.dto.UserSelectionPrioritiesDTO;
-import com.example.demo.models.Idea;
+import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.models.User;
-import com.example.demo.repositories.IdeaRepository;
 import com.example.demo.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,28 +18,28 @@ import java.util.List;
 @RequestMapping("/user-selection")
 public class UserSelectionController {
 
-    private final IdeaRepository ideaRepository;
     private final UserSelectionService userSelectionService;
     private final AuthenticationService authenticationService;
     private final CompetitionService competitionService;
+    private final IdeaService ideaService;
 
     @Autowired
-    public UserSelectionController(UserSelectionService userSelectionService,
-                                   AuthenticationService authenticationService,
-                                   CompetitionService competitionService,
-                                   IdeaRepository ideaRepository) {
+    public UserSelectionController(UserSelectionService userSelectionService, AuthenticationService authenticationService,
+                                   CompetitionService competitionService, IdeaService ideaService) {
         this.userSelectionService = userSelectionService;
         this.authenticationService = authenticationService;
         this.competitionService = competitionService;
-        this.ideaRepository = ideaRepository;
+        this.ideaService = ideaService;
     }
 
     @GetMapping
     public String showGroupSelectionPage(Model model) {
         User currentUser = authenticationService.getCurrentUser();
-        List<Idea> ideas = ideaRepository.findSelectedIdeas(); // todo: replace with dto
+        boolean hasUserSubmitted = userSelectionService.hasUserSubmitted();
+        List<OutputIdeaDTO> ideas = ideaService.findSelectedIdeas();
 
         addCommonAttributes(currentUser, model);
+        model.addAttribute("hasUserSubmitted", hasUserSubmitted);
         model.addAttribute("userId", currentUser.getId());
         model.addAttribute("ideas", ideas);
 
@@ -49,7 +48,6 @@ public class UserSelectionController {
 
     @PostMapping("/submit-preferences")
     public String submitPreferences(@RequestBody UserSelectionPrioritiesDTO userSelectionPrioritiesDTO, Model model) {
-
         try {
             System.out.println("Received submission: " + userSelectionPrioritiesDTO.toString());
 
@@ -59,7 +57,6 @@ public class UserSelectionController {
             );
 
             model.addAttribute("userId", userSelectionPrioritiesDTO.userId());
-
             return "preferences-waiting-page";
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,7 +67,6 @@ public class UserSelectionController {
     @GetMapping("/results")
     public String showSelectionResults(Model model) {
         User currentUser = authenticationService.getCurrentUser();
-
         List<GroupAssignmentsDTO> groupAssignments = userSelectionService.getGroupAssignments();
 
         addCommonAttributes(currentUser, model);
@@ -78,7 +74,6 @@ public class UserSelectionController {
 
         return "results";
     }
-
 
     @GetMapping("/preferences-waiting-page")
     public String showPreferencesWaitingPage(Model model) {

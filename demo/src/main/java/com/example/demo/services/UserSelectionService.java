@@ -19,6 +19,7 @@ public class UserSelectionService {
     private final IdeaRepository ideaRepository;
     private final IdeaSelectionRepository ideaSelectionRepository;
     private final UserSelectionPrioritiesRepository userSelectionPrioritiesRepository;
+    private final AuthenticationService authenticationService;
 
     @Autowired
     public UserSelectionService(UserSelectionPrioritiesRepository userSelectionPriorityRepository,
@@ -26,13 +27,15 @@ public class UserSelectionService {
                                 IdeaRepository ideaRepository,
                                 UserSelectionResultRepository userSelectionResultRepository,
                                 IdeaSelectionRepository ideaSelectionRepository,
-                                UserSelectionPrioritiesRepository userSelectionPrioritiesRepository) {
+                                UserSelectionPrioritiesRepository userSelectionPrioritiesRepository,
+                                AuthenticationService authenticationService) {
         this.userSelectionPriorityRepository = userSelectionPriorityRepository;
         this.userRepository = userRepository;
         this.ideaRepository = ideaRepository;
         this.userSelectionResultRepository = userSelectionResultRepository;
         this.ideaSelectionRepository = ideaSelectionRepository;
         this.userSelectionPrioritiesRepository = userSelectionPrioritiesRepository;
+        this.authenticationService = authenticationService;
     }
 
     public void saveUserSelections(Integer userId, Map<Integer, Integer> priorities, Timestamp submissionTimestamp) {
@@ -87,15 +90,23 @@ public class UserSelectionService {
                 allVotingUsers.remove(userOfPriority);
             }
         }
+        for (UserSelectionPriorities skippedPriority : skippedPriorities) {
+            User userOfPriority = skippedPriority.getUser();
+            if (allVotingUsers.contains(userOfPriority)) {
+                Idea ideaOfPriority = skippedPriority.getIdeaSelection().getIdea();
+                ideaToUsers.get(ideaOfPriority).add(userOfPriority);
+                allVotingUsers.remove(userOfPriority);
+            }
+        }
         saveGroupAssignmentsToDatabase(ideaToUsers);
     }
 
 
     private void saveGroupAssignmentsToDatabase(Map<Idea, List<User>> groupAssignments) {
         groupAssignments.forEach((idea, users) -> {
-            Integer ideaSelectionId = idea.getId(); // todo: ideaId?
+            Integer ideaId = idea.getId();
             users.forEach(user -> userSelectionResultRepository.save(
-                    new UserSelectionResult(new UserSelectionResult.UserSelectionResultId(user.getId(), ideaSelectionId))
+                    new UserSelectionResult(new UserSelectionResult.UserSelectionResultId(user.getId(), ideaId))
             ));
         });
     }
@@ -120,6 +131,29 @@ public class UserSelectionService {
 
     private int getMaxUsersPerGroup() {
         List<IdeaSelection> ideaSelections = ideaSelectionRepository.findAll();
-        return userRepository.countUsers() / ideaSelections.size();
+        int totalUsers = userRepository.countUsers();
+
+        if (ideaSelections.isEmpty()) {
+            throw new IllegalStateException("No idea selections available. Cannot assign users to groups.");
+        }
+        if (totalUsers == 0) {
+            throw new IllegalStateException("No users available to assign to groups.");
+        }
+
+        return totalUsers / ideaSelections.size();
     }
+
+    public boolean hasUserSubmitted() {
+        User currentUser = authenticationService.getCurrentUser();
+        return userSelectionPrioritiesRepository.existsByUserId(currentUser.getId());
+    }
+
+    public boolean resultsPresent() {
+        return userSelectionResultRepository.count() > 0;
+    }
+
+    public boolean preferenceChoiceActive() {
+        return ideaSelectionRepository.count() > 0;
+    }
+
 }

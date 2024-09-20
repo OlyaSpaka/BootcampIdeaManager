@@ -216,6 +216,24 @@ class IdeaServiceTest {
     }
 
     @Test
+    void testFindSelectedIdeas() {
+        // Arrange
+        Idea idea = new Idea();
+        idea.setCreatedAt(new Date());
+
+        when(ideaRepository.findSelectedIdeas()).thenReturn(Collections.singletonList(idea));
+        when(ideaMapper.map(idea)).thenReturn(new OutputIdeaDTO());
+
+        // Act
+        List<OutputIdeaDTO> result = ideaService.findSelectedIdeas();
+
+        // Assert
+        assertEquals(1, result.size());
+        verify(ideaRepository, times(1)).findSelectedIdeas();
+        verify(ideaMapper, times(1)).map(idea);
+    }
+
+    @Test
     void testRemovePictures() {
         // Arrange
         Idea idea = new Idea();
