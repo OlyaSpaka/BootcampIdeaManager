@@ -95,9 +95,9 @@
         user=${user},
         link1Href='/ideas/new-idea',
         link1Text='Create new idea',
-        link2Href='/notready',
+       link2Href='/ideas/my-ideas',
         link2Text='Show my own ideas',
-        link3Href='/notready',
+        link3Href='/ideas/bookmarks',
         link3Text='Show my favourite ideas'
     )}"></div>
 
@@ -123,12 +123,14 @@
         <tr th:each="idea : ${ideas}">
             <!-- Vote Button Column -->
             <td class="col-vote">
-                <span th:if="${userIdeaMap[idea.id]}" style="color: orange;">You cannot vote on your own idea!</span> <!-- Replace with colored text -->
+                <span th:if="${userIdeaMap[idea.id]}" style="color: orange;">You cannot vote on your own idea!</span>
+                <!-- Replace with colored text -->
                 <button type="button"
                         class="vote-button"
                         th:data-idea-id="${idea.id}"
                         th:data-user-id="${user_id}"
-                        th:if="${!blocked && !userIdeaMap[idea.id] && votesOfUsers[idea.id] == null}"> <!-- Hide if blocked or it's the user's idea -->
+                        th:if="${!blocked && !userIdeaMap[idea.id] && votesOfUsers[idea.id] == null}">
+                    <!-- Hide if blocked or it's the user's idea -->
                     Vote
                 </button>
                 <!-- Delete Button: Show only if a vote with the current ideaId exists in votesOfUsers -->
