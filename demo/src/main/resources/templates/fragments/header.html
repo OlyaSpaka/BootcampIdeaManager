@@ -17,11 +17,6 @@
             <p class="admin-note-label">Bootcamp description:</p>
             <p class="admin-note" th:text="${message}"></p>
         </div>
-        <form method="get" th:action="@{/vote/vote}" class="search-form">
-            <div class="search-container">
-                <button type="submit">Vote for ideas</button>
-            </div>
-        </form>
         <div class="account-info">
             <h3 th:text="${user}"></h3>
 <!--            <a th:href="${link1Href}" th:text="${link1Text}"></a>-->

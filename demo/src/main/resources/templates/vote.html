@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Bootcamp Ideas</title>
+    <title>Vote for Bootcamp ideas</title>
     <link rel="stylesheet" th:href="@{/default-style.css}">
     <link rel="stylesheet" th:href="@{/ideas-style.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -89,22 +89,17 @@
 <body>
 <div class="container">
     <div th:replace="~{fragments/header :: header(
-        title='Bootcamp Ideas',
+        title='Vote for Bootcamp ideas',
         subtitle=${competitionName},
         message=${competitionDescription},
-        user=${user},
-        link1Href='/ideas/new-idea',
-        link1Text='Create new idea',
-        link2Href='/ideas/my-ideas',
-        link2Text='Show my own ideas',
-        link3Href='/ideas/bookmarks',
-        link3Text='Show my favourite ideas'
+        user=${username},
+        link1Href='/ideas',
+        link1Text='See all ideas',
+        link2Href='',
+        link2Text='',
+        link3Href='',
+        link3Text=''
     )}"></div>
-
-    <!-- Moved "See all ideas" button here -->
-    <form method="get" th:action="@{/ideas}" style="margin-bottom: 20px;">
-        <button type="submit">See all ideas</button>
-    </form>
 
     <form method="get" action="/vote/vote" class="search-form">
         <div class="search-container">

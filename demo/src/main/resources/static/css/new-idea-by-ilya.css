@@ -55,14 +55,14 @@ button {
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
-    background-color: #007bff;
+    background-color: grey;
     color: white;
     cursor: pointer;
     font-size: 16px;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #ff4500;
 }
 
 /* Footer styling */
@@ -72,7 +72,7 @@ footer {
 }
 
 .footer-link {
-    color: #007bff;
+    color: #ff4500;
     text-decoration: none;
 }
 
@@ -82,7 +82,7 @@ footer {
 
 /* Header styling */
 .header {
-    background-color: #007bff;
+    background-color: #ff4500;
     color: white;
     padding: 20px;
     border-radius: 8px;
