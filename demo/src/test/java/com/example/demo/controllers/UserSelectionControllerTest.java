@@ -1,12 +1,6 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.GroupAssignmentsDTO;
 import com.example.demo.dto.UserSelectionPrioritiesDTO;
-import com.example.demo.dto.output.OutputIdeaDTO;
-import com.example.demo.models.User;
-import com.example.demo.services.AuthenticationService;
-import com.example.demo.services.CompetitionService;
-import com.example.demo.services.IdeaService;
 import com.example.demo.services.UserSelectionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,7 +13,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,15 +25,6 @@ class UserSelectionControllerTest {
 
     @Mock
     private UserSelectionService userSelectionService;
-
-    @Mock
-    private AuthenticationService authenticationService;
-
-    @Mock
-    private CompetitionService competitionService;
-
-    @Mock
-    private IdeaService ideaService;
 
     @InjectMocks
     private UserSelectionController userSelectionController;
@@ -56,9 +40,6 @@ class UserSelectionControllerTest {
     @Test
     void submitPreferences() throws Exception {
         // Arrange
-        UserSelectionPrioritiesDTO mockDTO = new UserSelectionPrioritiesDTO(1,
-                "2024-09-19T22:34:49Z", Map.of(1, 1));
-
         String mockRequestBody = """
                 {
                     "userId": 1,
@@ -75,12 +56,12 @@ class UserSelectionControllerTest {
                 .andExpect(view().name("preferences-waiting-page"))
                 .andExpect(model().attributeExists("userId"));
 
-        // Verify that the service method was called with the correct arguments
         ArgumentCaptor<Integer> userIdCaptor = ArgumentCaptor.forClass(Integer.class);
         ArgumentCaptor<Map> prioritiesCaptor = ArgumentCaptor.forClass(Map.class);
         ArgumentCaptor<Timestamp> timestampCaptor = ArgumentCaptor.forClass(Timestamp.class);
 
-        verify(userSelectionService).saveUserSelections(userIdCaptor.capture(), prioritiesCaptor.capture(), timestampCaptor.capture());
+        verify(userSelectionService).saveUserSelections(userIdCaptor.capture(), prioritiesCaptor.capture(),
+                timestampCaptor.capture());
 
         assertThat(userIdCaptor.getValue()).isEqualTo(1);
         assertThat(prioritiesCaptor.getValue()).isEqualTo(Map.of(1, 1));
@@ -89,8 +70,8 @@ class UserSelectionControllerTest {
 
     @Test
     void submitPreferencesErrorHandling() throws Exception {
-        // Simulate an exception being thrown by the service
-        doThrow(new RuntimeException("Test Exception")).when(userSelectionService).saveUserSelections(anyInt(), anyMap(), any(Timestamp.class));
+        doThrow(new RuntimeException("Test Exception")).when(userSelectionService).saveUserSelections(anyInt(), anyMap(),
+                any(Timestamp.class));
 
         String mockRequestBody = """
                 {

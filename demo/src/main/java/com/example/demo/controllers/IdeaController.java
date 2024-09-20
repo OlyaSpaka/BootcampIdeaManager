@@ -35,7 +35,10 @@ public class IdeaController {
     private final VoteTypeService voteTypeService;
 
 
-    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService, AuthenticationService authenticationService, CategoryService categoryService, BookmarkService bookmarkService, UserSelectionService userSelectionService, AzureBlobStorageService blobService, VoteTypeService voteTypeService) {
+    public IdeaController(IdeaService ideaService, CompetitionService competitionService, CommentService commentService,
+                          AuthenticationService authenticationService, CategoryService categoryService,
+                          BookmarkService bookmarkService, UserSelectionService userSelectionService,
+                          AzureBlobStorageService blobService, VoteTypeService voteTypeService) {
         this.ideaService = ideaService;
         this.competitionService = competitionService;
         this.commentService = commentService;
