@@ -5,10 +5,7 @@ import com.example.demo.dto.output.OutputIdeaDTO;
 import com.example.demo.models.User;
 import com.example.demo.models.Vote;
 import com.example.demo.models.VoteType;
-import com.example.demo.services.AuthenticationService;
-import com.example.demo.services.IdeaService;
-import com.example.demo.services.VoteService;
-import com.example.demo.services.VoteTypeService;
+import com.example.demo.services.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +27,14 @@ public class VoteController {
     private final IdeaService ideaService;
     private final VoteTypeService voteTypeService;
     private final AuthenticationService authenticationService;
-    public VoteController(VoteService voteService, IdeaService ideaService, VoteTypeService voteTypeService, AuthenticationService authenticationService) {
+    private final CompetitionService competitionService;
+    public VoteController(VoteService voteService, IdeaService ideaService, VoteTypeService voteTypeService,
+                          AuthenticationService authenticationService, CompetitionService competitionService) {
         this.voteService = voteService;
         this.ideaService = ideaService;
         this.voteTypeService = voteTypeService;
         this.authenticationService = authenticationService;
+        this.competitionService = competitionService;
     }
 
     @PostMapping
@@ -69,6 +69,8 @@ public class VoteController {
     private void addCommonAttributes(User currentUser, Model model) {
         model.addAttribute("username", currentUser.getUsername());
         model.addAttribute("user_id", currentUser.getId());
+        model.addAttribute("competitionName", competitionService.getCompetitionName(1));
+        model.addAttribute("competitionDescription", competitionService.getCompetitionDescription(1));
     }
 
 

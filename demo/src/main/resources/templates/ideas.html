@@ -89,6 +89,7 @@
                class="footer-link-right"
                th:text="'Go to group selection'"></a>
             <span th:if="${!preferences}" class="footer-link-right">Group selection starts soon</span>
+            <a th:href="@{/vote/vote}" class="footer-link-right" th:text="'Vote for ideas'"></a>
         </div>
         <div th:replace="~{fragments/logout}"></div>
     </footer>

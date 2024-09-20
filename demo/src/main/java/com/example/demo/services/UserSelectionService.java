@@ -68,7 +68,7 @@ public class UserSelectionService {
         Map<Idea, List<User>> ideaToUsers = new HashMap<>();
         List<UserSelectionPriorities> allPriorities = userSelectionPrioritiesRepository.findAll();
         List<User> allVotingUsers = userRepository.findAllWithUserRole();
-        List<UserSelectionPriorities> skippedPriorities = new ArrayList<>(); // todo: ???
+        List<UserSelectionPriorities> skippedPriorities = new ArrayList<>();
         int maxGroupSize = getMaxUsersPerGroup();
 
         allPriorities.sort(Comparator.comparing(UserSelectionPriorities::getPriority)
